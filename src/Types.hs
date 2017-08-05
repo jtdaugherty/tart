@@ -21,7 +21,7 @@ import Lens.Micro.TH
 data Mode = Main
           deriving (Eq, Show)
 
-data Name = Unused
+data Name = Canvas
           deriving (Eq, Show, Ord)
 
 type Coord = (Int, Int)

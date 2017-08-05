@@ -54,3 +54,4 @@ resizeCanvas s = do
 
             return $ s & drawing .~ newDraw
                        & drawingFrozen .~ newDrawFrozen
+                       & canvasSize .~ newSz

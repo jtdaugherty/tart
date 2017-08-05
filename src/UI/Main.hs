@@ -12,7 +12,7 @@ import Types
 
 drawMainUI :: AppState -> [Widget Name]
 drawMainUI s =
-    [raw $ canvasToImage $ s^.drawingFrozen]
+    [clickable Canvas $ raw $ canvasToImage $ s^.drawingFrozen]
 
 canvasToImage :: A.UArray Coord Char -> V.Image
 canvasToImage a =
