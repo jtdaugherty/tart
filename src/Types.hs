@@ -7,6 +7,7 @@ module Types
   , AppState(..)
   , drawing
   , canvasSize
+  , mode
 
   , blankCharacter
   )
@@ -29,6 +30,7 @@ blankCharacter = ' '
 data AppState =
     AppState { _drawing      :: IOUArray Coord Char
              , _canvasSize   :: (Int, Int)
+             , _mode         :: Mode
              }
 
 makeLenses ''AppState

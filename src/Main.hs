@@ -28,6 +28,7 @@ mkInitialState = do
     draw <- A.newArray arrayBounds blankCharacter
     return $ AppState { _drawing = draw
                       , _canvasSize = (0, 0)
+                      , _mode = Main
                       }
 
 main :: IO ()

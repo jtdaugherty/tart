@@ -4,8 +4,12 @@ module UI
 where
 
 import Brick
+import Lens.Micro.Platform
 
 import Types
+import UI.Main
 
 drawUI :: AppState -> [Widget Name]
-drawUI = const [str "Hello"]
+drawUI s =
+    case s^.mode of
+        Main -> drawMainUI s
