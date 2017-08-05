@@ -7,5 +7,5 @@ import Brick
 
 import Types
 
-handleMainEvent :: AppState -> BrickEvent e n -> EventM n (Next AppState)
-handleMainEvent s _ = continue s
+handleMainEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
+handleMainEvent s _ = halt s
