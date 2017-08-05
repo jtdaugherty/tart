@@ -10,6 +10,7 @@
   - circles
   - lines (click, then click again)
   - fill?!
+  - eyedropper (attr/character picker)
 - Guide lines
 - Save to disk, load from disk.
   - What format(s)? Are there any others? Probably needs to be RLE.
