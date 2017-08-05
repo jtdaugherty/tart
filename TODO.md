@@ -20,5 +20,7 @@
   - fill?!
   - eyedropper (attr/character picker)
 
+- Layers
+
 - Scroll around rather than truncating to terminal size
 - Set canvas size (up to terminal size)?
