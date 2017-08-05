@@ -41,12 +41,12 @@ resizeCanvas s = do
 
             -- Use the difference in size to determine the range of data
             -- to copy to the new canvas
-            let maxIndex = ( min (newSz^._1) (s^.canvasSize._1)
-                           , min (newSz^._2) (s^.canvasSize._2)
-                           )
+            let (maxW, maxH) = ( min (newSz^._1) (s^.canvasSize._1)
+                               , min (newSz^._2) (s^.canvasSize._2)
+                               )
 
-            forM_ [0..maxIndex^._1-1] $ \w ->
-                forM_ [0..maxIndex^._2-1] $ \h ->
+            forM_ [0..maxW-1] $ \w ->
+                forM_ [0..maxH-1] $ \h ->
                     A.writeArray newDraw (w, h) =<<
                         A.readArray (s^.drawing) (w, h)
 
