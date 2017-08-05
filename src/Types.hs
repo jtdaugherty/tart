@@ -8,12 +8,14 @@ module Types
   , drawing
   , canvasSize
   , mode
+  , drawingFrozen
 
   , blankCharacter
   )
 where
 
 import Data.Array.IO (IOUArray)
+import Data.Array.Unboxed (UArray)
 import Lens.Micro.TH
 
 data Mode = Main
@@ -28,9 +30,10 @@ blankCharacter :: Char
 blankCharacter = ' '
 
 data AppState =
-    AppState { _drawing      :: IOUArray Coord Char
-             , _canvasSize   :: (Int, Int)
-             , _mode         :: Mode
+    AppState { _drawing       :: IOUArray Coord Char
+             , _drawingFrozen :: UArray Coord Char
+             , _canvasSize    :: (Int, Int)
+             , _mode          :: Mode
              }
 
 makeLenses ''AppState
