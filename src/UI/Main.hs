@@ -4,6 +4,7 @@ module UI.Main
 where
 
 import Brick
+import Data.Monoid ((<>))
 import qualified Graphics.Vty as V
 import qualified Data.Array.Unboxed as A
 import Lens.Micro.Platform
@@ -12,7 +13,16 @@ import Types
 
 drawMainUI :: AppState -> [Widget Name]
 drawMainUI s =
-    [clickable Canvas $ raw $ canvasToImage $ s^.drawingFrozen]
+    [ hud s
+    , canvas s
+    ]
+
+hud :: AppState -> Widget Name
+hud s =
+    str $ "[tool:" <> show (s^.tool) <> "]"
+
+canvas :: AppState -> Widget Name
+canvas s = clickable Canvas $ raw $ canvasToImage $ s^.drawingFrozen
 
 canvasToImage :: A.UArray Coord Char -> V.Image
 canvasToImage a =

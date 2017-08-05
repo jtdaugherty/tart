@@ -23,6 +23,7 @@ mkInitialState = do
                       , _drawingFrozen = drawFreeze
                       , _canvasSize    = (0, 0)
                       , _mode          = Main
+                      , _tool          = Point
                       }
 
 application :: App AppState () Name

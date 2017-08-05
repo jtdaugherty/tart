@@ -3,12 +3,14 @@ module Types
   ( Mode(..)
   , Name(..)
   , Coord
+  , Tool(..)
 
   , AppState(..)
   , drawing
   , canvasSize
   , mode
   , drawingFrozen
+  , tool
 
   , blankCharacter
   )
@@ -24,6 +26,9 @@ data Mode = Main
 data Name = Canvas
           deriving (Eq, Show, Ord)
 
+data Tool = Point
+          deriving (Eq, Show)
+
 type Coord = (Int, Int)
 
 blankCharacter :: Char
@@ -34,6 +39,7 @@ data AppState =
              , _drawingFrozen :: UArray Coord Char
              , _canvasSize    :: (Int, Int)
              , _mode          :: Mode
+             , _tool          :: Tool
              }
 
 makeLenses ''AppState

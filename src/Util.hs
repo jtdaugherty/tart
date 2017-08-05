@@ -1,6 +1,7 @@
 module Util
   ( checkForMouseSupport
   , resizeCanvas
+  , setTool
   )
 where
 
@@ -14,6 +15,9 @@ import Lens.Micro.Platform
 import Brick
 
 import Types
+
+setTool :: AppState -> Tool -> AppState
+setTool s t = s & tool .~ t
 
 checkForMouseSupport :: IO ()
 checkForMouseSupport = do
