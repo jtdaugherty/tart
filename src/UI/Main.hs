@@ -13,13 +13,18 @@ import Types
 
 drawMainUI :: AppState -> [Widget Name]
 drawMainUI s =
-    [ hud s
+    [ maybeHud s
     , canvas s
     ]
 
+maybeHud :: AppState -> Widget Name
+maybeHud s =
+    case s^.showHud of
+        False -> emptyWidget
+        True -> hud s
+
 hud :: AppState -> Widget Name
-hud s =
-    str $ "[tool:" <> show (s^.tool) <> "]"
+hud s = str $ "[tool:" <> show (s^.tool) <> "]"
 
 canvas :: AppState -> Widget Name
 canvas s = clickable Canvas $ raw $ canvasToImage $ s^.drawingFrozen

@@ -24,6 +24,7 @@ mkInitialState = do
                       , _canvasSize    = (0, 0)
                       , _mode          = Main
                       , _tool          = Point
+                      , _showHud       = True
                       }
 
 application :: App AppState () Name

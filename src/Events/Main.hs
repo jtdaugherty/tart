@@ -14,6 +14,8 @@ handleMainEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
 handleMainEvent s (MouseDown Canvas _ _ (Location l)) = do
     continue =<< drawAtPoint s l
 handleMainEvent s (VtyEvent (V.EvKey (V.KChar 'q') [])) = halt s
+handleMainEvent s (VtyEvent (V.EvKey (V.KChar 'h') [])) =
+    continue $ toggleHud s
 handleMainEvent s (VtyEvent (V.EvKey (V.KChar '1') [])) =
     continue $ setTool s Point
 handleMainEvent s _ = continue s

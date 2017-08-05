@@ -2,6 +2,7 @@ module Util
   ( checkForMouseSupport
   , resizeCanvas
   , setTool
+  , toggleHud
   )
 where
 
@@ -18,6 +19,9 @@ import Types
 
 setTool :: AppState -> Tool -> AppState
 setTool s t = s & tool .~ t
+
+toggleHud :: AppState -> AppState
+toggleHud s = s & showHud %~ not
 
 checkForMouseSupport :: IO ()
 checkForMouseSupport = do

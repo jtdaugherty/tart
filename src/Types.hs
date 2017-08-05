@@ -11,6 +11,7 @@ module Types
   , mode
   , drawingFrozen
   , tool
+  , showHud
 
   , blankCharacter
   )
@@ -40,6 +41,7 @@ data AppState =
              , _canvasSize    :: (Int, Int)
              , _mode          :: Mode
              , _tool          :: Tool
+             , _showHud       :: Bool
              }
 
 makeLenses ''AppState
