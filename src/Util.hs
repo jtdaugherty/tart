@@ -47,14 +47,14 @@ resizeCanvas s = do
             let copyCell rowVec col =
                     if col < Vec.length rowVec
                     then Vec.unsafeIndex rowVec col
-                    else blankCharacter
+                    else blankPixel
                 copyRow row = Vec.generate (newSz^._1)
                               (if row < Vec.length (s^.drawing)
                                then copyCell (Vec.unsafeIndex (s^.drawing) row)
-                               else const blankCharacter)
+                               else const blankPixel)
                 newDraw = if s^.canvasSize == (0, 0)
                           then Vec.replicate (newSz^._2) $
-                               Vec.replicate (newSz^._1) blankCharacter
+                               Vec.replicate (newSz^._1) blankPixel
                           else Vec.generate (newSz^._2) copyRow
 
             return $ s & drawing .~ newDraw

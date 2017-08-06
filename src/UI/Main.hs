@@ -29,8 +29,8 @@ hud s = str $ "[tool:" <> show (s^.tool) <> "]"
 canvas :: AppState -> Widget Name
 canvas s = clickable Canvas $ raw $ canvasToImage $ s^.drawing
 
-canvasToImage :: Vec.Vector (Vec.Vector Char) -> V.Image
+canvasToImage :: Vec.Vector (Vec.Vector Pixel) -> V.Image
 canvasToImage a =
-    let getRow r = V.string V.defAttr $ Vec.toList r
+    let getRow r = V.horizCat $ (uncurry $ flip V.char) <$> Vec.toList r
         rows = Vec.toList $ getRow <$> a
     in V.vertCat rows

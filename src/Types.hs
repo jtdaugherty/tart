@@ -3,6 +3,7 @@ module Types
   ( Mode(..)
   , Name(..)
   , Coord
+  , Pixel
   , Tool(..)
 
   , AppState(..)
@@ -12,12 +13,13 @@ module Types
   , tool
   , showHud
 
-  , blankCharacter
+  , blankPixel
   )
 where
 
 import Lens.Micro.TH
-import qualified Data.Vector as V
+import qualified Data.Vector as Vec
+import qualified Graphics.Vty as V
 
 data Mode = Main
           deriving (Eq, Show)
@@ -30,11 +32,13 @@ data Tool = Point
 
 type Coord = (Int, Int)
 
-blankCharacter :: Char
-blankCharacter = ' '
+type Pixel = (Char, V.Attr)
+
+blankPixel :: Pixel
+blankPixel = (' ', V.defAttr)
 
 data AppState =
-    AppState { _drawing       :: V.Vector (V.Vector Char)
+    AppState { _drawing       :: Vec.Vector (Vec.Vector Pixel)
              , _canvasSize    :: (Int, Int)
              , _mode          :: Mode
              , _tool          :: Tool
