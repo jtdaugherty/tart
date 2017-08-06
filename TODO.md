@@ -1,6 +1,5 @@
 
 - Let user pick RGB colors
-- Let user choose both foreground and background colors
 
 - Guide lines?
 

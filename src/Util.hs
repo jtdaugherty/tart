@@ -2,7 +2,8 @@ module Util
   ( checkForMouseSupport
   , resizeCanvas
   , setTool
-  , setPaletteIndex
+  , setFgPaletteIndex
+  , setBgPaletteIndex
   , toggleHud
 
   , beginCharacterSelect
@@ -25,8 +26,11 @@ import Types
 setTool :: AppState -> Tool -> AppState
 setTool s t = s & tool .~ t
 
-setPaletteIndex :: AppState -> Int -> AppState
-setPaletteIndex s i = s & drawPaletteIndex .~ i
+setFgPaletteIndex :: AppState -> Int -> AppState
+setFgPaletteIndex s i = s & drawFgPaletteIndex .~ i
+
+setBgPaletteIndex :: AppState -> Int -> AppState
+setBgPaletteIndex s i = s & drawBgPaletteIndex .~ i
 
 beginCharacterSelect :: AppState -> AppState
 beginCharacterSelect = (& mode .~ CharacterSelect)

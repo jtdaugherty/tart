@@ -12,7 +12,8 @@ module Types
   , mode
   , tool
   , showHud
-  , drawPaletteIndex
+  , drawFgPaletteIndex
+  , drawBgPaletteIndex
   , palette
   , drawCharacter
 
@@ -29,7 +30,9 @@ data Mode = Main
           deriving (Eq, Show)
 
 data Name = Canvas
-          | PaletteEntry Int
+          | Hud
+          | FgPaletteEntry Int
+          | BgPaletteEntry Int
           deriving (Eq, Show, Ord)
 
 data Tool = FreeHand
@@ -43,14 +46,15 @@ blankPixel :: Pixel
 blankPixel = (' ', V.defAttr)
 
 data AppState =
-    AppState { _drawing          :: Vec.Vector (Vec.Vector Pixel)
-             , _canvasSize       :: (Int, Int)
-             , _mode             :: Mode
-             , _drawPaletteIndex :: Int
-             , _drawCharacter    :: Char
-             , _tool             :: Tool
-             , _showHud          :: Bool
-             , _palette          :: Vec.Vector V.Color
+    AppState { _drawing            :: Vec.Vector (Vec.Vector Pixel)
+             , _canvasSize         :: (Int, Int)
+             , _mode               :: Mode
+             , _drawFgPaletteIndex :: Int
+             , _drawBgPaletteIndex :: Int
+             , _drawCharacter      :: Char
+             , _tool               :: Tool
+             , _showHud            :: Bool
+             , _palette            :: Vec.Vector V.Color
              }
 
 makeLenses ''AppState

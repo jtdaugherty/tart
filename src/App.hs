@@ -17,25 +17,26 @@ import Util
 defaultPalette :: Vec.Vector V.Color
 defaultPalette = Vec.fromList
     [ V.white
+    , V.black
     , V.blue
     , V.red
     , V.magenta
     , V.green
     , V.cyan
     , V.yellow
-    , V.black
     ]
 
 mkInitialState :: AppState
 mkInitialState =
-    AppState { _drawing          = mempty
-             , _canvasSize       = (0, 0)
-             , _mode             = Main
-             , _tool             = FreeHand
-             , _drawCharacter    = '*'
-             , _showHud          = True
-             , _drawPaletteIndex = 0
-             , _palette          = defaultPalette
+    AppState { _drawing            = mempty
+             , _canvasSize         = (0, 0)
+             , _mode               = Main
+             , _tool               = FreeHand
+             , _drawCharacter      = '*'
+             , _showHud            = True
+             , _drawFgPaletteIndex = 0
+             , _drawBgPaletteIndex = 1
+             , _palette            = defaultPalette
              }
 
 application :: App AppState () Name

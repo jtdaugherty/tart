@@ -26,28 +26,33 @@ maybeHud s =
 
 hud :: AppState -> Widget Name
 hud s =
-    (drawTool s <+> str " " <+> drawChar s <+> str " " <+> drawPalette s) <=>
-    hBorder
+    let fgPal = drawPalette (s^.palette) "fg" (s^.drawFgPaletteIndex) FgPaletteEntry
+        bgPal = drawPalette (s^.palette) "bg" (s^.drawBgPaletteIndex) BgPaletteEntry
+    in clickable Hud $
+       vBox [ hBorder
+            , drawTool s <+> str " " <+> drawChar s <+> str " " <+> fgPal <+> str " " <+> bgPal
+            , hBorder
+            ]
 
 drawChar :: AppState -> Widget Name
-drawChar s = str $ "char:[" <> [s^.drawCharacter] <> "]"
+drawChar s = padTop (Pad 1) $ str $ "char:[" <> [s^.drawCharacter] <> "]"
 
 drawTool :: AppState -> Widget Name
-drawTool s = str $ "tool:" <> show (s^.tool)
+drawTool s = padTop (Pad 1) $ str $ "tool:" <> show (s^.tool)
 
-drawPalette :: AppState -> Widget Name
-drawPalette s =
-    hBox (curColor : str "palette:" : entries)
+drawPalette :: Vec.Vector V.Color -> String -> Int -> (Int -> Name) -> Widget Name
+drawPalette pal label curIdx mkName =
+    hBox (border curColor : str " " : entries)
     where
-        curColor = hBox [ str "current:"
-                        , drawPaletteEntry ( s^.drawPaletteIndex
-                                           , Vec.unsafeIndex (s^.palette) (s^.drawPaletteIndex)
+        curColor = hBox [ str $ label <> ":"
+                        , drawPaletteEntry ( curIdx
+                                           , Vec.unsafeIndex pal curIdx
                                            )
                         , str " "
                         ]
-        entries = drawPaletteEntry <$> (zip [0..] $ Vec.toList $ s^.palette)
+        entries = padTopBottom 1 <$> drawPaletteEntry <$> (zip [0..] $ Vec.toList pal)
         drawPaletteEntry (idx, color) =
-            clickable (PaletteEntry idx) $
+            clickable (mkName idx) $
             raw $ V.string (V.defAttr `V.withBackColor` color) "  "
 
 canvas :: AppState -> Widget Name
