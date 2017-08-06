@@ -9,7 +9,6 @@ module Types
   , drawing
   , canvasSize
   , mode
-  , drawingFrozen
   , tool
   , showHud
 
@@ -17,9 +16,8 @@ module Types
   )
 where
 
-import Data.Array.IO (IOUArray)
-import Data.Array.Unboxed (UArray)
 import Lens.Micro.TH
+import qualified Data.Vector as V
 
 data Mode = Main
           deriving (Eq, Show)
@@ -36,8 +34,7 @@ blankCharacter :: Char
 blankCharacter = ' '
 
 data AppState =
-    AppState { _drawing       :: IOUArray Coord Char
-             , _drawingFrozen :: UArray Coord Char
+    AppState { _drawing       :: V.Vector (V.Vector Char)
              , _canvasSize    :: (Int, Int)
              , _mode          :: Mode
              , _tool          :: Tool

@@ -9,5 +9,4 @@ import Util
 main :: IO ()
 main = do
     checkForMouseSupport
-    st <- mkInitialState
-    void $ defaultMain application st
+    void $ defaultMain application mkInitialState

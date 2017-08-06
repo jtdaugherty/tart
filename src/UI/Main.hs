@@ -6,8 +6,8 @@ where
 import Brick
 import Data.Monoid ((<>))
 import qualified Graphics.Vty as V
-import qualified Data.Array.Unboxed as A
 import Lens.Micro.Platform
+import qualified Data.Vector as Vec
 
 import Types
 
@@ -27,12 +27,10 @@ hud :: AppState -> Widget Name
 hud s = str $ "[tool:" <> show (s^.tool) <> "]"
 
 canvas :: AppState -> Widget Name
-canvas s = clickable Canvas $ raw $ canvasToImage $ s^.drawingFrozen
+canvas s = clickable Canvas $ raw $ canvasToImage $ s^.drawing
 
-canvasToImage :: A.UArray Coord Char -> V.Image
+canvasToImage :: Vec.Vector (Vec.Vector Char) -> V.Image
 canvasToImage a =
-    let (_, (lastCol, lastRow)) = A.bounds a
-        rows = getRow <$> [0..lastRow]
-        getRow r = V.string V.defAttr (getCol r <$> [0..lastCol])
-        getCol r c = a A.! (c, r)
+    let getRow r = V.string V.defAttr $ Vec.toList r
+        rows = Vec.toList $ getRow <$> a
     in V.vertCat rows

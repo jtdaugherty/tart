@@ -6,10 +6,10 @@ module Util
   )
 where
 
-import Control.Monad (when, forM_)
+import Control.Monad (when)
 import Control.Monad.Trans (liftIO)
 import qualified Graphics.Vty as V
-import qualified Data.Array.MArray as A
+import qualified Data.Vector as Vec
 import System.Exit (exitFailure)
 import Lens.Micro.Platform
 
@@ -43,23 +43,19 @@ resizeCanvas s = do
     case newSz /= s^.canvasSize of
         False -> return s
         True -> liftIO $ do
-            -- Create a new draw array
-            let newBounds = ((0, 0), (newSz & each %~ pred))
-            newDraw <- A.newArray newBounds blankCharacter
-
-            -- Use the difference in size to determine the range of data
-            -- to copy to the new canvas
-            let (maxW, maxH) = ( min (newSz^._1) (s^.canvasSize._1)
-                               , min (newSz^._2) (s^.canvasSize._2)
-                               )
-
-            forM_ [0..maxW-1] $ \w ->
-                forM_ [0..maxH-1] $ \h ->
-                    A.writeArray newDraw (w, h) =<<
-                        A.readArray (s^.drawing) (w, h)
-
-            newDrawFrozen <- A.freeze newDraw
+            -- Create a new draw array with the right bounds
+            let copyCell rowVec col =
+                    if col < Vec.length rowVec
+                    then Vec.unsafeIndex rowVec col
+                    else blankCharacter
+                copyRow row = Vec.generate (newSz^._1)
+                              (if row < Vec.length (s^.drawing)
+                               then copyCell (Vec.unsafeIndex (s^.drawing) row)
+                               else const blankCharacter)
+                newDraw = if s^.canvasSize == (0, 0)
+                          then Vec.replicate (newSz^._2) $
+                               Vec.replicate (newSz^._1) blankCharacter
+                          else Vec.generate (newSz^._2) copyRow
 
             return $ s & drawing .~ newDraw
-                       & drawingFrozen .~ newDrawFrozen
                        & canvasSize .~ newSz

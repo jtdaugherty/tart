@@ -5,7 +5,6 @@ module App
 where
 
 import qualified Graphics.Vty as V
-import qualified Data.Array.MArray as A
 
 import Brick
 
@@ -14,18 +13,14 @@ import Events
 import UI
 import Util
 
-mkInitialState :: IO AppState
-mkInitialState = do
-    let arrayBounds = ((0, 0), (0, 0))
-    draw <- A.newArray arrayBounds blankCharacter
-    drawFreeze <- A.freeze draw
-    return $ AppState { _drawing       = draw
-                      , _drawingFrozen = drawFreeze
-                      , _canvasSize    = (0, 0)
-                      , _mode          = Main
-                      , _tool          = Point
-                      , _showHud       = True
-                      }
+mkInitialState :: AppState
+mkInitialState =
+    AppState { _drawing       = mempty
+             , _canvasSize    = (0, 0)
+             , _mode          = Main
+             , _tool          = Point
+             , _showHud       = True
+             }
 
 application :: App AppState () Name
 application =
