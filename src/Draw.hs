@@ -12,5 +12,6 @@ import Types
 
 drawAtPoint :: AppState -> (Int, Int) -> EventM Name AppState
 drawAtPoint s point =
-    return $ s & drawing.ix (point^._2).ix (point^._1) .~
-                   ('x', V.defAttr `V.withForeColor` (Vec.unsafeIndex (s^.palette) (s^.drawPaletteIndex)))
+    let ch = s^.drawCharacter
+        attr = V.defAttr `V.withForeColor` (Vec.unsafeIndex (s^.palette) (s^.drawPaletteIndex))
+    in return $ s & drawing.ix (point^._2).ix (point^._1) .~ (ch, attr)

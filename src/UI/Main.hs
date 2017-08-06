@@ -25,7 +25,12 @@ maybeHud s =
         True -> hud s
 
 hud :: AppState -> Widget Name
-hud s = (drawTool s <+> str " " <+> drawPalette s) <=> hBorder
+hud s =
+    (drawTool s <+> str " " <+> drawChar s <+> str " " <+> drawPalette s) <=>
+    hBorder
+
+drawChar :: AppState -> Widget Name
+drawChar s = str $ "char:[" <> [s^.drawCharacter] <> "]"
 
 drawTool :: AppState -> Widget Name
 drawTool s = str $ "tool:" <> show (s^.tool)

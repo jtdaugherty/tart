@@ -14,6 +14,7 @@ module Types
   , showHud
   , drawPaletteIndex
   , palette
+  , drawCharacter
 
   , blankPixel
   )
@@ -45,6 +46,7 @@ data AppState =
              , _canvasSize       :: (Int, Int)
              , _mode             :: Mode
              , _drawPaletteIndex :: Int
+             , _drawCharacter    :: Char
              , _tool             :: Tool
              , _showHud          :: Bool
              , _palette          :: Vec.Vector V.Color

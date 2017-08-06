@@ -32,6 +32,7 @@ mkInitialState =
              , _canvasSize       = (0, 0)
              , _mode             = Main
              , _tool             = FreeHand
+             , _drawCharacter    = '*'
              , _showHud          = True
              , _drawPaletteIndex = 0
              , _palette          = defaultPalette
