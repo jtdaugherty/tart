@@ -5,6 +5,7 @@ module App
 where
 
 import qualified Graphics.Vty as V
+import qualified Data.Vector as Vec
 
 import Brick
 
@@ -13,14 +14,23 @@ import Events
 import UI
 import Util
 
+defaultPalette :: Vec.Vector V.Color
+defaultPalette = Vec.fromList
+    [ V.white
+    , V.blue
+    , V.red
+    , V.magenta
+    ]
+
 mkInitialState :: AppState
 mkInitialState =
-    AppState { _drawing       = mempty
-             , _canvasSize    = (0, 0)
-             , _mode          = Main
-             , _tool          = Point
-             , _showHud       = True
-             , _drawAttr      = V.defAttr `V.withForeColor` V.white
+    AppState { _drawing          = mempty
+             , _canvasSize       = (0, 0)
+             , _mode             = Main
+             , _tool             = Point
+             , _showHud          = True
+             , _drawPaletteIndex = 0
+             , _palette          = defaultPalette
              }
 
 application :: App AppState () Name

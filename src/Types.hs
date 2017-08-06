@@ -12,7 +12,8 @@ module Types
   , mode
   , tool
   , showHud
-  , drawAttr
+  , drawPaletteIndex
+  , palette
 
   , blankPixel
   )
@@ -26,6 +27,7 @@ data Mode = Main
           deriving (Eq, Show)
 
 data Name = Canvas
+          | PaletteEntry Int
           deriving (Eq, Show, Ord)
 
 data Tool = Point
@@ -39,12 +41,13 @@ blankPixel :: Pixel
 blankPixel = (' ', V.defAttr)
 
 data AppState =
-    AppState { _drawing       :: Vec.Vector (Vec.Vector Pixel)
-             , _canvasSize    :: (Int, Int)
-             , _mode          :: Mode
-             , _drawAttr      :: V.Attr
-             , _tool          :: Tool
-             , _showHud       :: Bool
+    AppState { _drawing          :: Vec.Vector (Vec.Vector Pixel)
+             , _canvasSize       :: (Int, Int)
+             , _mode             :: Mode
+             , _drawPaletteIndex :: Int
+             , _tool             :: Tool
+             , _showHud          :: Bool
+             , _palette          :: Vec.Vector V.Color
              }
 
 makeLenses ''AppState
