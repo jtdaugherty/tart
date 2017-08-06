@@ -30,7 +30,7 @@ data Name = Canvas
           | PaletteEntry Int
           deriving (Eq, Show, Ord)
 
-data Tool = Point
+data Tool = FreeHand
           deriving (Eq, Show)
 
 type Coord = (Int, Int)

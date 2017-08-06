@@ -19,5 +19,5 @@ handleMainEvent s (VtyEvent (V.EvKey (V.KChar 'q') [])) = halt s
 handleMainEvent s (VtyEvent (V.EvKey (V.KChar 'h') [])) =
     continue $ toggleHud s
 handleMainEvent s (VtyEvent (V.EvKey (V.KChar '1') [])) =
-    continue $ setTool s Point
+    continue $ setTool s FreeHand
 handleMainEvent s _ = continue s
