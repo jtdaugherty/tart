@@ -1,10 +1,8 @@
 
-- Hide-able HUD with indicators of drawing mode, character, attributes
-- Change character used to draw: let user enter any character
-- Palette (let user pick color of current drawing primitive) including
-  RGB colors (maybe let the user enter RGB colors)
+- Let user pick RGB colors
+- Let user choose both foreground and background colors
 
-- Guide lines
+- Guide lines?
 
 - Save to disk, load from disk.
   - What format(s)? Are there any others? Probably needs to be RLE.
