@@ -1,4 +1,5 @@
 
+- More efficient pixel updates
 - Let user pick RGB colors
 
 - Guide lines?
