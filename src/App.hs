@@ -20,6 +20,10 @@ defaultPalette = Vec.fromList
     , V.blue
     , V.red
     , V.magenta
+    , V.green
+    , V.cyan
+    , V.yellow
+    , V.black
     ]
 
 mkInitialState :: AppState
