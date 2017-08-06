@@ -20,6 +20,7 @@ mkInitialState =
              , _mode          = Main
              , _tool          = Point
              , _showHud       = True
+             , _drawAttr      = V.defAttr `V.withForeColor` V.white
              }
 
 application :: App AppState () Name

@@ -12,6 +12,7 @@ module Types
   , mode
   , tool
   , showHud
+  , drawAttr
 
   , blankPixel
   )
@@ -41,6 +42,7 @@ data AppState =
     AppState { _drawing       :: Vec.Vector (Vec.Vector Pixel)
              , _canvasSize    :: (Int, Int)
              , _mode          :: Mode
+             , _drawAttr      :: V.Attr
              , _tool          :: Tool
              , _showHud       :: Bool
              }
