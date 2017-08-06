@@ -4,6 +4,10 @@ module Util
   , setTool
   , setPaletteIndex
   , toggleHud
+
+  , beginCharacterSelect
+  , cancelCharacterSelect
+  , selectCharacter
   )
 where
 
@@ -23,6 +27,16 @@ setTool s t = s & tool .~ t
 
 setPaletteIndex :: AppState -> Int -> AppState
 setPaletteIndex s i = s & drawPaletteIndex .~ i
+
+beginCharacterSelect :: AppState -> AppState
+beginCharacterSelect = (& mode .~ CharacterSelect)
+
+cancelCharacterSelect :: AppState -> AppState
+cancelCharacterSelect = (& mode .~ Main)
+
+selectCharacter :: Char -> AppState -> AppState
+selectCharacter c s = s & drawCharacter .~ c
+                        & mode .~ Main
 
 toggleHud :: AppState -> AppState
 toggleHud s = s & showHud %~ not

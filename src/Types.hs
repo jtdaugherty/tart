@@ -25,6 +25,7 @@ import qualified Data.Vector as Vec
 import qualified Graphics.Vty as V
 
 data Mode = Main
+          | CharacterSelect
           deriving (Eq, Show)
 
 data Name = Canvas

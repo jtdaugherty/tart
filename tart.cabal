@@ -18,8 +18,10 @@ executable tart
   main-is:             Main.hs
   other-modules:       Events
                        Events.Main
+                       Events.CharacterSelect
                        UI
                        UI.Main
+                       UI.CharacterSelect
                        Util
                        Types
                        App

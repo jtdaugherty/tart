@@ -9,6 +9,7 @@ import qualified Graphics.Vty as V
 
 import Types
 import Events.Main
+import Events.CharacterSelect
 import Util
 
 handleEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
@@ -17,3 +18,4 @@ handleEvent s (VtyEvent (V.EvResize _ _)) =
 handleEvent s e =
     case s^.mode of
         Main -> handleMainEvent s e
+        CharacterSelect -> handleCharacterSelectEvent s e
