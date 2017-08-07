@@ -17,7 +17,8 @@ import Theme
 
 defaultPalette :: Vec.Vector PaletteEntry
 defaultPalette = Vec.fromList
-    [ PaletteEntry (`V.withForeColor` V.white   ) (`V.withBackColor` V.white)
+    [ PaletteEntry id id
+    , PaletteEntry (`V.withForeColor` V.white   ) (`V.withBackColor` V.white)
     , PaletteEntry (`V.withForeColor` V.black   ) (`V.withBackColor` V.black)
     , PaletteEntry (`V.withForeColor` V.blue    ) (`V.withBackColor` V.blue)
     , PaletteEntry (`V.withForeColor` V.red     ) (`V.withBackColor` V.red)
@@ -36,7 +37,7 @@ mkInitialState =
              , _drawCharacter           = '*'
              , _showHud                 = True
              , _drawFgPaletteIndex      = 0
-             , _drawBgPaletteIndex      = 1
+             , _drawBgPaletteIndex      = 0
              , _palette                 = defaultPalette
              , _fgPaletteSelectorExtent = Nothing
              , _bgPaletteSelectorExtent = Nothing
