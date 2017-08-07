@@ -34,7 +34,9 @@ hud s =
             ]
 
 drawChar :: AppState -> Widget Name
-drawChar s = borderWithLabel (str "Char") $ padLeftRight 2 $ str [s^.drawCharacter]
+drawChar s =
+    clickable CharSelector $
+    borderWithLabel (str "Char") $ padLeftRight 2 $ str [s^.drawCharacter]
 
 drawToolSelector :: AppState -> Widget Name
 drawToolSelector s =

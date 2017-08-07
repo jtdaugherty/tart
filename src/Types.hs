@@ -40,6 +40,7 @@ data Name = Canvas
           | Hud
           | ToolSelector
           | ToolSelectorEntry Tool
+          | CharSelector
           | FgSelector
           | BgSelector
           | FgPaletteEntry Int

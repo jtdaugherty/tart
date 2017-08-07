@@ -28,4 +28,6 @@ handleMainEvent s (VtyEvent (V.EvKey (V.KChar '0') [])) =
     continue $ setTool s Eraser
 handleMainEvent s (VtyEvent (V.EvKey (V.KChar 'c') [])) =
     continue $ beginCharacterSelect s
+handleMainEvent s (MouseDown CharSelector _ _ _) = do
+    continue $ beginCharacterSelect s
 handleMainEvent s _ = continue s
