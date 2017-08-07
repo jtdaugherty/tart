@@ -11,7 +11,6 @@ import qualified Graphics.Vty as V
 import Types
 import Util
 import Events.Common
-import UI.ToolSelect
 
 handleToolSelectEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
 handleToolSelectEvent s e = do

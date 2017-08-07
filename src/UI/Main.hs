@@ -7,6 +7,7 @@ where
 import Brick
 import Brick.Widgets.Border
 import Brick.Widgets.Center
+import Data.Monoid ((<>))
 import qualified Graphics.Vty as V
 import Lens.Micro.Platform
 import qualified Data.Vector as Vec
@@ -14,6 +15,7 @@ import qualified Data.Vector as Vec
 import Types
 import UI.Common
 import Theme
+import Util
 
 drawMainUI :: AppState -> [Widget Name]
 drawMainUI s =
@@ -52,11 +54,13 @@ toolSelectorEntryWidth = 20
 
 drawToolSelector :: AppState -> Widget Name
 drawToolSelector s =
-    clickable ToolSelector $
-    borderWithLabel ((withDefAttr keybindingAttr $ str "T") <+> str "ool") $
-    hLimit toolSelectorEntryWidth $
-    hCenter $
-    str $ show (s^.tool)
+    let Just idx = lookup (s^.tool) tools
+    in clickable ToolSelector $
+       borderWithLabel ((withDefAttr keybindingAttr $ str "T") <+> str "ool") $
+       hLimit toolSelectorEntryWidth $
+       hCenter $
+       (withDefAttr keybindingAttr (str $ show idx)) <+>
+       (str $ ":" <> show (s^.tool))
 
 drawPaletteSelector :: AppState -> Bool -> Widget Name
 drawPaletteSelector s isFg =

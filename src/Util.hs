@@ -9,6 +9,8 @@ module Util
   , beginBgPaletteSelect
   , beginToolSelect
 
+  , tools
+
   , beginCharacterSelect
   , cancelCharacterSelect
   , selectCharacter
@@ -25,6 +27,12 @@ import Lens.Micro.Platform
 import Brick
 
 import Types
+
+tools :: [(Tool, Int)]
+tools =
+    [ (FreeHand, 1)
+    , (Eraser, 0)
+    ]
 
 beginToolSelect :: AppState -> AppState
 beginToolSelect s =

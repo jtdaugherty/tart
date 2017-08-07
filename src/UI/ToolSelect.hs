@@ -1,6 +1,5 @@
 module UI.ToolSelect
   ( drawToolSelectUI
-  , tools
   )
 where
 
@@ -12,18 +11,14 @@ import Lens.Micro.Platform
 
 import Types
 import UI.Main
+import Util
+import Theme
 
 drawToolSelectUI :: AppState -> [Widget Name]
 drawToolSelectUI s =
     let Just ext = s^.toolSelectorExtent
         toolSel = drawToolSelector ext
     in toolSel <> drawMainUI s
-
-tools :: [(Tool, Int)]
-tools =
-    [ (FreeHand, 1)
-    , (Eraser, 0)
-    ]
 
 drawToolSelector :: Extent Name -> [Widget Name]
 drawToolSelector ext =
@@ -43,4 +38,5 @@ drawToolSelector ext =
             clickable (ToolSelectorEntry t) $
             vLimit 1 $
             hLimit toolSelectorEntryWidth $
-            (str $ show i <> ":" <> show t) <+> fill ' '
+            (withDefAttr keybindingAttr (str $ show i)) <+>
+            (str $ ":" <> show t) <+> fill ' '

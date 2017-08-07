@@ -12,7 +12,6 @@ import Types
 import Draw
 import Util
 import Events.Common
-import UI.ToolSelect
 
 handleMainEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
 handleMainEvent s e = do
