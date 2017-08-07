@@ -31,7 +31,7 @@ handleEvent s (MouseDown BgSelector _ _ _) = do
 handleEvent s (MouseDown ToolSelector _ _ _) = do
     continue $ beginToolSelect s
 handleEvent s (MouseDown Canvas _ _ (Location l)) = do
-    continue $ drawWithCurrentTool l s
+    continue =<< drawWithCurrentTool l s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'q') [])) = halt s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'h') [])) =
     continue $ toggleHud s
