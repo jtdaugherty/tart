@@ -20,10 +20,10 @@ handleEvent s (VtyEvent (V.EvResize _ _)) = do
 handleEvent s e = do
     s' <- updateExtents s
     case s'^.mode of
-        Main -> handleMainEvent s' e
+        Main                 -> handleMainEvent s' e
         FgPaletteEntrySelect -> handlePaletteEntrySelectEvent s' e
         BgPaletteEntrySelect -> handlePaletteEntrySelectEvent s' e
-        CharacterSelect -> handleCharacterSelectEvent s' e
+        CharacterSelect      -> handleCharacterSelectEvent s' e
 
 updateExtents :: AppState -> EventM Name AppState
 updateExtents s = do
