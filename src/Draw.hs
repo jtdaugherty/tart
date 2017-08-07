@@ -29,7 +29,7 @@ drawAtPoint point s =
 
 drawAtPoint' :: (Int, Int) -> Char -> V.Attr -> AppState -> AppState
 drawAtPoint' point ch attr s =
-    s & drawing.ix (point^._2).ix (point^._1) .~ (ch, attr)
+    s & drawing.ix (point^._2).ix (point^._1) .~ encodePixel ch attr
 
 eraseAtPoint :: (Int, Int) -> AppState -> AppState
 eraseAtPoint point s = drawAtPoint' point ' ' V.defAttr s

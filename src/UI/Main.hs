@@ -11,6 +11,7 @@ import Data.Monoid ((<>))
 import qualified Graphics.Vty as V
 import Lens.Micro.Platform
 import qualified Data.Vector as Vec
+import Data.Word (Word64)
 
 import Types
 import UI.Common
@@ -77,8 +78,8 @@ drawPaletteSelector s isFg =
 canvas :: AppState -> Widget Name
 canvas s = clickable Canvas $ raw $ canvasToImage $ s^.drawing
 
-canvasToImage :: Vec.Vector (Vec.Vector Pixel) -> V.Image
+canvasToImage :: Vec.Vector (Vec.Vector Word64) -> V.Image
 canvasToImage a =
-    let getRow r = V.horizCat $ (uncurry $ flip V.char) <$> Vec.toList r
+    let getRow r = V.horizCat $ (uncurry $ flip V.char) <$> decodePixel <$> Vec.toList r
         rows = Vec.toList $ getRow <$> a
     in V.vertCat rows
