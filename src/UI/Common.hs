@@ -23,8 +23,8 @@ drawPalette pal mkName ext =
     where
         borderHack = translateBy l topBorder
         topBorder = hBox [ borderElem bsIntersectL
-                         , hLimit 6 hBorder
-                         , borderElem bsIntersectR
+                         , hLimit 2 hBorder
+                         , borderElem bsIntersectB
                          ]
         body = translateBy l $ border $ vBox entries
         l = Location ( fst $ loc $ extentUpperLeft ext

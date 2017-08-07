@@ -5,7 +5,6 @@ where
 
 import Brick
 import Brick.Widgets.Border
-import Data.Monoid ((<>))
 import qualified Graphics.Vty as V
 import Lens.Micro.Platform
 import qualified Data.Vector as Vec
@@ -27,27 +26,27 @@ maybeHud s =
 
 hud :: AppState -> Widget Name
 hud s =
-    let fgPal = drawPaletteSelector (s^.palette) "fg" (s^.drawFgPaletteIndex) FgSelector
-        bgPal = drawPaletteSelector (s^.palette) "bg" (s^.drawBgPaletteIndex) BgSelector
+    let fgPal = drawPaletteSelector (s^.palette) "FG" (s^.drawFgPaletteIndex) FgSelector
+        bgPal = drawPaletteSelector (s^.palette) "BG" (s^.drawBgPaletteIndex) BgSelector
     in clickable Hud $
-       vBox [ drawTool s <+> str " " <+> drawChar s <+> str " " <+> fgPal <+> str " " <+> bgPal
+       vBox [ drawToolSelector s <+> str " " <+> drawChar s <+> str " " <+> fgPal <+> str " " <+> bgPal
             , hBorderWithLabel (str "Press 'h' to hide")
             ]
 
 drawChar :: AppState -> Widget Name
-drawChar s = padTop (Pad 1) $ str $ "char:[" <> [s^.drawCharacter] <> "]"
+drawChar s = borderWithLabel (str "Char") $ padLeftRight 2 $ str [s^.drawCharacter]
 
-drawTool :: AppState -> Widget Name
-drawTool s = clickable ToolSelector $ border $ str $ "tool:" <> show (s^.tool)
+drawToolSelector :: AppState -> Widget Name
+drawToolSelector s =
+    clickable ToolSelector $
+    borderWithLabel (str "Tool") $
+    str $ show (s^.tool)
 
 drawPaletteSelector :: Vec.Vector V.Color -> String -> Int -> Name -> Widget Name
 drawPaletteSelector pal label curIdx selName =
-    (clickable selName $ border curColor)
+    (clickable selName $ borderWithLabel (str label) curColor)
     where
-        curColor = hBox [ str $ label <> ":"
-                        , drawPaletteEntry pal curIdx 2
-                        , str " "
-                        ]
+        curColor = drawPaletteEntry pal curIdx 2
 
 canvas :: AppState -> Widget Name
 canvas s = clickable Canvas $ raw $ canvasToImage $ s^.drawing
