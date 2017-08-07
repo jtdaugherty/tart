@@ -21,6 +21,7 @@ executable tart
                        Events.CharacterSelect
                        Events.PaletteEntrySelect
                        Events.ToolSelect
+                       Events.Common
                        UI
                        UI.Main
                        UI.Common
