@@ -1,10 +1,12 @@
 module UI.Main
   ( drawMainUI
+  , toolSelectorEntryWidth
   )
 where
 
 import Brick
 import Brick.Widgets.Border
+import Brick.Widgets.Center
 import qualified Graphics.Vty as V
 import Lens.Micro.Platform
 import qualified Data.Vector as Vec
@@ -38,10 +40,15 @@ drawChar s =
     clickable CharSelector $
     borderWithLabel (str "Char") $ padLeftRight 2 $ str [s^.drawCharacter]
 
+toolSelectorEntryWidth :: Int
+toolSelectorEntryWidth = 20
+
 drawToolSelector :: AppState -> Widget Name
 drawToolSelector s =
     clickable ToolSelector $
     borderWithLabel (str "Tool") $
+    hLimit toolSelectorEntryWidth $
+    hCenter $
     str $ show (s^.tool)
 
 drawPaletteSelector :: Vec.Vector V.Color -> String -> Int -> Name -> Widget Name

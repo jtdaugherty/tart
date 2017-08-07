@@ -6,6 +6,7 @@ where
 import Data.Monoid ((<>))
 import Brick
 import Brick.Widgets.Border
+import Brick.Widgets.Border.Style
 import Lens.Micro.Platform
 
 import Types
@@ -25,13 +26,20 @@ tools =
 
 drawToolSelector :: Extent Name -> [Widget Name]
 drawToolSelector ext =
-    [body]
+    [borderHack, body]
     where
+        borderHack = translateBy l topBorder
+        topBorder = hBox [ borderElem bsIntersectL
+                         , hLimit toolSelectorEntryWidth hBorder
+                         , borderElem bsIntersectR
+                         ]
         body = translateBy l $ border $ vBox entries
         l = Location ( fst $ loc $ extentUpperLeft ext
-                     , (snd $ extentSize ext) + (snd $ loc $ extentUpperLeft ext)
+                     , (snd $ extentSize ext) + (snd $ loc $ extentUpperLeft ext) - 1
                      )
         entries = mkEntry <$> tools
         mkEntry (t, i) =
             clickable (ToolSelectorEntry t) $
-            str $ show i <> ":" <> show t
+            vLimit 1 $
+            hLimit toolSelectorEntryWidth $
+            (str $ show i <> ":" <> show t) <+> fill ' '
