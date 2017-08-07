@@ -36,7 +36,7 @@ executable tart
   default-language:    Haskell2010
   build-depends:       base >=4.9 && < 5,
                        brick >= 0.23,
-                       vty,
+                       vty >= 5.17,
                        array,
                        vector,
                        microlens-platform,
