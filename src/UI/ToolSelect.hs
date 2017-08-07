@@ -1,5 +1,6 @@
 module UI.ToolSelect
   ( drawToolSelectUI
+  , tools
   )
 where
 
