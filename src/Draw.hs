@@ -36,7 +36,7 @@ drawAtPoint point s =
     drawAtPoint' point (s^.drawCharacter) (currentPaletteAttribute s) s
 
 drawAtPoint' :: (Int, Int) -> Char -> V.Attr -> AppState -> EventM Name AppState
-drawAtPoint' point ch attr s = refreeze $ do
+drawAtPoint' point ch attr s = do
     let arr = s^.drawing
     liftIO $ A.writeArray arr point $ encodePixel ch attr
     return s
@@ -50,10 +50,3 @@ currentPaletteAttribute s =
     let PaletteEntry mkFg _ = Vec.unsafeIndex (s^.palette) (s^.drawFgPaletteIndex)
         PaletteEntry _ mkBg = Vec.unsafeIndex (s^.palette) (s^.drawBgPaletteIndex)
     in mkFg $ mkBg V.defAttr
-
-refreeze :: EventM Name AppState -> EventM Name AppState
-refreeze mkS = do
-    s <- mkS
-    liftIO $ do
-        f <- A.freeze $ s^.drawing
-        return $ s & drawingFrozen .~ f
