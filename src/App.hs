@@ -6,6 +6,7 @@ where
 
 import qualified Graphics.Vty as V
 import qualified Data.Vector as Vec
+import qualified Data.Array.MArray as A
 
 import Brick
 
@@ -28,21 +29,25 @@ defaultPalette = Vec.fromList
     , PaletteEntry (`V.withForeColor` V.yellow  ) (`V.withBackColor` V.yellow)
     ]
 
-mkInitialState :: AppState
-mkInitialState =
-    AppState { _drawing                 = mempty
-             , _canvasSize              = (0, 0)
-             , _mode                    = Main
-             , _tool                    = FreeHand
-             , _drawCharacter           = '*'
-             , _showHud                 = True
-             , _drawFgPaletteIndex      = 0
-             , _drawBgPaletteIndex      = 0
-             , _palette                 = defaultPalette
-             , _fgPaletteSelectorExtent = Nothing
-             , _bgPaletteSelectorExtent = Nothing
-             , _toolSelectorExtent      = Nothing
-             }
+mkInitialState :: IO AppState
+mkInitialState = do
+    let arrayBounds = ((0, 0), (0, 0))
+    draw <- A.newArray arrayBounds blankPixel
+    drawFreeze <- A.freeze draw
+    return $ AppState { _drawing                 = draw
+                      , _drawingFrozen           = drawFreeze
+                      , _canvasSize              = (0, 0)
+                      , _mode                    = Main
+                      , _tool                    = FreeHand
+                      , _drawCharacter           = '*'
+                      , _showHud                 = True
+                      , _drawFgPaletteIndex      = 0
+                      , _drawBgPaletteIndex      = 0
+                      , _palette                 = defaultPalette
+                      , _fgPaletteSelectorExtent = Nothing
+                      , _bgPaletteSelectorExtent = Nothing
+                      , _toolSelectorExtent      = Nothing
+                      }
 
 application :: App AppState () Name
 application =

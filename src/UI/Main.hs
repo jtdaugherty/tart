@@ -9,8 +9,8 @@ import Brick.Widgets.Border
 import Brick.Widgets.Center
 import Data.Monoid ((<>))
 import qualified Graphics.Vty as V
+import qualified Data.Array.Unboxed as A
 import Lens.Micro.Platform
-import qualified Data.Vector as Vec
 import Data.Word (Word64)
 
 import Types
@@ -76,10 +76,12 @@ drawPaletteSelector s isFg =
         curColor = drawPaletteEntry s curIdx 2 isFg
 
 canvas :: AppState -> Widget Name
-canvas s = clickable Canvas $ raw $ canvasToImage $ s^.drawing
+canvas s = clickable Canvas $ raw $ canvasToImage $ s^.drawingFrozen
 
-canvasToImage :: Vec.Vector (Vec.Vector Word64) -> V.Image
+canvasToImage :: A.UArray (Int, Int) Word64 -> V.Image
 canvasToImage a =
-    let getRow r = V.horizCat $ (uncurry $ flip V.char) <$> decodePixel <$> Vec.toList r
-        rows = Vec.toList $ getRow <$> a
+    let (_, (lastCol, lastRow)) = A.bounds a
+        rows = getRow <$> [0..lastRow]
+        getRow r = V.horizCat $ (uncurry $ flip V.char) <$> decodePixel <$> getCol r <$> [0..lastCol]
+        getCol r c = a A.! (c, r)
     in V.vertCat rows

@@ -37,6 +37,7 @@ executable tart
   build-depends:       base >=4.9 && < 5,
                        brick >= 0.23,
                        vty,
+                       array,
                        vector,
                        microlens-platform,
                        microlens-th,
