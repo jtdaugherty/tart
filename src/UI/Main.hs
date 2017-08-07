@@ -28,8 +28,8 @@ maybeHud s =
 
 hud :: AppState -> Widget Name
 hud s =
-    let fgPal = drawPaletteSelector (s^.palette) "FG" (s^.drawFgPaletteIndex) FgSelector
-        bgPal = drawPaletteSelector (s^.palette) "BG" (s^.drawBgPaletteIndex) BgSelector
+    let fgPal = drawPaletteSelector s True
+        bgPal = drawPaletteSelector s False
     in clickable Hud $
        vBox [ drawToolSelector s <+> str " " <+> drawChar s <+> str " " <+> fgPal <+> str " " <+> bgPal
             , hBorderWithLabel (str "Press 'h' to hide")
@@ -51,11 +51,15 @@ drawToolSelector s =
     hCenter $
     str $ show (s^.tool)
 
-drawPaletteSelector :: Vec.Vector V.Color -> String -> Int -> Name -> Widget Name
-drawPaletteSelector pal label curIdx selName =
+drawPaletteSelector :: AppState -> Bool -> Widget Name
+drawPaletteSelector s isFg =
     (clickable selName $ borderWithLabel (str label) curColor)
     where
-        curColor = drawPaletteEntry pal curIdx 2
+        label = if isFg then "FG" else "BG"
+        curIdx = if isFg then s^.drawFgPaletteIndex
+                         else s^.drawBgPaletteIndex
+        selName = if isFg then FgSelector else BgSelector
+        curColor = drawPaletteEntry s curIdx 2 isFg
 
 canvas :: AppState -> Widget Name
 canvas s = clickable Canvas $ raw $ canvasToImage $ s^.drawing

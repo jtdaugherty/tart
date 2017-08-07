@@ -13,9 +13,9 @@ import UI.Common
 
 drawPaletteEntrySelectUI :: AppState -> [Widget Name]
 drawPaletteEntrySelectUI s =
-    let (Just ext, mkName) = case s^.mode of
-          FgPaletteEntrySelect -> (s^.fgPaletteSelectorExtent, FgPaletteEntry)
-          BgPaletteEntrySelect -> (s^.bgPaletteSelectorExtent, BgPaletteEntry)
+    let isFg = case s^.mode of
+          FgPaletteEntrySelect -> True
+          BgPaletteEntrySelect -> False
           m -> error $ "BUG: should never get called in mode " <> show m
-        pal = drawPalette (s^.palette) mkName ext
+        pal = drawPalette s isFg
     in pal <> drawMainUI s
