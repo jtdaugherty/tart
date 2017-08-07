@@ -15,6 +15,8 @@ handleMainEvent s (MouseDown FgSelector _ _ _) = do
     continue $ beginFgPaletteSelect s
 handleMainEvent s (MouseDown BgSelector _ _ _) = do
     continue $ beginBgPaletteSelect s
+handleMainEvent s (MouseDown ToolSelector _ _ _) = do
+    continue $ beginToolSelect s
 handleMainEvent s (MouseDown Canvas _ _ (Location l)) = do
     continue $ drawWithCurrentTool l s
 handleMainEvent s (VtyEvent (V.EvKey (V.KChar 'q') [])) = halt s

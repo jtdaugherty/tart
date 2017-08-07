@@ -39,6 +39,7 @@ mkInitialState =
              , _palette                 = defaultPalette
              , _fgPaletteSelectorExtent = Nothing
              , _bgPaletteSelectorExtent = Nothing
+             , _toolSelectorExtent      = Nothing
              }
 
 application :: App AppState () Name

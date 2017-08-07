@@ -7,6 +7,7 @@ module Util
   , toggleHud
   , beginFgPaletteSelect
   , beginBgPaletteSelect
+  , beginToolSelect
 
   , beginCharacterSelect
   , cancelCharacterSelect
@@ -24,6 +25,10 @@ import Lens.Micro.Platform
 import Brick
 
 import Types
+
+beginToolSelect :: AppState -> AppState
+beginToolSelect s =
+    s & mode .~ ToolSelect
 
 beginFgPaletteSelect :: AppState -> AppState
 beginFgPaletteSelect s =

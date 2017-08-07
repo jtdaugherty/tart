@@ -38,7 +38,7 @@ drawChar :: AppState -> Widget Name
 drawChar s = padTop (Pad 1) $ str $ "char:[" <> [s^.drawCharacter] <> "]"
 
 drawTool :: AppState -> Widget Name
-drawTool s = padTop (Pad 1) $ str $ "tool:" <> show (s^.tool)
+drawTool s = clickable ToolSelector $ border $ str $ "tool:" <> show (s^.tool)
 
 drawPaletteSelector :: Vec.Vector V.Color -> String -> Int -> Name -> Widget Name
 drawPaletteSelector pal label curIdx selName =

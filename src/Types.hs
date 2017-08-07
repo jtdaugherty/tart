@@ -18,6 +18,7 @@ module Types
   , drawCharacter
   , fgPaletteSelectorExtent
   , bgPaletteSelectorExtent
+  , toolSelectorExtent
 
   , blankPixel
   )
@@ -32,10 +33,13 @@ data Mode = Main
           | CharacterSelect
           | FgPaletteEntrySelect
           | BgPaletteEntrySelect
+          | ToolSelect
           deriving (Eq, Show)
 
 data Name = Canvas
           | Hud
+          | ToolSelector
+          | ToolSelectorEntry Tool
           | FgSelector
           | BgSelector
           | FgPaletteEntry Int
@@ -44,7 +48,7 @@ data Name = Canvas
 
 data Tool = FreeHand
           | Eraser
-          deriving (Eq, Show)
+          deriving (Eq, Show, Ord)
 
 type Coord = (Int, Int)
 
@@ -65,6 +69,7 @@ data AppState =
              , _palette                 :: Vec.Vector V.Color
              , _fgPaletteSelectorExtent :: Maybe (Extent Name)
              , _bgPaletteSelectorExtent :: Maybe (Extent Name)
+             , _toolSelectorExtent      :: Maybe (Extent Name)
              }
 
 makeLenses ''AppState

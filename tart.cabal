@@ -20,11 +20,13 @@ executable tart
                        Events.Main
                        Events.CharacterSelect
                        Events.PaletteEntrySelect
+                       Events.ToolSelect
                        UI
                        UI.Main
                        UI.Common
                        UI.CharacterSelect
                        UI.PaletteEntrySelect
+                       UI.ToolSelect
                        Util
                        Types
                        App

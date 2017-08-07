@@ -10,6 +10,7 @@ import Types
 import UI.Main
 import UI.CharacterSelect
 import UI.PaletteEntrySelect
+import UI.ToolSelect
 
 drawUI :: AppState -> [Widget Name]
 drawUI s =
@@ -17,4 +18,5 @@ drawUI s =
         Main                 -> drawMainUI s
         FgPaletteEntrySelect -> drawPaletteEntrySelectUI s
         BgPaletteEntrySelect -> drawPaletteEntrySelectUI s
+        ToolSelect           -> drawToolSelectUI s
         CharacterSelect      -> drawCharacterSelectUI s
