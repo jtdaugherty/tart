@@ -45,7 +45,7 @@ drawPaletteSelector pal label curIdx selName =
     (clickable selName $ border curColor)
     where
         curColor = hBox [ str $ label <> ":"
-                        , drawPaletteEntry pal curIdx
+                        , drawPaletteEntry pal curIdx 2
                         , str " "
                         ]
 

@@ -18,4 +18,4 @@ drawPaletteEntrySelectUI s =
           BgPaletteEntrySelect -> (s^.bgPaletteSelectorExtent, BgPaletteEntry)
           m -> error $ "BUG: should never get called in mode " <> show m
         pal = drawPalette (s^.palette) mkName ext
-    in pal : drawMainUI s
+    in pal <> drawMainUI s
