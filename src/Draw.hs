@@ -10,6 +10,7 @@ import Brick
 import Lens.Micro.Platform
 import Control.Monad.Trans (liftIO)
 import qualified Data.Array.MArray as A
+import qualified Data.Array.Unsafe as A
 import qualified Data.Vector as Vec
 import qualified Graphics.Vty as V
 
@@ -20,7 +21,7 @@ clearCanvas s = do
     let newBounds = ((0, 0), ((s^.canvasSize) & each %~ pred))
     liftIO $ do
         newDraw <- A.newArray newBounds blankPixel
-        newFreeze <- A.freeze newDraw
+        newFreeze <- A.unsafeFreeze newDraw
         return $ s & drawing .~ newDraw
                    & drawingFrozen .~ newFreeze
 

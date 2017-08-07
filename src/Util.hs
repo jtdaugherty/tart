@@ -24,6 +24,7 @@ import qualified Graphics.Vty as V
 import qualified Data.Array.MArray as A
 import System.Exit (exitFailure)
 import Lens.Micro.Platform
+import qualified Data.Array.Unsafe as A
 
 import Brick
 
@@ -112,7 +113,7 @@ resizeCanvas s = do
                     A.writeArray newDraw (w, h) =<<
                         A.readArray (s^.drawing) (w, h)
 
-            newDrawFrozen <- A.freeze newDraw
+            newDrawFrozen <- A.unsafeFreeze newDraw
 
             return $ s & drawing .~ newDraw
                        & drawingFrozen .~ newDrawFrozen
