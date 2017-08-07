@@ -43,6 +43,7 @@ data Name = Canvas
           deriving (Eq, Show, Ord)
 
 data Tool = FreeHand
+          | Eraser
           deriving (Eq, Show)
 
 type Coord = (Int, Int)

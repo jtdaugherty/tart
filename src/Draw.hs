@@ -1,5 +1,7 @@
 module Draw
-  ( drawAtPoint
+  ( drawWithCurrentTool
+  , drawAtPoint
+  , eraseAtPoint
   )
 where
 
@@ -9,11 +11,26 @@ import qualified Graphics.Vty as V
 
 import Types
 
+drawWithCurrentTool :: (Int, Int) -> AppState -> AppState
+drawWithCurrentTool point s =
+    case s^.tool of
+        FreeHand -> drawAtPoint point s
+        Eraser   -> eraseAtPoint point s
+
 drawAtPoint :: (Int, Int) -> AppState -> AppState
 drawAtPoint point s =
-    let ch = s^.drawCharacter
-        fg = Vec.unsafeIndex (s^.palette) (s^.drawFgPaletteIndex)
+    drawAtPoint' point (s^.drawCharacter) (currentPaletteAttribute s) s
+
+drawAtPoint' :: (Int, Int) -> Char -> V.Attr -> AppState -> AppState
+drawAtPoint' point ch attr s =
+    s & drawing.ix (point^._2).ix (point^._1) .~ (ch, attr)
+
+eraseAtPoint :: (Int, Int) -> AppState -> AppState
+eraseAtPoint point s = drawAtPoint' point ' ' V.defAttr s
+
+currentPaletteAttribute :: AppState -> V.Attr
+currentPaletteAttribute s =
+    let fg = Vec.unsafeIndex (s^.palette) (s^.drawFgPaletteIndex)
         bg = Vec.unsafeIndex (s^.palette) (s^.drawBgPaletteIndex)
-        attr = V.defAttr `V.withForeColor` fg
-                         `V.withBackColor` bg
-    in s & drawing.ix (point^._2).ix (point^._1) .~ (ch, attr)
+    in V.defAttr `V.withForeColor` fg
+                 `V.withBackColor` bg

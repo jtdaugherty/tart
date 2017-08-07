@@ -12,7 +12,6 @@
     as well as to version without color escapes
 
 - Extra drawing primitives:
-  - eraser
   - circles
   - rectangles (click and drag)
   - lines (click and drag)
