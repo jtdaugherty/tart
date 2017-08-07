@@ -40,7 +40,7 @@ hud s =
                          , bgPal
                          ]
     in clickable Hud $
-       vBox [ hBox $ padRight (Pad 1) <$> toolbarEntries
+       vBox [ hCenter $ padLeft (Pad 1) $ hBox $ padRight (Pad 1) <$> toolbarEntries
             , hBorderWithLabel (str "Press 'h' to hide")
             ]
 
