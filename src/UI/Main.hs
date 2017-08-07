@@ -29,9 +29,8 @@ hud s =
     let fgPal = drawPalette (s^.palette) "fg" (s^.drawFgPaletteIndex) FgPaletteEntry
         bgPal = drawPalette (s^.palette) "bg" (s^.drawBgPaletteIndex) BgPaletteEntry
     in clickable Hud $
-       vBox [ hBorder
-            , drawTool s <+> str " " <+> drawChar s <+> str " " <+> fgPal <+> str " " <+> bgPal
-            , hBorder
+       vBox [ drawTool s <+> str " " <+> drawChar s <+> str " " <+> fgPal <+> str " " <+> bgPal
+            , hBorderWithLabel (str "Press 'h' to hide")
             ]
 
 drawChar :: AppState -> Widget Name
