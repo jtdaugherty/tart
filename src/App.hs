@@ -15,16 +15,16 @@ import UI
 import Util
 import Theme
 
-defaultPalette :: Vec.Vector V.Color
+defaultPalette :: Vec.Vector PaletteEntry
 defaultPalette = Vec.fromList
-    [ V.white
-    , V.black
-    , V.blue
-    , V.red
-    , V.magenta
-    , V.green
-    , V.cyan
-    , V.yellow
+    [ PaletteEntry (`V.withForeColor` V.white   ) (`V.withBackColor` V.white)
+    , PaletteEntry (`V.withForeColor` V.black   ) (`V.withBackColor` V.black)
+    , PaletteEntry (`V.withForeColor` V.blue    ) (`V.withBackColor` V.blue)
+    , PaletteEntry (`V.withForeColor` V.red     ) (`V.withBackColor` V.red)
+    , PaletteEntry (`V.withForeColor` V.magenta ) (`V.withBackColor` V.magenta)
+    , PaletteEntry (`V.withForeColor` V.green   ) (`V.withBackColor` V.green)
+    , PaletteEntry (`V.withForeColor` V.cyan    ) (`V.withBackColor` V.cyan)
+    , PaletteEntry (`V.withForeColor` V.yellow  ) (`V.withBackColor` V.yellow)
     ]
 
 mkInitialState :: AppState

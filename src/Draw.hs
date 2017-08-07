@@ -36,7 +36,6 @@ eraseAtPoint point s = drawAtPoint' point ' ' V.defAttr s
 
 currentPaletteAttribute :: AppState -> V.Attr
 currentPaletteAttribute s =
-    let fg = Vec.unsafeIndex (s^.palette) (s^.drawFgPaletteIndex)
-        bg = Vec.unsafeIndex (s^.palette) (s^.drawBgPaletteIndex)
-    in V.defAttr `V.withForeColor` fg
-                 `V.withBackColor` bg
+    let PaletteEntry mkFg _ = Vec.unsafeIndex (s^.palette) (s^.drawFgPaletteIndex)
+        PaletteEntry _ mkBg = Vec.unsafeIndex (s^.palette) (s^.drawBgPaletteIndex)
+    in mkFg $ mkBg V.defAttr

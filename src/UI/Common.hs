@@ -17,9 +17,9 @@ import Types
 drawPaletteEntry :: AppState -> Int -> Int -> Bool -> Widget Name
 drawPaletteEntry s idx width isFg =
     let pal = s^.palette
-        color = Vec.unsafeIndex pal idx
-        attr = if isFg then V.defAttr `V.withForeColor` color
-                       else V.defAttr `V.withBackColor` color
+        PaletteEntry mkFg mkBg = Vec.unsafeIndex pal idx
+        attr = if isFg then mkFg V.defAttr
+                       else mkBg V.defAttr
         ch = if isFg then s^.drawCharacter else ' '
     in raw $ V.string attr (replicate width ch)
 

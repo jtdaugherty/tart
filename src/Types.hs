@@ -5,6 +5,7 @@ module Types
   , Coord
   , Pixel
   , Tool(..)
+  , PaletteEntry(..)
 
   , AppState(..)
   , drawing
@@ -55,6 +56,11 @@ type Coord = (Int, Int)
 
 type Pixel = (Char, V.Attr)
 
+data PaletteEntry =
+    PaletteEntry { paletteFg :: V.Attr -> V.Attr
+                 , paletteBg :: V.Attr -> V.Attr
+                 }
+
 blankPixel :: Pixel
 blankPixel = (' ', V.defAttr)
 
@@ -67,7 +73,7 @@ data AppState =
              , _drawCharacter           :: Char
              , _tool                    :: Tool
              , _showHud                 :: Bool
-             , _palette                 :: Vec.Vector V.Color
+             , _palette                 :: Vec.Vector PaletteEntry
              , _fgPaletteSelectorExtent :: Maybe (Extent Name)
              , _bgPaletteSelectorExtent :: Maybe (Extent Name)
              , _toolSelectorExtent      :: Maybe (Extent Name)
