@@ -14,7 +14,7 @@ import UI.PaletteEntrySelect
 drawUI :: AppState -> [Widget Name]
 drawUI s =
     case s^.mode of
-        Main -> drawMainUI s
+        Main                 -> drawMainUI s
         FgPaletteEntrySelect -> drawPaletteEntrySelectUI s
         BgPaletteEntrySelect -> drawPaletteEntrySelectUI s
-        CharacterSelect -> drawCharacterSelectUI s
+        CharacterSelect      -> drawCharacterSelectUI s
