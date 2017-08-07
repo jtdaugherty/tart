@@ -31,8 +31,13 @@ hud :: AppState -> Widget Name
 hud s =
     let fgPal = drawPaletteSelector s True
         bgPal = drawPaletteSelector s False
+        toolbarEntries = [ padLeft (Pad 1) $ drawToolSelector s
+                         , drawChar s
+                         , fgPal
+                         , bgPal
+                         ]
     in clickable Hud $
-       vBox [ drawToolSelector s <+> str " " <+> drawChar s <+> str " " <+> fgPal <+> str " " <+> bgPal
+       vBox [ hBox $ padRight (Pad 1) <$> toolbarEntries
             , hBorderWithLabel (str "Press 'h' to hide")
             ]
 
