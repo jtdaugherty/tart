@@ -28,15 +28,17 @@ defaultPalette = Vec.fromList
 
 mkInitialState :: AppState
 mkInitialState =
-    AppState { _drawing            = mempty
-             , _canvasSize         = (0, 0)
-             , _mode               = Main
-             , _tool               = FreeHand
-             , _drawCharacter      = '*'
-             , _showHud            = True
-             , _drawFgPaletteIndex = 0
-             , _drawBgPaletteIndex = 1
-             , _palette            = defaultPalette
+    AppState { _drawing                 = mempty
+             , _canvasSize              = (0, 0)
+             , _mode                    = Main
+             , _tool                    = FreeHand
+             , _drawCharacter           = '*'
+             , _showHud                 = True
+             , _drawFgPaletteIndex      = 0
+             , _drawBgPaletteIndex      = 1
+             , _palette                 = defaultPalette
+             , _fgPaletteSelectorExtent = Nothing
+             , _bgPaletteSelectorExtent = Nothing
              }
 
 application :: App AppState () Name

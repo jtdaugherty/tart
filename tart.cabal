@@ -19,9 +19,12 @@ executable tart
   other-modules:       Events
                        Events.Main
                        Events.CharacterSelect
+                       Events.PaletteEntrySelect
                        UI
                        UI.Main
+                       UI.Common
                        UI.CharacterSelect
+                       UI.PaletteEntrySelect
                        Util
                        Types
                        App

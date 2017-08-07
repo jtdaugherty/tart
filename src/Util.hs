@@ -5,6 +5,8 @@ module Util
   , setFgPaletteIndex
   , setBgPaletteIndex
   , toggleHud
+  , beginFgPaletteSelect
+  , beginBgPaletteSelect
 
   , beginCharacterSelect
   , cancelCharacterSelect
@@ -23,14 +25,24 @@ import Brick
 
 import Types
 
+beginFgPaletteSelect :: AppState -> AppState
+beginFgPaletteSelect s =
+    s & mode .~ FgPaletteEntrySelect
+
+beginBgPaletteSelect :: AppState -> AppState
+beginBgPaletteSelect s =
+    s & mode .~ BgPaletteEntrySelect
+
 setTool :: AppState -> Tool -> AppState
 setTool s t = s & tool .~ t
 
 setFgPaletteIndex :: AppState -> Int -> AppState
 setFgPaletteIndex s i = s & drawFgPaletteIndex .~ i
+                          & mode .~ Main
 
 setBgPaletteIndex :: AppState -> Int -> AppState
 setBgPaletteIndex s i = s & drawBgPaletteIndex .~ i
+                          & mode .~ Main
 
 beginCharacterSelect :: AppState -> AppState
 beginCharacterSelect = (& mode .~ CharacterSelect)

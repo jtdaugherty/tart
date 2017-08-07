@@ -16,21 +16,28 @@ module Types
   , drawBgPaletteIndex
   , palette
   , drawCharacter
+  , fgPaletteSelectorExtent
+  , bgPaletteSelectorExtent
 
   , blankPixel
   )
 where
 
+import Brick (Extent)
 import Lens.Micro.TH
 import qualified Data.Vector as Vec
 import qualified Graphics.Vty as V
 
 data Mode = Main
           | CharacterSelect
+          | FgPaletteEntrySelect
+          | BgPaletteEntrySelect
           deriving (Eq, Show)
 
 data Name = Canvas
           | Hud
+          | FgSelector
+          | BgSelector
           | FgPaletteEntry Int
           | BgPaletteEntry Int
           deriving (Eq, Show, Ord)
@@ -46,15 +53,17 @@ blankPixel :: Pixel
 blankPixel = (' ', V.defAttr)
 
 data AppState =
-    AppState { _drawing            :: Vec.Vector (Vec.Vector Pixel)
-             , _canvasSize         :: (Int, Int)
-             , _mode               :: Mode
-             , _drawFgPaletteIndex :: Int
-             , _drawBgPaletteIndex :: Int
-             , _drawCharacter      :: Char
-             , _tool               :: Tool
-             , _showHud            :: Bool
-             , _palette            :: Vec.Vector V.Color
+    AppState { _drawing                 :: Vec.Vector (Vec.Vector Pixel)
+             , _canvasSize              :: (Int, Int)
+             , _mode                    :: Mode
+             , _drawFgPaletteIndex      :: Int
+             , _drawBgPaletteIndex      :: Int
+             , _drawCharacter           :: Char
+             , _tool                    :: Tool
+             , _showHud                 :: Bool
+             , _palette                 :: Vec.Vector V.Color
+             , _fgPaletteSelectorExtent :: Maybe (Extent Name)
+             , _bgPaletteSelectorExtent :: Maybe (Extent Name)
              }
 
 makeLenses ''AppState

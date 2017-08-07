@@ -11,6 +11,7 @@ import Lens.Micro.Platform
 import qualified Data.Vector as Vec
 
 import Types
+import UI.Common
 
 drawMainUI :: AppState -> [Widget Name]
 drawMainUI s =
@@ -26,8 +27,8 @@ maybeHud s =
 
 hud :: AppState -> Widget Name
 hud s =
-    let fgPal = drawPalette (s^.palette) "fg" (s^.drawFgPaletteIndex) FgPaletteEntry
-        bgPal = drawPalette (s^.palette) "bg" (s^.drawBgPaletteIndex) BgPaletteEntry
+    let fgPal = drawPaletteSelector (s^.palette) "fg" (s^.drawFgPaletteIndex) FgSelector
+        bgPal = drawPaletteSelector (s^.palette) "bg" (s^.drawBgPaletteIndex) BgSelector
     in clickable Hud $
        vBox [ drawTool s <+> str " " <+> drawChar s <+> str " " <+> fgPal <+> str " " <+> bgPal
             , hBorderWithLabel (str "Press 'h' to hide")
@@ -39,20 +40,14 @@ drawChar s = padTop (Pad 1) $ str $ "char:[" <> [s^.drawCharacter] <> "]"
 drawTool :: AppState -> Widget Name
 drawTool s = padTop (Pad 1) $ str $ "tool:" <> show (s^.tool)
 
-drawPalette :: Vec.Vector V.Color -> String -> Int -> (Int -> Name) -> Widget Name
-drawPalette pal label curIdx mkName =
-    hBox (border curColor : str " " : entries)
+drawPaletteSelector :: Vec.Vector V.Color -> String -> Int -> Name -> Widget Name
+drawPaletteSelector pal label curIdx selName =
+    (clickable selName $ border curColor)
     where
         curColor = hBox [ str $ label <> ":"
-                        , drawPaletteEntry ( curIdx
-                                           , Vec.unsafeIndex pal curIdx
-                                           )
+                        , drawPaletteEntry pal curIdx
                         , str " "
                         ]
-        entries = padTopBottom 1 <$> drawPaletteEntry <$> (zip [0..] $ Vec.toList pal)
-        drawPaletteEntry (idx, color) =
-            clickable (mkName idx) $
-            raw $ V.string (V.defAttr `V.withBackColor` color) "  "
 
 canvas :: AppState -> Widget Name
 canvas s = clickable Canvas $ raw $ canvasToImage $ s^.drawing
