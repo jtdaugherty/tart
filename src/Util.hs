@@ -39,13 +39,22 @@ setMode :: Mode -> AppState -> AppState
 setMode m s = s & mode .~ m
 
 beginToolSelect :: AppState -> AppState
-beginToolSelect = setMode ToolSelect
+beginToolSelect s =
+    if s^.showHud
+    then setMode ToolSelect s
+    else s
 
 beginFgPaletteSelect :: AppState -> AppState
-beginFgPaletteSelect = setMode FgPaletteEntrySelect
+beginFgPaletteSelect s =
+    if s^.showHud
+    then setMode FgPaletteEntrySelect s
+    else s
 
 beginBgPaletteSelect :: AppState -> AppState
-beginBgPaletteSelect = setMode BgPaletteEntrySelect
+beginBgPaletteSelect s =
+    if s^.showHud
+    then setMode BgPaletteEntrySelect s
+    else s
 
 setTool :: AppState -> Tool -> AppState
 setTool s t = s & tool .~ t
