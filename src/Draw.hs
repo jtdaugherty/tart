@@ -2,6 +2,7 @@ module Draw
   ( drawWithCurrentTool
   , drawAtPoint
   , eraseAtPoint
+  , clearCanvas
   )
 where
 
@@ -10,6 +11,11 @@ import qualified Data.Vector as Vec
 import qualified Graphics.Vty as V
 
 import Types
+
+clearCanvas :: AppState -> AppState
+clearCanvas s =
+    s & drawing .~ (Vec.replicate (s^.canvasSize._2) $
+                    Vec.replicate (s^.canvasSize._1) blankPixel)
 
 drawWithCurrentTool :: (Int, Int) -> AppState -> AppState
 drawWithCurrentTool point s =
