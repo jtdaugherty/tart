@@ -6,7 +6,6 @@ where
 import Brick
 import Data.Char (isDigit)
 import qualified Graphics.Vty as V
-import Lens.Micro.Platform
 
 import Types
 import Draw
@@ -39,7 +38,7 @@ handleEvent s (VtyEvent (V.EvKey (V.KChar 'h') [])) =
 handleEvent s (VtyEvent (V.EvKey (V.KChar c) [])) | isDigit c = do
     let idx = read [c]
     case filter ((== idx) . snd) tools of
-        [(t, _)] -> continue $ (setTool s t) & mode .~ Main
+        [(t, _)] -> continue $ setMode Main $ setTool s t
         _ -> continue s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'c') [])) =
     continue $ beginCharacterSelect s

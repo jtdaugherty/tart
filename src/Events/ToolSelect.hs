@@ -4,7 +4,6 @@ module Events.ToolSelect
 where
 
 import Brick
-import Lens.Micro.Platform
 import Data.Char (isDigit)
 import qualified Graphics.Vty as V
 
@@ -21,11 +20,11 @@ handleToolSelectEvent s e = do
 
 handleEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
 handleEvent s (MouseDown (ToolSelectorEntry t) _ _ _) = do
-    continue $ (setTool s t) & mode .~ Main
+    continue $ setMode Main $ setTool s t
 handleEvent s (VtyEvent (V.EvKey (V.KChar c) [])) | isDigit c = do
     let idx = read [c]
     case filter ((== idx) . snd) tools of
-        [(t, _)] -> continue $ (setTool s t) & mode .~ Main
+        [(t, _)] -> continue $ setMode Main $ setTool s t
         _ -> continue s
 handleEvent s (MouseUp _ _ _) =
     -- Ignore mouse-up events so we don't go back to Main mode. This
@@ -34,4 +33,4 @@ handleEvent s (MouseUp _ _ _) =
     -- from Main.
     continue s
 handleEvent s _ =
-    continue $ s & mode .~ Main
+    continue $ setMode Main s

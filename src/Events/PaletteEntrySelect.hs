@@ -46,4 +46,4 @@ handleEvent s (MouseUp _ _ _) =
     -- from Main.
     continue s
 handleEvent s _ =
-    continue $ s & mode .~ Main
+    continue $ setMode Main s

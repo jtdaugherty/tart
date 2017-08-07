@@ -8,6 +8,7 @@ module Util
   , beginFgPaletteSelect
   , beginBgPaletteSelect
   , beginToolSelect
+  , setMode
 
   , tools
 
@@ -34,38 +35,35 @@ tools =
     , (Eraser, 0)
     ]
 
+setMode :: Mode -> AppState -> AppState
+setMode m s = s & mode .~ m
+
 beginToolSelect :: AppState -> AppState
-beginToolSelect s =
-    s & mode .~ ToolSelect
+beginToolSelect = setMode ToolSelect
 
 beginFgPaletteSelect :: AppState -> AppState
-beginFgPaletteSelect s =
-    s & mode .~ FgPaletteEntrySelect
+beginFgPaletteSelect = setMode FgPaletteEntrySelect
 
 beginBgPaletteSelect :: AppState -> AppState
-beginBgPaletteSelect s =
-    s & mode .~ BgPaletteEntrySelect
+beginBgPaletteSelect = setMode BgPaletteEntrySelect
 
 setTool :: AppState -> Tool -> AppState
 setTool s t = s & tool .~ t
 
 setFgPaletteIndex :: AppState -> Int -> AppState
-setFgPaletteIndex s i = s & drawFgPaletteIndex .~ i
-                          & mode .~ Main
+setFgPaletteIndex s i = setMode Main $ s & drawFgPaletteIndex .~ i
 
 setBgPaletteIndex :: AppState -> Int -> AppState
-setBgPaletteIndex s i = s & drawBgPaletteIndex .~ i
-                          & mode .~ Main
+setBgPaletteIndex s i = setMode Main $ s & drawBgPaletteIndex .~ i
 
 beginCharacterSelect :: AppState -> AppState
-beginCharacterSelect = (& mode .~ CharacterSelect)
+beginCharacterSelect = setMode CharacterSelect
 
 cancelCharacterSelect :: AppState -> AppState
-cancelCharacterSelect = (& mode .~ Main)
+cancelCharacterSelect = setMode Main
 
 selectCharacter :: Char -> AppState -> AppState
-selectCharacter c s = s & drawCharacter .~ c
-                        & mode .~ Main
+selectCharacter c s = setMode Main $ s & drawCharacter .~ c
 
 toggleHud :: AppState -> AppState
 toggleHud s = s & showHud %~ not

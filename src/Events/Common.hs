@@ -13,14 +13,14 @@ import Util
 handleCommonEvent :: AppState -> BrickEvent Name e -> EventM Name (Maybe AppState)
 handleCommonEvent s (VtyEvent (V.EvKey (V.KChar 't') [])) = do
     if s^.mode == ToolSelect
-       then return $ Just $ s & mode .~ Main
+       then return $ Just $ setMode Main s
        else return $ Just $ beginToolSelect s
 handleCommonEvent s (VtyEvent (V.EvKey (V.KChar 'f') [])) = do
     if s^.mode == FgPaletteEntrySelect
-       then return $ Just $ s & mode .~ Main
+       then return $ Just $ setMode Main s
        else return $ Just $ beginFgPaletteSelect s
 handleCommonEvent s (VtyEvent (V.EvKey (V.KChar 'b') [])) = do
     if s^.mode == BgPaletteEntrySelect
-       then return $ Just $ s & mode .~ Main
+       then return $ Just $ setMode Main s
        else return $ Just $ beginBgPaletteSelect s
 handleCommonEvent _ _ = return Nothing
