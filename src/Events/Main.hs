@@ -4,12 +4,15 @@ module Events.Main
 where
 
 import Brick
+import Data.Char (isDigit)
 import qualified Graphics.Vty as V
+import Lens.Micro.Platform
 
 import Types
 import Draw
 import Util
 import Events.Common
+import UI.ToolSelect
 
 handleMainEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
 handleMainEvent s e = do
@@ -34,10 +37,11 @@ handleEvent s (MouseDown Canvas _ _ (Location l)) = do
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'q') [])) = halt s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'h') [])) =
     continue $ toggleHud s
-handleEvent s (VtyEvent (V.EvKey (V.KChar '1') [])) =
-    continue $ setTool s FreeHand
-handleEvent s (VtyEvent (V.EvKey (V.KChar '0') [])) =
-    continue $ setTool s Eraser
+handleEvent s (VtyEvent (V.EvKey (V.KChar c) [])) | isDigit c = do
+    let idx = read [c]
+    case filter ((== idx) . snd) tools of
+        [(t, _)] -> continue $ (setTool s t) & mode .~ Main
+        _ -> continue s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'c') [])) =
     continue $ beginCharacterSelect s
 handleEvent s (MouseDown CharSelector _ _ _) = do
