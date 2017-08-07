@@ -29,6 +29,7 @@ executable tart
                        UI.PaletteEntrySelect
                        UI.ToolSelect
                        Util
+                       Theme
                        Types
                        App
                        Draw

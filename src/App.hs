@@ -13,6 +13,7 @@ import Types
 import Events
 import UI
 import Util
+import Theme
 
 defaultPalette :: Vec.Vector V.Color
 defaultPalette = Vec.fromList
@@ -51,5 +52,5 @@ application =
             vty <- getVtyHandle
             V.setMode (V.outputIface vty) V.Mouse True
             resizeCanvas s
-        , appAttrMap = const $ attrMap V.defAttr []
+        , appAttrMap = const theme
         }

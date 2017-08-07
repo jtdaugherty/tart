@@ -13,6 +13,7 @@ import qualified Data.Vector as Vec
 
 import Types
 import UI.Common
+import Theme
 
 drawMainUI :: AppState -> [Widget Name]
 drawMainUI s =
@@ -38,7 +39,8 @@ hud s =
 drawChar :: AppState -> Widget Name
 drawChar s =
     clickable CharSelector $
-    borderWithLabel (str "Char") $ padLeftRight 2 $ str [s^.drawCharacter]
+    borderWithLabel ((withDefAttr keybindingAttr $ str "C") <+> str "har") $
+    padLeftRight 2 $ str [s^.drawCharacter]
 
 toolSelectorEntryWidth :: Int
 toolSelectorEntryWidth = 20
@@ -46,16 +48,18 @@ toolSelectorEntryWidth = 20
 drawToolSelector :: AppState -> Widget Name
 drawToolSelector s =
     clickable ToolSelector $
-    borderWithLabel (str "Tool") $
+    borderWithLabel ((withDefAttr keybindingAttr $ str "T") <+> str "ool") $
     hLimit toolSelectorEntryWidth $
     hCenter $
     str $ show (s^.tool)
 
 drawPaletteSelector :: AppState -> Bool -> Widget Name
 drawPaletteSelector s isFg =
-    (clickable selName $ borderWithLabel (str label) curColor)
+    (clickable selName $ borderWithLabel label curColor)
     where
-        label = if isFg then "FG" else "BG"
+        label = if isFg
+                then (withDefAttr keybindingAttr $ str "F") <+> str "G"
+                else (withDefAttr keybindingAttr $ str "B") <+> str "G"
         curIdx = if isFg then s^.drawFgPaletteIndex
                          else s^.drawBgPaletteIndex
         selName = if isFg then FgSelector else BgSelector
