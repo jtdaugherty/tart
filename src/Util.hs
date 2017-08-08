@@ -1,6 +1,5 @@
 module Util
   ( checkForMouseSupport
-  , resizeCanvas
   , setTool
   , setFgPaletteIndex
   , setBgPaletteIndex
@@ -8,6 +7,8 @@ module Util
   , beginBgPaletteSelect
   , beginToolSelect
   , setMode
+  , increaseCanvasSize
+  , decreaseCanvasSize
 
   , tools
 
@@ -34,6 +35,15 @@ tools =
     [ (FreeHand, 1)
     , (Eraser, 0)
     ]
+
+increaseCanvasSize :: AppState -> EventM Name AppState
+increaseCanvasSize s =
+    resizeCanvas s (s^.canvasSize & _1 %~ (+ 4) & _2 %~ (+ 2))
+
+decreaseCanvasSize :: AppState -> EventM Name AppState
+decreaseCanvasSize s =
+    resizeCanvas s (s^.canvasSize & _1 %~ (max 1 . (subtract 4))
+                                  & _2 %~ (max 1 . (subtract 2)))
 
 setMode :: Mode -> AppState -> AppState
 setMode m s = s & mode .~ m
@@ -84,11 +94,8 @@ checkForMouseSupport = do
 
     V.shutdown vty
 
-resizeCanvas :: AppState -> EventM n AppState
-resizeCanvas s = do
-    vty <- getVtyHandle
-    newSz <- liftIO $ V.displayBounds $ V.outputIface vty
-
+resizeCanvas :: AppState -> (Int, Int) -> EventM n AppState
+resizeCanvas s newSz = do
     -- If the new bounds are different than the old, create a new array
     -- and copy.
     case newSz /= s^.canvasSize of

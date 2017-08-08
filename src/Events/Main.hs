@@ -32,6 +32,10 @@ handleEvent s (MouseDown ToolSelector _ _ _) = do
     continue $ beginToolSelect s
 handleEvent s (MouseDown Canvas _ _ (Location l)) = do
     continue =<< drawWithCurrentTool l s
+handleEvent s (VtyEvent (V.EvKey (V.KChar '+') [])) = do
+    continue =<< increaseCanvasSize s
+handleEvent s (VtyEvent (V.EvKey (V.KChar '-') [])) = do
+    continue =<< decreaseCanvasSize s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'q') [])) = halt s
 handleEvent s (VtyEvent (V.EvKey (V.KChar c) [])) | isDigit c = do
     let idx = read [c]
