@@ -178,3 +178,4 @@ resizeCanvas s newSz = do
     c <- liftIO $ resizeFrom (s^.drawing) newSz
     return $ s & drawing .~ c
                & canvasOffset .~ (Location $ newSz & each %~ (`div` 2))
+               & canvasDirty .~ (canvasSize c /= canvasSize (s^.drawing))
