@@ -16,6 +16,7 @@
   - lines (click and drag)
   - fill?!
   - eyedropper (attr/character picker)
+  - text strings
 
 - Undo / redo
 
