@@ -1,7 +1,6 @@
 
-- More efficient pixel updates
+- Set custom canvas size
 - Let user pick RGB colors
-- Support "no background color" (i.e., use the default background)
 
 - Guide lines?
 
@@ -25,4 +24,3 @@
 - Scroll around rather than truncating to terminal size (WASD), resize
   the canvas array only when the user draws a pixel outside the current
   range
-- Set canvas size (up to terminal size)?
