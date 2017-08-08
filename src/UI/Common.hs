@@ -36,7 +36,7 @@ drawPalette s isFgPalette =
                  else BgPaletteEntry
         borderHack = translateBy l topBorder
         topBorder = hBox [ borderElem bsIntersectL
-                         , hLimit 2 hBorder
+                         , hLimit 4 hBorder
                          , borderElem bsIntersectB
                          ]
         body = translateBy l $ border $ vBox entries
