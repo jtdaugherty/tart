@@ -33,10 +33,6 @@ handleEvent s (MouseDown ToolSelector _ _ _) = do
 handleEvent s (MouseDown Canvas _ _ (Location l)) = do
     continue =<< drawWithCurrentTool l s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'q') [])) = halt s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 'h') [])) =
-    continue $ toggleHud s
-handleEvent s (MouseDown HideToolbar _ _ _) = do
-    continue $ toggleHud s
 handleEvent s (VtyEvent (V.EvKey (V.KChar c) [])) | isDigit c = do
     let idx = read [c]
     case filter ((== idx) . snd) tools of

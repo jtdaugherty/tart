@@ -41,9 +41,7 @@ hud s =
                          ]
     in clickable Hud $
        vBox [ hCenter $ padLeft (Pad 1) $ hBox $ padRight (Pad 1) <$> toolbarEntries
-            , hBorderWithLabel $
-              clickable HideToolbar $
-              (str "[" <+> (withDefAttr keybindingAttr (str "H")) <+> str "ide]")
+            , hBorder
             ]
 
 drawChar :: AppState -> Widget Name

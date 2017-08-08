@@ -4,7 +4,6 @@ module Util
   , setTool
   , setFgPaletteIndex
   , setBgPaletteIndex
-  , toggleHud
   , beginFgPaletteSelect
   , beginBgPaletteSelect
   , beginToolSelect
@@ -74,9 +73,6 @@ cancelCharacterSelect = setMode Main
 
 selectCharacter :: Char -> AppState -> AppState
 selectCharacter c s = setMode Main $ s & drawCharacter .~ c
-
-toggleHud :: AppState -> AppState
-toggleHud s = s & showHud %~ not
 
 checkForMouseSupport :: IO ()
 checkForMouseSupport = do
