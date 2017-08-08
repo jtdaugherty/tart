@@ -61,6 +61,7 @@ decreaseCanvasSize s =
 
 setMode :: Mode -> AppState -> AppState
 setMode m s = s & mode .~ m
+                & dragging .~ Nothing
 
 beginCanvasSizePrompt :: AppState -> AppState
 beginCanvasSizePrompt s =
