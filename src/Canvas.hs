@@ -1,3 +1,4 @@
+{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE BinaryLiterals #-}
 module Canvas
   ( Canvas
@@ -6,6 +7,7 @@ module Canvas
   , canvasSetPixel
   , canvasGetPixel
   , resizeFrom
+  , writeCanvas
 
   , blankPixel
   , encodePixel
@@ -16,6 +18,7 @@ where
 import Control.Monad (forM_)
 import Data.Bits
 import Data.Word (Word64)
+import Data.Monoid ((<>))
 import qualified Graphics.Vty as V
 import qualified Data.Array.IArray as I
 import qualified Data.Array.MArray as A
@@ -36,6 +39,38 @@ newCanvas sz = do
     draw <- A.newArray arrayBounds blankPixel
     drawFreeze <- A.freeze draw
     return $ Canvas draw drawFreeze sz
+
+writeCanvas :: FilePath -> Canvas -> IO ()
+writeCanvas path c = writeFile path $ ppCanvas c
+
+ppCanvas :: Canvas -> String
+ppCanvas c =
+    let ppLine pairs = unlines $ ppPair <$> pairs
+        ppPair (_attr, str) =
+            unlines [ str
+                    , "attr"
+                    ]
+    in unlines $ ppLine <$> rleEncode c
+
+decodeCanvas :: Canvas -> [[(Char, V.Attr)]]
+decodeCanvas c =
+    decodeRow <$> [0..height-1]
+    where
+        (width, height) = canvasSize c
+        decodeRow row = canvasGetPixel c <$> (, row) <$> [0..width-1]
+
+rleEncode :: Canvas -> [[(V.Attr, [Char])]]
+rleEncode c =
+    rleEncodeLine <$> decodeCanvas c
+
+rleEncodeLine :: [(Char, V.Attr)] -> [(V.Attr, [Char])]
+rleEncodeLine row =
+    let go chunk [] = [chunk]
+        go (prevAttr, prevChunk) ((curChar, curAttr):rest) =
+            if prevAttr == curAttr
+            then go (prevAttr, prevChunk <> [curChar]) rest
+            else (prevAttr, prevChunk) : go (curAttr, [curChar]) rest
+    in go (V.defAttr, "") row
 
 canvasSize :: Canvas -> (Int, Int)
 canvasSize = size

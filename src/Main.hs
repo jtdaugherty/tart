@@ -1,12 +1,15 @@
 module Main where
 
-import Control.Monad (void)
 import Brick
+import Lens.Micro.Platform
 
 import App
 import Util
+import Canvas
+import Types
 
 main :: IO ()
 main = do
     checkForMouseSupport
-    (void . defaultMain application) =<< mkInitialState
+    finalSt <- (defaultMain application) =<< mkInitialState
+    writeCanvas "out.txt" $ finalSt^.drawing
