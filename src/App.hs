@@ -1,3 +1,4 @@
+{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE OverloadedStrings #-}
 module App
   ( application
@@ -43,11 +44,11 @@ defaultPalette = Vec.fromList
 initialCanvasSize :: (Int, Int)
 initialCanvasSize = (20, 10)
 
-mkInitialState :: Maybe Canvas -> IO AppState
+mkInitialState :: Maybe (FilePath, Canvas) -> IO AppState
 mkInitialState mc = do
-    c <- case mc of
-        Nothing -> newCanvas initialCanvasSize
-        Just c -> return c
+    (c, fp) <- case mc of
+        Nothing -> (, Nothing) <$> newCanvas initialCanvasSize
+        Just (fp, c) -> return (c, Just fp)
 
     return $ AppState { _drawing                 = c
                       , _mode                    = Main
@@ -68,6 +69,8 @@ mkInitialState mc = do
                                                              ]
                       , _canvasOffset            = Location $
                                                    canvasSize c & each %~ (`div` 2)
+                      , _canvasPath              = fp
+                      , _canvasDirty             = False
                       }
 
 application :: App AppState () Name

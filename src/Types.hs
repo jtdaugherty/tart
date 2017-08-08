@@ -24,6 +24,8 @@ module Types
   , canvasSizeHeightEdit
   , canvasSizeFocus
   , canvasOffset
+  , canvasPath
+  , canvasDirty
   )
 where
 
@@ -89,6 +91,8 @@ data AppState =
              , _canvasSizeHeightEdit    :: Editor T.Text Name
              , _canvasSizeFocus         :: FocusRing Name
              , _canvasOffset            :: Location
+             , _canvasPath              :: Maybe FilePath
+             , _canvasDirty             :: Bool
              }
 
 makeLenses ''AppState

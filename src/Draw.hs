@@ -35,6 +35,7 @@ drawAtPoint' point ch attr s = do
     let arr = s^.drawing
     arr' <- liftIO $ canvasSetPixel arr point ch attr
     return $ s & drawing .~ arr'
+               & canvasDirty .~ True
 
 eraseAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
 eraseAtPoint point s =

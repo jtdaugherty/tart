@@ -11,6 +11,7 @@ module Util
   , decreaseCanvasSize
   , beginCanvasSizePrompt
   , tryResizeCanvas
+  , quit
 
   , canvasMoveDown
   , canvasMoveUp
@@ -46,6 +47,15 @@ tools =
     [ (FreeHand, 1)
     , (Eraser, 0)
     ]
+
+quit :: AppState -> EventM Name (Next AppState)
+quit s = do
+    when (s^.canvasDirty) $ do
+        case s^.canvasPath of
+            Nothing -> return ()
+            Just p -> liftIO $ writeCanvas p $ s^.drawing
+
+    halt s
 
 increaseCanvasSize :: AppState -> EventM Name AppState
 increaseCanvasSize s =

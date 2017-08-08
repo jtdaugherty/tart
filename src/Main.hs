@@ -1,7 +1,7 @@
 module Main where
 
+import Control.Monad (void)
 import Brick
-import Lens.Micro.Platform
 import System.Environment (getArgs)
 import System.Exit (exitFailure)
 import Data.Monoid ((<>))
@@ -9,10 +9,11 @@ import Data.Monoid ((<>))
 import App
 import Util
 import Canvas
-import Types
 
 main :: IO ()
 main = do
+    checkForMouseSupport
+
     args <- getArgs
     c <- case args of
         [f] -> do
@@ -21,10 +22,7 @@ main = do
                 Left e -> do
                     putStrLn $ f <> ": could not read file: " <> e
                     exitFailure
-                Right c -> return $ Just c
+                Right c -> return $ Just (f, c)
         _ -> return Nothing
 
-    checkForMouseSupport
-    finalSt <- (defaultMain application) =<< mkInitialState c
-    writeCanvasFriendly "out.txt" $ finalSt^.drawing
-    writeCanvas "out.bin" $ finalSt^.drawing
+    (void . defaultMain application) =<< mkInitialState c
