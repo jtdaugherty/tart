@@ -60,15 +60,23 @@ colorName :: V.Color -> String
 colorName (V.Color240 w) = "color240 " <> show w
 colorName (V.ISOColor w) =
     case w of
-        0 -> "black"
-        1 -> "red"
-        2 -> "green"
-        3 -> "yellow"
-        4 -> "blue"
-        5 -> "magenta"
-        6 -> "cyan"
-        7 -> "white"
-        _ -> "unknown"
+        0  -> "black"
+        1  -> "red"
+        2  -> "green"
+        3  -> "yellow"
+        4  -> "blue"
+        5  -> "magenta"
+        6  -> "cyan"
+        7  -> "white"
+        8  -> "brightBlack"
+        9  -> "brightRed"
+        10 -> "brightGreen"
+        11 -> "brightYellow"
+        12 -> "brightBlue"
+        13 -> "brightMagenta"
+        14 -> "brightCyan"
+        15 -> "brightWhite"
+        _  -> "unknown"
 
 decodeCanvas :: Canvas -> [[(Char, V.Attr)]]
 decodeCanvas c =
