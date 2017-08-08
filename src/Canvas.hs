@@ -46,11 +46,29 @@ writeCanvas path c = writeFile path $ ppCanvas c
 ppCanvas :: Canvas -> String
 ppCanvas c =
     let ppLine pairs = unlines $ ppPair <$> pairs
-        ppPair (_attr, str) =
-            unlines [ str
-                    , "attr"
+        ppChange NoChange    = "keep"
+        ppChange (Set color) = colorName color
+        ppChange Clear       = "clear"
+        ppPair ((fChange, bChange), str) =
+            unlines [ ppChange fChange
+                    , ppChange bChange
+                    , str
                     ]
     in unlines $ ppLine <$> rleEncode c
+
+colorName :: V.Color -> String
+colorName (V.Color240 w) = "color240 " <> show w
+colorName (V.ISOColor w) =
+    case w of
+        0 -> "black"
+        1 -> "red"
+        2 -> "green"
+        3 -> "yellow"
+        4 -> "blue"
+        5 -> "magenta"
+        6 -> "cyan"
+        7 -> "white"
+        _ -> "unknown"
 
 decodeCanvas :: Canvas -> [[(Char, V.Attr)]]
 decodeCanvas c =
@@ -59,18 +77,42 @@ decodeCanvas c =
         (width, height) = canvasSize c
         decodeRow row = canvasGetPixel c <$> (, row) <$> [0..width-1]
 
-rleEncode :: Canvas -> [[(V.Attr, [Char])]]
+rleEncode :: Canvas -> [[((ColorChange, ColorChange), [Char])]]
 rleEncode c =
     rleEncodeLine <$> decodeCanvas c
 
-rleEncodeLine :: [(Char, V.Attr)] -> [(V.Attr, [Char])]
+rleEncodeLine :: [(Char, V.Attr)] -> [((ColorChange, ColorChange), [Char])]
 rleEncodeLine row =
-    let go chunk [] = [chunk]
-        go (prevAttr, prevChunk) ((curChar, curAttr):rest) =
-            if prevAttr == curAttr
-            then go (prevAttr, prevChunk <> [curChar]) rest
-            else (prevAttr, prevChunk) : go (curAttr, [curChar]) rest
-    in go (V.defAttr, "") row
+    let go (changes, _, s) [] = [(changes, s)]
+        go (changes, prevAttr, prevChunk) ((curChar, curAttr):rest) =
+            let (f, b) = colorChanges prevAttr curAttr
+            in if f == NoChange && b == NoChange
+               then go (changes, prevAttr, prevChunk <> [curChar]) rest
+               else (changes, prevChunk) : go ((f, b), curAttr, [curChar]) rest
+    in go ((NoChange, NoChange), V.defAttr, "") row
+
+data ColorChange =
+    NoChange
+    | Clear
+    | Set V.Color
+    deriving (Show, Eq)
+
+colorChanges :: V.Attr -> V.Attr -> (ColorChange, ColorChange)
+colorChanges a b =
+    let fg = colorChange (V.attrForeColor a) (V.attrForeColor b)
+        bg = colorChange (V.attrBackColor a) (V.attrBackColor b)
+    in (fg, bg)
+
+colorChange ::  V.MaybeDefault V.Color
+            -> V.MaybeDefault V.Color
+            -> ColorChange
+colorChange V.Default V.Default       = NoChange
+colorChange _ V.KeepCurrent           = NoChange
+colorChange V.KeepCurrent V.Default   = Clear
+colorChange (V.SetTo _) V.Default     = Clear
+colorChange (V.SetTo a) (V.SetTo b)   = if a == b then NoChange else Set b
+colorChange V.Default (V.SetTo b)     = Set b
+colorChange V.KeepCurrent (V.SetTo b) = Set b
 
 canvasSize :: Canvas -> (Int, Int)
 canvasSize = size
