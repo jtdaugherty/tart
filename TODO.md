@@ -20,7 +20,3 @@
 - Undo / redo
 
 - Layers
-
-- Scroll around rather than truncating to terminal size (WASD), resize
-  the canvas array only when the user draws a pixel outside the current
-  range

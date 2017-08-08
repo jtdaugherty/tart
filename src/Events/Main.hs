@@ -20,7 +20,15 @@ handleMainEvent s e = do
         Nothing -> handleEvent s e
 
 handleEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
+handleEvent s (VtyEvent (V.EvKey (V.KChar 'w') [])) = do
+    continue $ canvasMoveDown s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 's') [])) = do
+    continue $ canvasMoveUp s
+handleEvent s (VtyEvent (V.EvKey (V.KChar 'a') [])) = do
+    continue $ canvasMoveLeft s
+handleEvent s (VtyEvent (V.EvKey (V.KChar 'd') [])) = do
+    continue $ canvasMoveRight s
+handleEvent s (VtyEvent (V.EvKey (V.KChar 'v') [])) = do
     continue $ beginCanvasSizePrompt s
 handleEvent s (MouseDown ResizeCanvas _ _ _) = do
     continue $ beginCanvasSizePrompt s

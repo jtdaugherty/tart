@@ -26,6 +26,7 @@ module Types
   , canvasSizeWidthEdit
   , canvasSizeHeightEdit
   , canvasSizeFocus
+  , canvasOffset
 
   , blankPixel
   , encodePixel
@@ -33,7 +34,7 @@ module Types
   )
 where
 
-import Brick (Extent)
+import Brick (Extent, Location)
 import Brick.Focus
 import Brick.Widgets.Edit (Editor)
 import qualified Data.Text as T
@@ -148,6 +149,7 @@ data AppState =
              , _canvasSizeWidthEdit     :: Editor T.Text Name
              , _canvasSizeHeightEdit    :: Editor T.Text Name
              , _canvasSizeFocus         :: FocusRing Name
+             , _canvasOffset            :: Location
              }
 
 makeLenses ''AppState

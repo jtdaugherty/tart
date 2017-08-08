@@ -59,6 +59,8 @@ mkInitialState = do
                       , _canvasSizeFocus         = focusRing [ CanvasSizeWidthEdit
                                                              , CanvasSizeHeightEdit
                                                              ]
+                      , _canvasOffset            = Location $
+                                                   initialCanvasSize & each %~ (`div` 2)
                       }
 
 application :: App AppState () Name

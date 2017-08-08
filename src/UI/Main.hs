@@ -49,7 +49,7 @@ drawCanvasSize :: AppState -> Widget Name
 drawCanvasSize s =
     let (width, height) = s^.canvasSize
     in clickable ResizeCanvas $
-       borderWithLabel (str "Canva" <+> (withDefAttr keybindingAttr (str "s"))) $
+       borderWithLabel (str "Can" <+> (withDefAttr keybindingAttr (str "v")) <+> str "as") $
        str $ show width <> " columns, " <> show height <> " rows"
 
 drawChar :: AppState -> Widget Name
@@ -85,7 +85,7 @@ drawPaletteSelector s isFg =
 
 canvas :: AppState -> Widget Name
 canvas s =
-    center $
+    centerAbout (s^.canvasOffset) $
     border $
     clickable Canvas $
     raw $ canvasToImage $ s^.drawingFrozen

@@ -12,6 +12,11 @@ module Util
   , beginCanvasSizePrompt
   , tryResizeCanvas
 
+  , canvasMoveDown
+  , canvasMoveUp
+  , canvasMoveLeft
+  , canvasMoveRight
+
   , tools
 
   , beginCharacterSelect
@@ -66,6 +71,22 @@ beginCanvasSizePrompt s =
                                            T.pack $ show $ s^.canvasSize._1)
           & canvasSizeHeightEdit .~ applyEdit gotoEOL (editor CanvasSizeHeightEdit (Just 1) $
                                            T.pack $ show $ s^.canvasSize._2)
+
+canvasMoveDown :: AppState -> AppState
+canvasMoveDown s =
+    s & canvasOffset._2 %~ pred
+
+canvasMoveUp :: AppState -> AppState
+canvasMoveUp s =
+    s & canvasOffset._2 %~ succ
+
+canvasMoveLeft :: AppState -> AppState
+canvasMoveLeft s =
+    s & canvasOffset._1 %~ pred
+
+canvasMoveRight :: AppState -> AppState
+canvasMoveRight s =
+    s & canvasOffset._1 %~ succ
 
 tryResizeCanvas :: AppState -> EventM Name AppState
 tryResizeCanvas s = do
@@ -153,3 +174,4 @@ resizeCanvas s newSz = do
             return $ s & drawing .~ newDraw
                        & drawingFrozen .~ newDrawFrozen
                        & canvasSize .~ newSz
+                       & canvasOffset .~ Location (maxW `div` 2, maxH `div` 2)
