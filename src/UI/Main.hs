@@ -76,7 +76,11 @@ drawPaletteSelector s isFg =
         curColor = drawPaletteEntry s curIdx 4 isFg
 
 canvas :: AppState -> Widget Name
-canvas s = clickable Canvas $ raw $ canvasToImage $ s^.drawingFrozen
+canvas s =
+    center $
+    border $
+    clickable Canvas $
+    raw $ canvasToImage $ s^.drawingFrozen
 
 canvasToImage :: A.UArray (Int, Int) Word64 -> V.Image
 canvasToImage a =

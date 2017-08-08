@@ -7,13 +7,13 @@ where
 import qualified Graphics.Vty as V
 import qualified Data.Vector as Vec
 import qualified Data.Array.MArray as A
+import Lens.Micro.Platform
 
 import Brick
 
 import Types
 import Events
 import UI
-import Util
 import Theme
 
 defaultPalette :: Vec.Vector PaletteEntry
@@ -29,14 +29,17 @@ defaultPalette = Vec.fromList
     , PaletteEntry (`V.withForeColor` V.yellow  ) (`V.withBackColor` V.yellow)
     ]
 
+initialCanvasSize :: (Int, Int)
+initialCanvasSize = (20, 10)
+
 mkInitialState :: IO AppState
 mkInitialState = do
-    let arrayBounds = ((0, 0), (0, 0))
+    let arrayBounds = ((0, 0), initialCanvasSize & each %~ pred)
     draw <- A.newArray arrayBounds blankPixel
     drawFreeze <- A.freeze draw
     return $ AppState { _drawing                 = draw
                       , _drawingFrozen           = drawFreeze
-                      , _canvasSize              = (0, 0)
+                      , _canvasSize              = initialCanvasSize
                       , _mode                    = Main
                       , _tool                    = FreeHand
                       , _drawCharacter           = '*'
@@ -58,6 +61,6 @@ application =
         , appStartEvent = \s -> do
             vty <- getVtyHandle
             V.setMode (V.outputIface vty) V.Mouse True
-            resizeCanvas s
+            return s
         , appAttrMap = const theme
         }
