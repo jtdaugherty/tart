@@ -9,8 +9,6 @@ module Types
 
   , AppState(..)
   , drawing
-  , drawingFrozen
-  , canvasSize
   , mode
   , tool
   , showHud
@@ -33,12 +31,11 @@ import Brick (Extent, Location)
 import Brick.Focus
 import Brick.Widgets.Edit (Editor)
 import qualified Data.Text as T
-import Data.Word (Word64)
 import Lens.Micro.TH
 import qualified Data.Vector as Vec
 import qualified Graphics.Vty as V
-import Data.Array.IO (IOUArray)
-import Data.Array.Unboxed (UArray)
+
+import Canvas
 
 data Mode = Main
           | CharacterSelect
@@ -76,9 +73,7 @@ data PaletteEntry =
                  }
 
 data AppState =
-    AppState { _drawing                 :: IOUArray (Int, Int) Word64
-             , _drawingFrozen           :: UArray (Int, Int) Word64
-             , _canvasSize              :: (Int, Int)
+    AppState { _drawing                 :: Canvas
              , _mode                    :: Mode
              , _drawFgPaletteIndex      :: Int
              , _drawBgPaletteIndex      :: Int

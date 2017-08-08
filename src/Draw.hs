@@ -9,8 +9,6 @@ where
 import Brick
 import Lens.Micro.Platform
 import Control.Monad.Trans (liftIO)
-import qualified Data.Array.MArray as A
-import qualified Data.Array.Unsafe as A
 import qualified Data.Vector as Vec
 import qualified Graphics.Vty as V
 
@@ -19,12 +17,8 @@ import Canvas
 
 clearCanvas :: AppState -> EventM Name AppState
 clearCanvas s = do
-    let newBounds = ((0, 0), ((s^.canvasSize) & each %~ pred))
-    liftIO $ do
-        newDraw <- A.newArray newBounds blankPixel
-        newFreeze <- A.unsafeFreeze newDraw
-        return $ s & drawing .~ newDraw
-                   & drawingFrozen .~ newFreeze
+    newC <- liftIO $ newCanvas $ canvasSize (s^.drawing)
+    return $ s & drawing .~ newC
 
 drawWithCurrentTool :: (Int, Int) -> AppState -> EventM Name AppState
 drawWithCurrentTool point s =
@@ -39,9 +33,8 @@ drawAtPoint point s =
 drawAtPoint' :: (Int, Int) -> Char -> V.Attr -> AppState -> EventM Name AppState
 drawAtPoint' point ch attr s = do
     let arr = s^.drawing
-    liftIO $ A.writeArray arr point $ encodePixel ch attr
-    f <- liftIO $ A.freeze arr
-    return $ s & drawingFrozen .~ f
+    arr' <- liftIO $ canvasSetPixel arr point ch attr
+    return $ s & drawing .~ arr'
 
 eraseAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
 eraseAtPoint point s =

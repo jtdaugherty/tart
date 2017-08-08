@@ -9,9 +9,7 @@ import Brick.Widgets.Border
 import Brick.Widgets.Center
 import Data.Monoid ((<>))
 import qualified Graphics.Vty as V
-import qualified Data.Array.Unboxed as A
 import Lens.Micro.Platform
-import Data.Word (Word64)
 
 import Types
 import UI.Common
@@ -48,7 +46,7 @@ hud s =
 
 drawCanvasSize :: AppState -> Widget Name
 drawCanvasSize s =
-    let (width, height) = s^.canvasSize
+    let (width, height) = canvasSize $ s^.drawing
     in clickable ResizeCanvas $
        borderWithLabel (str "Can" <+> (withDefAttr keybindingAttr (str "v")) <+> str "as") $
        str $ show width <> " columns, " <> show height <> " rows"
@@ -89,12 +87,12 @@ canvas s =
     centerAbout (s^.canvasOffset) $
     border $
     clickable Canvas $
-    raw $ canvasToImage $ s^.drawingFrozen
+    raw $ canvasToImage (s^.drawing)
 
-canvasToImage :: A.UArray (Int, Int) Word64 -> V.Image
+canvasToImage :: Canvas -> V.Image
 canvasToImage a =
-    let (_, (lastCol, lastRow)) = A.bounds a
+    let (lastCol, lastRow) = canvasSize a & each %~ pred
         rows = getRow <$> [0..lastRow]
-        getRow r = V.horizCat $ (uncurry $ flip V.char) <$> decodePixel <$> getCol r <$> [0..lastCol]
-        getCol r c = a A.! (c, r)
+        getRow r = V.horizCat $ (uncurry $ flip V.char) <$> getCol r <$> [0..lastCol]
+        getCol r c = canvasGetPixel a (c, r)
     in V.vertCat rows

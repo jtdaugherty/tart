@@ -7,7 +7,6 @@ where
 
 import qualified Graphics.Vty as V
 import qualified Data.Vector as Vec
-import qualified Data.Array.MArray as A
 import Lens.Micro.Platform
 
 import Brick
@@ -38,12 +37,8 @@ initialCanvasSize = (20, 10)
 
 mkInitialState :: IO AppState
 mkInitialState = do
-    let arrayBounds = ((0, 0), initialCanvasSize & each %~ pred)
-    draw <- A.newArray arrayBounds blankPixel
-    drawFreeze <- A.freeze draw
-    return $ AppState { _drawing                 = draw
-                      , _drawingFrozen           = drawFreeze
-                      , _canvasSize              = initialCanvasSize
+    c <- newCanvas initialCanvasSize
+    return $ AppState { _drawing                 = c
                       , _mode                    = Main
                       , _tool                    = FreeHand
                       , _drawCharacter           = '*'
