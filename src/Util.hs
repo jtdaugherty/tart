@@ -38,7 +38,8 @@ tools =
 
 increaseCanvasSize :: AppState -> EventM Name AppState
 increaseCanvasSize s =
-    resizeCanvas s (s^.canvasSize & _1 %~ (+ 4) & _2 %~ (+ 2))
+    resizeCanvas s (s^.canvasSize & _1 %~ (\w -> if w == 1 then 4 else w + 4)
+                                  & _2 %~ (\h -> if h == 1 then 2 else h + 2))
 
 decreaseCanvasSize :: AppState -> EventM Name AppState
 decreaseCanvasSize s =
