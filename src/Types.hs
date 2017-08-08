@@ -23,6 +23,9 @@ module Types
   , bgPaletteSelectorExtent
   , toolSelectorExtent
   , dragging
+  , canvasSizeWidthEdit
+  , canvasSizeHeightEdit
+  , canvasSizeFocus
 
   , blankPixel
   , encodePixel
@@ -31,6 +34,9 @@ module Types
 where
 
 import Brick (Extent)
+import Brick.Focus
+import Brick.Widgets.Edit (Editor)
+import qualified Data.Text as T
 import Data.Bits
 import Data.Word (Word64)
 import Lens.Micro.TH
@@ -44,6 +50,7 @@ data Mode = Main
           | FgPaletteEntrySelect
           | BgPaletteEntrySelect
           | ToolSelect
+          | CanvasSizePrompt
           deriving (Eq, Show)
 
 data Name = Canvas
@@ -55,6 +62,9 @@ data Name = Canvas
           | BgSelector
           | FgPaletteEntry Int
           | BgPaletteEntry Int
+          | ResizeCanvas
+          | CanvasSizeWidthEdit
+          | CanvasSizeHeightEdit
           deriving (Eq, Show, Ord)
 
 data Tool = FreeHand
@@ -135,6 +145,9 @@ data AppState =
              , _bgPaletteSelectorExtent :: Maybe (Extent Name)
              , _toolSelectorExtent      :: Maybe (Extent Name)
              , _dragging                :: Maybe Name
+             , _canvasSizeWidthEdit     :: Editor T.Text Name
+             , _canvasSizeHeightEdit    :: Editor T.Text Name
+             , _canvasSizeFocus         :: FocusRing Name
              }
 
 makeLenses ''AppState

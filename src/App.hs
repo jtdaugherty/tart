@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module App
   ( application
   , mkInitialState
@@ -10,6 +11,8 @@ import qualified Data.Array.MArray as A
 import Lens.Micro.Platform
 
 import Brick
+import Brick.Focus
+import Brick.Widgets.Edit (editor)
 
 import Types
 import Events
@@ -51,12 +54,22 @@ mkInitialState = do
                       , _bgPaletteSelectorExtent = Nothing
                       , _toolSelectorExtent      = Nothing
                       , _dragging                = Nothing
+                      , _canvasSizeWidthEdit     = editor CanvasSizeWidthEdit (Just 1) ""
+                      , _canvasSizeHeightEdit    = editor CanvasSizeHeightEdit (Just 1) ""
+                      , _canvasSizeFocus         = focusRing [ CanvasSizeWidthEdit
+                                                             , CanvasSizeHeightEdit
+                                                             ]
                       }
 
 application :: App AppState () Name
 application =
     App { appDraw = drawUI
-        , appChooseCursor = neverShowCursor
+        , appChooseCursor = \s locs ->
+            case s^.mode of
+                CanvasSizePrompt -> do
+                    cur <- focusGetCurrent (s^.canvasSizeFocus)
+                    showCursorNamed cur locs
+                _ -> Nothing
         , appHandleEvent = handleEvent
         , appStartEvent = \s -> do
             vty <- getVtyHandle

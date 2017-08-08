@@ -22,12 +22,14 @@ executable tart
                        Events.PaletteEntrySelect
                        Events.ToolSelect
                        Events.Common
+                       Events.CanvasSizePrompt
                        UI
                        UI.Main
                        UI.Common
                        UI.CharacterSelect
                        UI.PaletteEntrySelect
                        UI.ToolSelect
+                       UI.CanvasSizePrompt
                        Util
                        Theme
                        Types
@@ -41,4 +43,6 @@ executable tart
                        vector,
                        microlens-platform,
                        microlens-th,
-                       mtl
+                       mtl,
+                       text,
+                       text-zipper

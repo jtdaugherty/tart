@@ -48,7 +48,8 @@ hud s =
 drawCanvasSize :: AppState -> Widget Name
 drawCanvasSize s =
     let (width, height) = s^.canvasSize
-    in borderWithLabel (str "Canvas") $
+    in clickable ResizeCanvas $
+       borderWithLabel (str "Canva" <+> (withDefAttr keybindingAttr (str "s"))) $
        str $ show width <> " columns, " <> show height <> " rows"
 
 drawChar :: AppState -> Widget Name

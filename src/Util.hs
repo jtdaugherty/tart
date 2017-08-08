@@ -9,6 +9,8 @@ module Util
   , setMode
   , increaseCanvasSize
   , decreaseCanvasSize
+  , beginCanvasSizePrompt
+  , tryResizeCanvas
 
   , tools
 
@@ -22,11 +24,16 @@ import Control.Monad (when, forM_)
 import Control.Monad.Trans (liftIO)
 import qualified Graphics.Vty as V
 import qualified Data.Array.MArray as A
+import qualified Data.Text as T
 import System.Exit (exitFailure)
 import Lens.Micro.Platform
 import qualified Data.Array.Unsafe as A
+import Data.Text.Zipper (gotoEOL)
+import Text.Read (readMaybe)
 
 import Brick
+import Brick.Focus
+import Brick.Widgets.Edit (editor, applyEdit, getEditContents)
 
 import Types
 
@@ -48,6 +55,30 @@ decreaseCanvasSize s =
 
 setMode :: Mode -> AppState -> AppState
 setMode m s = s & mode .~ m
+
+beginCanvasSizePrompt :: AppState -> AppState
+beginCanvasSizePrompt s =
+    setMode CanvasSizePrompt $
+        s & canvasSizeFocus .~ focusRing [ CanvasSizeWidthEdit
+                                         , CanvasSizeHeightEdit
+                                         ]
+          & canvasSizeWidthEdit  .~ applyEdit gotoEOL (editor CanvasSizeWidthEdit (Just 1) $
+                                           T.pack $ show $ s^.canvasSize._1)
+          & canvasSizeHeightEdit .~ applyEdit gotoEOL (editor CanvasSizeHeightEdit (Just 1) $
+                                           T.pack $ show $ s^.canvasSize._2)
+
+tryResizeCanvas :: AppState -> EventM Name AppState
+tryResizeCanvas s = do
+    -- If the canvas size prompt inputs are valid, resize the canvas and
+    -- exit prompt mode. Otherwise stay in prompt mode.
+    let [wStr] = getEditContents $ s^.canvasSizeWidthEdit
+        [hStr] = getEditContents $ s^.canvasSizeHeightEdit
+        result = (,) <$> (readMaybe $ T.unpack wStr)
+                     <*> (readMaybe $ T.unpack hStr)
+    case result of
+        Just (w, h) | w > 0 && h > 0 -> do
+            resizeCanvas (setMode Main s) (w, h)
+        _ -> return s
 
 beginToolSelect :: AppState -> AppState
 beginToolSelect s =

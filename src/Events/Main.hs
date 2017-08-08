@@ -20,6 +20,10 @@ handleMainEvent s e = do
         Nothing -> handleEvent s e
 
 handleEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
+handleEvent s (VtyEvent (V.EvKey (V.KChar 's') [])) = do
+    continue $ beginCanvasSizePrompt s
+handleEvent s (MouseDown ResizeCanvas _ _ _) = do
+    continue $ beginCanvasSizePrompt s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'f') [])) = do
     continue $ beginFgPaletteSelect s
 handleEvent s (MouseDown FgSelector _ _ _) = do
