@@ -41,14 +41,12 @@ hud s =
                          , drawCanvasSize s
                          ]
         filename = case s^.canvasPath of
-            Nothing -> emptyWidget
-            Just p -> borderElem bsHorizontal <+> str ("[" <> p <> "]")
-        modified = if not $ s^.canvasDirty
-                      then emptyWidget
-                      else str "[modified]" <+> borderElem bsHorizontal
+            Nothing -> "<unsaved>"
+            Just p -> p
+        modified = if not $ s^.canvasDirty then "" else "*"
     in clickable Hud $
        vBox [ hCenter $ padLeft (Pad 1) $ hBox $ padRight (Pad 1) <$> toolbarEntries
-            , hBox [filename, hBorder, modified]
+            , hBox [borderElem bsHorizontal <+> str ("[" <> filename <> modified <> "]") <+> hBorder]
             ]
 
 drawCanvasSize :: AppState -> Widget Name
