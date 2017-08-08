@@ -52,7 +52,7 @@ mkInitialState mc = do
 
     return $ AppState { _drawing                 = c
                       , _mode                    = Main
-                      , _tool                    = FreeHand
+                      , _tool                    = Freehand
                       , _drawCharacter           = '*'
                       , _showHud                 = True
                       , _drawFgPaletteIndex      = 0

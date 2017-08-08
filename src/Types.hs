@@ -64,7 +64,7 @@ data Name = Canvas
           | AskToSaveFilenameEdit
           deriving (Eq, Show, Ord)
 
-data Tool = FreeHand
+data Tool = Freehand
           | Eraser
           deriving (Eq, Show, Ord)
 

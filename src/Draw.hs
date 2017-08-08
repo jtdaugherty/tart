@@ -23,7 +23,7 @@ clearCanvas s = do
 drawWithCurrentTool :: (Int, Int) -> AppState -> EventM Name AppState
 drawWithCurrentTool point s =
     case s^.tool of
-        FreeHand -> drawAtPoint point s
+        Freehand -> drawAtPoint point s
         Eraser   -> eraseAtPoint point s
 
 drawAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
