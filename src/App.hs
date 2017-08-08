@@ -18,6 +18,7 @@ import Types
 import Events
 import UI
 import Theme
+import Canvas
 
 defaultPalette :: Vec.Vector PaletteEntry
 defaultPalette = Vec.fromList

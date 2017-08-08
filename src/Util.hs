@@ -41,6 +41,7 @@ import Brick.Focus
 import Brick.Widgets.Edit (editor, applyEdit, getEditContents)
 
 import Types
+import Canvas
 
 tools :: [(Tool, Int)]
 tools =

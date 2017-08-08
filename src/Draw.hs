@@ -15,6 +15,7 @@ import qualified Data.Vector as Vec
 import qualified Graphics.Vty as V
 
 import Types
+import Canvas
 
 clearCanvas :: AppState -> EventM Name AppState
 clearCanvas s = do
