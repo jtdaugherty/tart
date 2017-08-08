@@ -1,5 +1,4 @@
 
-- Set custom canvas size
 - Let user pick RGB colors
 
 - Guide lines?
