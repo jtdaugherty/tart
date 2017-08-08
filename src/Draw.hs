@@ -39,7 +39,8 @@ drawAtPoint' :: (Int, Int) -> Char -> V.Attr -> AppState -> EventM Name AppState
 drawAtPoint' point ch attr s = do
     let arr = s^.drawing
     liftIO $ A.writeArray arr point $ encodePixel ch attr
-    return s
+    f <- liftIO $ A.freeze arr
+    return $ s & drawingFrozen .~ f
 
 eraseAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
 eraseAtPoint point s =
