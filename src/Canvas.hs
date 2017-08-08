@@ -1,3 +1,4 @@
+{-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE BinaryLiterals #-}
 module Canvas
@@ -8,6 +9,8 @@ module Canvas
   , canvasGetPixel
   , resizeFrom
   , writeCanvasFriendly
+  , writeCanvas
+  , readCanvas
 
   , blankPixel
   , encodePixel
@@ -15,7 +18,7 @@ module Canvas
   )
 where
 
-import Control.Monad (forM_)
+import Control.Monad (forM_, replicateM)
 import Data.Bits
 import Data.Word (Word64)
 import Data.Monoid ((<>))
@@ -23,6 +26,11 @@ import qualified Graphics.Vty as V
 import qualified Data.Array.IArray as I
 import qualified Data.Array.MArray as A
 import qualified Data.Array.Unsafe as A
+import qualified Data.Binary as B
+import qualified Data.Binary.Put as B
+import qualified Data.Binary.Get as B
+import qualified Data.ByteString as BS
+import qualified Data.ByteString.Lazy as BSL
 import Data.Array.IO (IOUArray)
 import Data.Array.Unboxed (UArray)
 import Lens.Micro.Platform
@@ -42,6 +50,48 @@ newCanvas sz = do
 
 writeCanvasFriendly :: FilePath -> Canvas -> IO ()
 writeCanvasFriendly path c = writeFile path $ ppCanvas c
+
+readCanvas :: FilePath -> IO (Either String Canvas)
+readCanvas path = do
+    bytes <- BS.readFile path
+
+    let parser :: B.Get ((Int, Int), [Word64])
+        parser = do
+            (w, h) <- B.get
+            ps <- replicateM (w * h) B.get
+            return ((w, h), ps)
+    case B.runGetOrFail parser $ BSL.fromStrict bytes of
+        Left (_, _, s) -> return $ Left s
+        Right (remaining, _, val) -> do
+            let (sz, pixels) = val
+
+            if | not $ BSL.null remaining ->
+                   return $ Left $ "File contained " <> show (BSL.length remaining) <>
+                                   " extra bytes"
+               | length pixels /= fst sz * snd sz ->
+                   return $ Left "File did not contain expected amount of data"
+               | otherwise -> do
+                   c <- newCanvas sz
+
+                   let (width, height) = sz
+                       idxs = [(w, h) | w <- [0..width-1], h <- [0..height-1]]
+
+                   forM_ (zip idxs pixels) $ uncurry $ A.writeArray (mut c)
+
+                   f <- A.unsafeFreeze $ mut c
+                   return $ Right $ c { immut = f }
+
+writeCanvas :: FilePath -> Canvas -> IO ()
+writeCanvas path c = do
+    let bytes = B.runPut $ do
+          B.put $ canvasSize c
+
+          let (width, height) = canvasSize c
+          forM_ [0..width-1] $ \w ->
+              forM_ [0..height-1] $ \h ->
+                  B.put $ (immut c) I.! (w, h)
+
+    BS.writeFile path $ BSL.toStrict bytes
 
 ppCanvas :: Canvas -> String
 ppCanvas c =

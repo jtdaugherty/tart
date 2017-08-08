@@ -43,9 +43,12 @@ defaultPalette = Vec.fromList
 initialCanvasSize :: (Int, Int)
 initialCanvasSize = (20, 10)
 
-mkInitialState :: IO AppState
-mkInitialState = do
-    c <- newCanvas initialCanvasSize
+mkInitialState :: Maybe Canvas -> IO AppState
+mkInitialState mc = do
+    c <- case mc of
+        Nothing -> newCanvas initialCanvasSize
+        Just c -> return c
+
     return $ AppState { _drawing                 = c
                       , _mode                    = Main
                       , _tool                    = FreeHand
@@ -64,7 +67,7 @@ mkInitialState = do
                                                              , CanvasSizeHeightEdit
                                                              ]
                       , _canvasOffset            = Location $
-                                                   initialCanvasSize & each %~ (`div` 2)
+                                                   canvasSize c & each %~ (`div` 2)
                       }
 
 application :: App AppState () Name
