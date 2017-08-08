@@ -3,8 +3,6 @@
 
 - Guide lines?
 
-- Dirty flag with prompt to save on exit
-
 - Extra drawing primitives:
   - circles
   - rectangles (click and drag)

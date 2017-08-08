@@ -13,6 +13,7 @@ import Events.CharacterSelect
 import Events.PaletteEntrySelect
 import Events.ToolSelect
 import Events.CanvasSizePrompt
+import Events.AskToSave
 
 handleEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
 handleEvent s (VtyEvent (V.EvResize _ _)) = do
@@ -42,6 +43,7 @@ handleEvent s e = do
                 ToolSelect           -> handleToolSelectEvent st ev
                 CharacterSelect      -> handleCharacterSelectEvent st ev
                 CanvasSizePrompt     -> handleCanvasSizePromptEvent st ev
+                AskToSave            -> handleAskToSaveEvent st ev
 
 updateExtents :: AppState -> EventM Name AppState
 updateExtents s = do

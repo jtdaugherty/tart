@@ -23,6 +23,7 @@ executable tart
                        Events.ToolSelect
                        Events.Common
                        Events.CanvasSizePrompt
+                       Events.AskToSave
                        UI
                        UI.Main
                        UI.Common
@@ -30,6 +31,7 @@ executable tart
                        UI.PaletteEntrySelect
                        UI.ToolSelect
                        UI.CanvasSizePrompt
+                       UI.AskToSave
                        Util
                        Theme
                        Types

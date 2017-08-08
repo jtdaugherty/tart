@@ -26,6 +26,7 @@ module Types
   , canvasOffset
   , canvasPath
   , canvasDirty
+  , askToSaveFilenameEdit
   )
 where
 
@@ -45,6 +46,7 @@ data Mode = Main
           | BgPaletteEntrySelect
           | ToolSelect
           | CanvasSizePrompt
+          | AskToSave
           deriving (Eq, Show)
 
 data Name = Canvas
@@ -59,6 +61,7 @@ data Name = Canvas
           | ResizeCanvas
           | CanvasSizeWidthEdit
           | CanvasSizeHeightEdit
+          | AskToSaveFilenameEdit
           deriving (Eq, Show, Ord)
 
 data Tool = FreeHand
@@ -93,6 +96,7 @@ data AppState =
              , _canvasOffset            :: Location
              , _canvasPath              :: Maybe FilePath
              , _canvasDirty             :: Bool
+             , _askToSaveFilenameEdit   :: Editor T.Text Name
              }
 
 makeLenses ''AppState

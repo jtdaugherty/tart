@@ -48,14 +48,28 @@ tools =
     , (Eraser, 0)
     ]
 
-quit :: AppState -> EventM Name (Next AppState)
-quit s = do
-    when (s^.canvasDirty) $ do
-        case s^.canvasPath of
-            Nothing -> return ()
-            Just p -> liftIO $ writeCanvas p $ s^.drawing
+quit :: Bool -> AppState -> EventM Name (Next AppState)
+quit ask s = do
+    case (s^.canvasDirty) of
+        True ->
+            case s^.canvasPath of
+                Nothing ->
+                    case ask of
+                        True -> continue $ askToSave s
+                        False -> halt s
+                Just p ->
+                    if ask
+                    then continue $ askToSave s
+                    else do
+                        liftIO $ writeCanvas p $ s^.drawing
+                        halt s
+        False -> halt s
 
-    halt s
+askToSave :: AppState -> AppState
+askToSave s =
+    setMode AskToSave $
+        s & askToSaveFilenameEdit .~ applyEdit gotoEOL (editor AskToSaveFilenameEdit (Just 1) $
+                                           T.pack $ maybe "" id $ s^.canvasPath)
 
 increaseCanvasSize :: AppState -> EventM Name AppState
 increaseCanvasSize s =

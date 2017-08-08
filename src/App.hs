@@ -71,6 +71,7 @@ mkInitialState mc = do
                                                    canvasSize c & each %~ (`div` 2)
                       , _canvasPath              = fp
                       , _canvasDirty             = False
+                      , _askToSaveFilenameEdit   = editor AskToSaveFilenameEdit (Just 1) ""
                       }
 
 application :: App AppState () Name
@@ -81,6 +82,8 @@ application =
                 CanvasSizePrompt -> do
                     cur <- focusGetCurrent (s^.canvasSizeFocus)
                     showCursorNamed cur locs
+                AskToSave ->
+                    showCursorNamed AskToSaveFilenameEdit locs
                 _ -> Nothing
         , appHandleEvent = handleEvent
         , appStartEvent = \s -> do

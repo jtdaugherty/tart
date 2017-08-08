@@ -49,7 +49,7 @@ handleEvent s (VtyEvent (V.EvKey (V.KChar '+') [])) = do
 handleEvent s (VtyEvent (V.EvKey (V.KChar '-') [])) = do
     continue =<< decreaseCanvasSize s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'q') [])) = do
-    quit s
+    quit True s
 handleEvent s (VtyEvent (V.EvKey (V.KChar c) [])) | isDigit c = do
     let idx = read [c]
     case filter ((== idx) . snd) tools of

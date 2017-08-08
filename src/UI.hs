@@ -12,6 +12,7 @@ import UI.CharacterSelect
 import UI.PaletteEntrySelect
 import UI.ToolSelect
 import UI.CanvasSizePrompt
+import UI.AskToSave
 
 drawUI :: AppState -> [Widget Name]
 drawUI s =
@@ -22,3 +23,4 @@ drawUI s =
         ToolSelect           -> drawToolSelectUI s
         CharacterSelect      -> drawCharacterSelectUI s
         CanvasSizePrompt     -> drawCanvasSizePromptUI s
+        AskToSave            -> drawAskToSaveUI s
