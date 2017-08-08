@@ -38,11 +38,18 @@ hud s =
                          , drawChar s
                          , fgPal
                          , bgPal
+                         , drawCanvasSize s
                          ]
     in clickable Hud $
        vBox [ hCenter $ padLeft (Pad 1) $ hBox $ padRight (Pad 1) <$> toolbarEntries
             , hBorder
             ]
+
+drawCanvasSize :: AppState -> Widget Name
+drawCanvasSize s =
+    let (width, height) = s^.canvasSize
+    in borderWithLabel (str "Canvas") $
+       str $ show width <> " columns, " <> show height <> " rows"
 
 drawChar :: AppState -> Widget Name
 drawChar s =
