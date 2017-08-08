@@ -40,11 +40,15 @@ hud s =
                          , bgPal
                          , drawCanvasSize s
                          ]
+        filename = case s^.canvasPath of
+            Nothing -> emptyWidget
+            Just p -> borderElem bsHorizontal <+> str ("[" <> p <> "]")
+        modified = if not $ s^.canvasDirty
+                      then emptyWidget
+                      else str "[modified]" <+> borderElem bsHorizontal
     in clickable Hud $
        vBox [ hCenter $ padLeft (Pad 1) $ hBox $ padRight (Pad 1) <$> toolbarEntries
-            , if not $ s^.canvasDirty
-                 then hBorder
-                 else hBorder <+> str "[modified]" <+> borderElem bsHorizontal
+            , hBox [filename, hBorder, modified]
             ]
 
 drawCanvasSize :: AppState -> Widget Name
