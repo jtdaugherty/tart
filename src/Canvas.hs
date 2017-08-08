@@ -7,7 +7,7 @@ module Canvas
   , canvasSetPixel
   , canvasGetPixel
   , resizeFrom
-  , writeCanvas
+  , writeCanvasFriendly
 
   , blankPixel
   , encodePixel
@@ -40,8 +40,8 @@ newCanvas sz = do
     drawFreeze <- A.freeze draw
     return $ Canvas draw drawFreeze sz
 
-writeCanvas :: FilePath -> Canvas -> IO ()
-writeCanvas path c = writeFile path $ ppCanvas c
+writeCanvasFriendly :: FilePath -> Canvas -> IO ()
+writeCanvasFriendly path c = writeFile path $ ppCanvas c
 
 ppCanvas :: Canvas -> String
 ppCanvas c =

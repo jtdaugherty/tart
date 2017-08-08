@@ -12,4 +12,4 @@ main :: IO ()
 main = do
     checkForMouseSupport
     finalSt <- (defaultMain application) =<< mkInitialState
-    writeCanvas "out.txt" $ finalSt^.drawing
+    writeCanvasFriendly "out.txt" $ finalSt^.drawing
