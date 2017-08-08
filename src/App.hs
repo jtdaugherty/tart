@@ -47,6 +47,7 @@ mkInitialState = do
                       , _fgPaletteSelectorExtent = Nothing
                       , _bgPaletteSelectorExtent = Nothing
                       , _toolSelectorExtent      = Nothing
+                      , _dragging                = Nothing
                       }
 
 application :: App AppState () Name

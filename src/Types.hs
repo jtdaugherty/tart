@@ -22,6 +22,7 @@ module Types
   , fgPaletteSelectorExtent
   , bgPaletteSelectorExtent
   , toolSelectorExtent
+  , dragging
 
   , blankPixel
   , encodePixel
@@ -133,6 +134,7 @@ data AppState =
              , _fgPaletteSelectorExtent :: Maybe (Extent Name)
              , _bgPaletteSelectorExtent :: Maybe (Extent Name)
              , _toolSelectorExtent      :: Maybe (Extent Name)
+             , _dragging                :: Maybe Name
              }
 
 makeLenses ''AppState
