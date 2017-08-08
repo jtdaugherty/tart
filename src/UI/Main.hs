@@ -6,6 +6,7 @@ where
 
 import Brick
 import Brick.Widgets.Border
+import Brick.Widgets.Border.Style
 import Brick.Widgets.Center
 import Data.Monoid ((<>))
 import qualified Graphics.Vty as V
@@ -41,7 +42,9 @@ hud s =
                          ]
     in clickable Hud $
        vBox [ hCenter $ padLeft (Pad 1) $ hBox $ padRight (Pad 1) <$> toolbarEntries
-            , hBorder
+            , if not $ s^.canvasDirty
+                 then hBorder
+                 else hBorder <+> str "[modified]" <+> borderElem bsHorizontal
             ]
 
 drawCanvasSize :: AppState -> Widget Name
