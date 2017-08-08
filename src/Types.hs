@@ -55,6 +55,7 @@ data Name = Canvas
           | BgSelector
           | FgPaletteEntry Int
           | BgPaletteEntry Int
+          | HideToolbar
           deriving (Eq, Show, Ord)
 
 data Tool = FreeHand
