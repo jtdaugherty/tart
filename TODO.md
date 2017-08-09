@@ -4,7 +4,6 @@
 - Let user pick RGB colors
 
 - Extra drawing primitives:
-  - unicode style box in addition to ascii box
   - circles
   - lines (click and drag)
   - fill?!
