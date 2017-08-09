@@ -83,12 +83,24 @@ drawBox bs a b which s = do
         left =   (, bsVertical bs, attr)  <$> (ul^._1, ) <$> [ul^._2 + 1..ll^._2 - 1]
         right =  (, bsVertical bs, attr)  <$> (ur^._1, ) <$> [ur^._2 + 1..lr^._2 - 1]
 
+        width = lr^._1 - ul^._1
+        height = lr^._2 - ul^._2
+        corners = if width == 0
+                  then [ (ul, bsVertical bs, attr)
+                       , (lr, bsVertical bs, attr)
+                       ]
+                  else if height == 0
+                       then [ (ul, bsHorizontal bs, attr)
+                            , (lr, bsHorizontal bs, attr)
+                            ]
+                       else [ (ul, bsCornerTL bs, attr)
+                            , (lr, bsCornerBR bs, attr)
+                            , (ll, bsCornerBL bs, attr)
+                            , (ur, bsCornerTR bs, attr)
+                            ]
+
         -- Draw the corners
-        pixels = [ (ul, bsCornerTL bs, attr)
-                 , (lr, bsCornerBR bs, attr)
-                 , (ll, bsCornerBL bs, attr)
-                 , (ur, bsCornerTR bs, attr)
-                 ] <>
+        pixels = corners <>
                  -- Draw the top and bottom
                  top <>
                  bottom <>
