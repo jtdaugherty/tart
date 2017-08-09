@@ -5,7 +5,6 @@
 
 - Extra drawing primitives:
   - circles
-  - rectangles (click and drag)
   - lines (click and drag)
   - fill?!
   - eyedropper (attr/character picker)
