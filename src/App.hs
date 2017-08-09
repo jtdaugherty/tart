@@ -62,6 +62,7 @@ mkInitialState chan mc = do
                       , _fgPaletteSelectorExtent = Nothing
                       , _bgPaletteSelectorExtent = Nothing
                       , _toolSelectorExtent      = Nothing
+                      , _canvasExtent            = Nothing
                       , _dragging                = Nothing
                       , _canvasSizeWidthEdit     = editor CanvasSizeWidthEdit (Just 1) ""
                       , _canvasSizeHeightEdit    = editor CanvasSizeHeightEdit (Just 1) ""

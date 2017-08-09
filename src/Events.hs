@@ -59,7 +59,9 @@ updateExtents s = do
     fgExtent <- lookupExtent FgSelector
     bgExtent <- lookupExtent BgSelector
     tsExtent <- lookupExtent ToolSelector
+    cExtent <- lookupExtent Canvas
 
     return $ s & fgPaletteSelectorExtent .~ fgExtent
                & bgPaletteSelectorExtent .~ bgExtent
                & toolSelectorExtent      .~ tsExtent
+               & canvasExtent            .~ cExtent
