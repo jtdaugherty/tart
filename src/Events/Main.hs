@@ -6,6 +6,7 @@ where
 import Brick
 import Data.Char (isDigit)
 import qualified Graphics.Vty as V
+import Lens.Micro.Platform
 
 import Types
 import Draw
@@ -48,6 +49,8 @@ handleEvent s (VtyEvent (V.EvKey (V.KChar '+') [])) = do
     continue =<< increaseCanvasSize s
 handleEvent s (VtyEvent (V.EvKey (V.KChar '-') [])) = do
     continue =<< decreaseCanvasSize s
+handleEvent s (VtyEvent (V.EvKey V.KEsc [])) = do
+    continue $ s & dragging .~ Nothing
 handleEvent s (AppEvent (DragFinished _ _ _)) = do
     continue s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'q') [])) = do
