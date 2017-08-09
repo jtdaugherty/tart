@@ -23,6 +23,8 @@ import Control.Monad (forM_, replicateM)
 import Data.Bits
 import Data.Word (Word64)
 import Data.Monoid ((<>))
+import Data.List (reverse)
+import Data.Char (isSpace)
 import qualified Graphics.Vty as V
 import qualified Data.Array.IArray as I
 import qualified Data.Array.MArray as A
@@ -99,7 +101,11 @@ writeCanvas path c = do
 
 ppCanvas :: Bool -> Canvas -> String
 ppCanvas emitSequences c =
-    let ppLine pairs = concat $ ppPair <$> pairs
+    let maybeStrip = if emitSequences
+                     then id
+                     else strip
+        strip = reverse . dropWhile isSpace . reverse
+        ppLine pairs = concat $ ppPair <$> pairs
         ppChange _ _ | not emitSequences = ""
         ppChange _ NoChange              = ""
         ppChange b (Set color)           = colorCode b color
@@ -116,7 +122,7 @@ ppCanvas emitSequences c =
                                        then bg <> fg
                                        else fg <> bg
             in ctrlseq <> str
-    in unlines $ ppLine <$> rleEncode c
+    in unlines $ maybeStrip <$> ppLine <$> rleEncode c
 
 colorCode :: Bool -> V.Color -> String
 colorCode f (V.Color240 w) =
