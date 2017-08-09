@@ -7,6 +7,9 @@ module Types
   , Tool(..)
   , PaletteEntry(..)
   , AppEvent(..)
+  , isBox
+  , getToolBorderStyle
+  , toolName
 
   , AppState(..)
   , drawing
@@ -38,6 +41,7 @@ import Brick (Extent, Location)
 import Brick.BChan (BChan)
 import Brick.Focus
 import Brick.Widgets.Edit (Editor)
+import Brick.Widgets.Border.Style
 import qualified Data.Text as T
 import Lens.Micro.TH
 import qualified Data.Vector as Vec
@@ -74,10 +78,29 @@ data Name = Canvas
           deriving (Eq, Show, Ord)
 
 data Tool = Freehand
-          | Box
+          | BoxAscii
+          | BoxUnicode
+          | BoxRounded
           | Recolor
           | Eraser
           deriving (Eq, Show, Ord)
+
+toolName :: Tool -> String
+toolName Freehand = "Freehand"
+toolName BoxAscii = "Box (ASCII)"
+toolName BoxUnicode = "Box (Unicode)"
+toolName BoxRounded = "box (Rounded)"
+toolName Recolor = "Re-color"
+toolName Eraser = "Eraser"
+
+isBox :: Tool -> Bool
+isBox = (`elem` [BoxAscii, BoxUnicode, BoxRounded])
+
+getToolBorderStyle :: Tool -> BorderStyle
+getToolBorderStyle BoxAscii = ascii
+getToolBorderStyle BoxUnicode = unicode
+getToolBorderStyle BoxRounded = unicodeRounded
+getToolBorderStyle _ = ascii
 
 type Coord = (Int, Int)
 

@@ -26,16 +26,18 @@ drawWithCurrentTool point s =
         Freehand -> drawAtPoint point s
         Eraser   -> eraseAtPoint point s
         Recolor  -> recolorAtPoint point s
-        Box      -> do
+        t | isBox t -> do
             case s^.dragging of
                 Nothing -> return s
                 Just (n, l0, l1) ->
                     case n of
                         Canvas -> do
+                            let bs = getToolBorderStyle t
                             o <- liftIO $ clearCanvas (s^.drawingOverlay)
-                            drawBox ascii l0 l1 drawingOverlay $
+                            drawBox bs l0 l1 drawingOverlay $
                                      s & drawingOverlay .~ o
                         _ -> return s
+        _ -> return s
 
 drawAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
 drawAtPoint point s =

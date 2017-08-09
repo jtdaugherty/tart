@@ -39,4 +39,4 @@ drawToolSelector ext =
             vLimit 1 $
             hLimit toolSelectorEntryWidth $
             (withDefAttr keybindingAttr (str $ show i)) <+>
-            (str $ ":" <> show t) <+> fill ' '
+            (str $ ":" <> toolName t) <+> fill ' '

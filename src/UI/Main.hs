@@ -74,7 +74,7 @@ drawToolSelector s =
        hLimit toolSelectorEntryWidth $
        hCenter $
        (withDefAttr keybindingAttr (str $ show idx)) <+>
-       (str $ ":" <> show (s^.tool))
+       (str $ ":" <> toolName (s^.tool))
 
 drawPaletteSelector :: AppState -> Bool -> Widget Name
 drawPaletteSelector s isFg =

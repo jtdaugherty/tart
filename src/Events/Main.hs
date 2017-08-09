@@ -57,7 +57,7 @@ handleEvent s (AppEvent (DragFinished n _ _)) = do
     s' <- case n of
         Canvas ->
             case s^.tool of
-                Box -> do
+                t | isBox t -> do
                     c' <- liftIO $ merge (s^.drawing) (s^.drawingOverlay)
                     return $ s & drawing .~ c'
                 _ -> return s
