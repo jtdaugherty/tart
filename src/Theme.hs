@@ -15,7 +15,7 @@ keybindingAttr = "keybinding"
 
 theme :: AttrMap
 theme = attrMap defAttr
-  [ (keybindingAttr, fg white)
+  [ (keybindingAttr, fg white `withStyle` underline)
   , (editAttr, black `on` yellow)
   , (editFocusedAttr, black `on` yellow)
   ]
