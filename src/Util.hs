@@ -28,6 +28,7 @@ where
 
 import Control.Monad (when)
 import Control.Monad.Trans (liftIO)
+import Data.Monoid ((<>))
 import qualified Graphics.Vty as V
 import qualified Data.Text as T
 import System.Exit (exitFailure)
@@ -62,6 +63,8 @@ quit ask s = do
                     then continue $ askToSave s
                     else do
                         liftIO $ writeCanvas p $ s^.drawing
+                        liftIO $ writeCanvasPlain (p <> ".plain.txt") $ s^.drawing
+                        liftIO $ writeCanvasForTerminal (p <> ".ansi.txt") $ s^.drawing
                         halt s
         False -> halt s
 

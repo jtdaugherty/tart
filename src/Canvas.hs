@@ -8,8 +8,9 @@ module Canvas
   , canvasSetPixel
   , canvasGetPixel
   , resizeFrom
-  , writeCanvasFriendly
   , writeCanvas
+  , writeCanvasForTerminal
+  , writeCanvasPlain
   , readCanvas
 
   , blankPixel
@@ -48,8 +49,11 @@ newCanvas sz = do
     drawFreeze <- A.freeze draw
     return $ Canvas draw drawFreeze sz
 
-writeCanvasFriendly :: FilePath -> Canvas -> IO ()
-writeCanvasFriendly path c = writeFile path $ ppCanvas c
+writeCanvasForTerminal :: FilePath -> Canvas -> IO ()
+writeCanvasForTerminal path c = writeFile path $ ppCanvas True c
+
+writeCanvasPlain :: FilePath -> Canvas -> IO ()
+writeCanvasPlain path c = writeFile path $ ppCanvas False c
 
 readCanvas :: FilePath -> IO (Either String Canvas)
 readCanvas path = do
@@ -93,40 +97,38 @@ writeCanvas path c = do
 
     BS.writeFile path $ BSL.toStrict bytes
 
-ppCanvas :: Canvas -> String
-ppCanvas c =
-    let ppLine pairs = unlines $ ppPair <$> pairs
-        ppChange NoChange    = "keep"
-        ppChange (Set color) = colorName color
-        ppChange Clear       = "clear"
+ppCanvas :: Bool -> Canvas -> String
+ppCanvas emitSequences c =
+    let ppLine pairs = concat $ ppPair <$> pairs
+        ppChange _ | not emitSequences = ""
+        ppChange NoChange              = ""
+        ppChange (Set color)           = "\ESC[" <> colorCode color <> "m"
+        ppChange Clear                 = "\ESC[0m"
         ppPair ((fChange, bChange), str) =
-            unlines [ ppChange fChange
-                    , ppChange bChange
-                    , str
-                    ]
+            ppChange fChange <> ppChange bChange <> str
     in unlines $ ppLine <$> rleEncode c
 
-colorName :: V.Color -> String
-colorName (V.Color240 w) = "color240 " <> show w
-colorName (V.ISOColor w) =
+colorCode :: V.Color -> String
+colorCode (V.Color240 _) = "" -- not yet implemented
+colorCode (V.ISOColor w) =
     case w of
-        0  -> "black"
-        1  -> "red"
-        2  -> "green"
-        3  -> "yellow"
-        4  -> "blue"
-        5  -> "magenta"
-        6  -> "cyan"
-        7  -> "white"
-        8  -> "brightBlack"
-        9  -> "brightRed"
-        10 -> "brightGreen"
-        11 -> "brightYellow"
-        12 -> "brightBlue"
-        13 -> "brightMagenta"
-        14 -> "brightCyan"
-        15 -> "brightWhite"
-        _  -> "unknown"
+        0  -> "0;30" -- "black"
+        1  -> "0;31" -- "red"
+        2  -> "0;32" -- "green"
+        3  -> "0;33" -- "yellow"
+        4  -> "0;34" -- "blue"
+        5  -> "0;35" -- "magenta"
+        6  -> "0;36" -- "cyan"
+        7  -> "0;37" -- "white"
+        8  -> "1;30" -- "brightBlack"
+        9  -> "1;31" -- "brightRed"
+        10 -> "1;32" -- "brightGreen"
+        11 -> "1;33" -- "brightYellow"
+        12 -> "1;34" -- "brightBlue"
+        13 -> "1;35" -- "brightMagenta"
+        14 -> "1;36" -- "brightCyan"
+        15 -> "1;37" -- "brightWhite"
+        _  -> "" -- "unknown"
 
 decodeCanvas :: Canvas -> [[(Char, V.Attr)]]
 decodeCanvas c =
