@@ -13,6 +13,7 @@ module Canvas
   , writeCanvasForTerminal
   , writeCanvasPlain
   , readCanvas
+  , merge
 
   , blankPixel
   , encodePixel
@@ -20,7 +21,7 @@ module Canvas
   )
 where
 
-import Control.Monad (forM_, replicateM)
+import Control.Monad (forM_, replicateM, when)
 import Data.Bits
 import Data.Word (Word64)
 import Data.Monoid ((<>))
@@ -227,21 +228,7 @@ resizeFrom old newSz = do
         False -> return old
         True -> do
             new <- newCanvas newSz
-
-            -- Use the difference in size to determine the range of data
-            -- to copy to the new canvas
-            let (maxW, maxH) = ( min (newSz^._1) ((canvasSize old)^._1)
-                               , min (newSz^._2) ((canvasSize old)^._2)
-                               )
-
-            forM_ [0..maxW-1] $ \w ->
-                forM_ [0..maxH-1] $ \h ->
-                    A.writeArray (mut new) (w, h) $
-                        (immut old) I.! (w, h)
-
-            f <- A.unsafeFreeze $ mut new
-            return $ new { immut = f
-                         }
+            merge new old
 
 encodePixel :: Char -> V.Attr -> Word64
 encodePixel c a =
@@ -289,3 +276,17 @@ decodeAttrColor v =
     in if ty == 1
        then V.SetTo $ V.Color240 color
        else V.SetTo $ V.ISOColor color
+
+merge :: Canvas -> Canvas -> IO Canvas
+merge dest src = do
+    let (width, height) = (min srcW destW, min srcH destH)
+        (srcW, srcH) = canvasSize src
+        (destW, destH) = canvasSize dest
+    forM_ [0..width-1] $ \w ->
+        forM_ [0..height-1] $ \h -> do
+            let pix = (immut src) I.! (w, h)
+            when (pix /= blankPixel) $
+                A.writeArray (mut dest) (w, h) pix
+
+    f <- A.unsafeFreeze $ mut dest
+    return $ dest { immut = f }
