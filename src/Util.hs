@@ -89,7 +89,9 @@ handleDragFinished s n =
             case s^.tool of
                 t | isBox t -> do
                     c' <- liftIO $ merge (s^.drawing) (s^.drawingOverlay)
+                    o' <- liftIO $ clearCanvas (s^.drawingOverlay)
                     return $ s & drawing .~ c'
+                               & drawingOverlay .~ o'
                 _ -> return s
         _ -> return s
 
