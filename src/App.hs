@@ -51,7 +51,10 @@ mkInitialState chan mc = do
         Nothing -> (, Nothing) <$> newCanvas initialCanvasSize
         Just (fp, c) -> return (c, Just fp)
 
+    overlay <- newCanvas (canvasSize c)
+
     return $ AppState { _drawing                 = c
+                      , _drawingOverlay          = overlay
                       , _mode                    = Main
                       , _tool                    = Freehand
                       , _drawCharacter           = '*'

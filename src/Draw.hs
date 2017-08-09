@@ -1,3 +1,4 @@
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TupleSections #-}
 module Draw
   ( drawWithCurrentTool
@@ -19,28 +20,32 @@ import Types
 import Canvas
 import Util
 
-clearCanvas :: AppState -> EventM Name AppState
-clearCanvas s = do
-    newC <- liftIO $ newCanvas $ canvasSize (s^.drawing)
-    return $ s & drawing .~ newC
-
 drawWithCurrentTool :: (Int, Int) -> AppState -> EventM Name AppState
 drawWithCurrentTool point s =
     case s^.tool of
         Freehand -> drawAtPoint point s
         Eraser   -> eraseAtPoint point s
         Recolor  -> recolorAtPoint point s
-        Box      -> return s
+        Box      -> do
+            case s^.dragging of
+                Nothing -> return s
+                Just (n, l0, l1) ->
+                    case n of
+                        Canvas -> do
+                            o <- liftIO $ clearCanvas (s^.drawingOverlay)
+                            drawBox ascii l0 l1 drawingOverlay $
+                                     s & drawingOverlay .~ o
+                        _ -> return s
 
 drawAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
 drawAtPoint point s =
     drawAtPoint' point (s^.drawCharacter) (currentPaletteAttribute s) s
 
-drawMany :: [((Int, Int), Char, V.Attr)] -> AppState -> EventM Name AppState
-drawMany pixels s = do
-    let arr = s^.drawing
+drawMany :: [((Int, Int), Char, V.Attr)] -> Lens' AppState Canvas -> AppState -> EventM Name AppState
+drawMany pixels which s = do
+    let arr = s^.which
     arr' <- liftIO $ canvasSetMany arr pixels
-    return $ s & drawing .~ arr'
+    return $ s & which .~ arr'
                & canvasDirty .~ True
 
 drawAtPoint' :: (Int, Int) -> Char -> V.Attr -> AppState -> EventM Name AppState
@@ -59,8 +64,13 @@ recolorAtPoint point s = do
     let c = fst $ canvasGetPixel (s^.drawing) point
     drawAtPoint' point c (currentPaletteAttribute s) s
 
-drawBox :: BorderStyle -> Location -> Location -> AppState -> EventM Name AppState
-drawBox bs a b s = do
+drawBox :: BorderStyle
+        -> Location
+        -> Location
+        -> Lens' AppState Canvas
+        -> AppState
+        -> EventM Name AppState
+drawBox bs a b which s = do
     let attr = currentPaletteAttribute s
         (ul, lr) = boxCorners a b
         (ll, ur) = ( (ul^._1, lr^._2)
@@ -84,7 +94,7 @@ drawBox bs a b s = do
                  left <>
                  right
 
-    drawMany pixels s
+    drawMany pixels which s
 
 boxCorners :: Location -> Location -> ((Int, Int), (Int, Int))
 boxCorners (Location (a0, a1)) (Location (b0, b1)) =

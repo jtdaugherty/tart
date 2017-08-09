@@ -10,6 +10,7 @@ module Types
 
   , AppState(..)
   , drawing
+  , drawingOverlay
   , mode
   , tool
   , showHud
@@ -89,6 +90,7 @@ data PaletteEntry =
 
 data AppState =
     AppState { _drawing                 :: Canvas
+             , _drawingOverlay          :: Canvas
              , _mode                    :: Mode
              , _drawFgPaletteIndex      :: Int
              , _drawBgPaletteIndex      :: Int
