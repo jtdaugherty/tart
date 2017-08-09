@@ -13,6 +13,7 @@ module Util
   , tryResizeCanvas
   , quit
   , currentPaletteAttribute
+  , handleDragFinished
 
   , canvasMoveDown
   , canvasMoveUp
@@ -79,6 +80,17 @@ askToSave s =
     setMode AskToSave $
         s & askToSaveFilenameEdit .~ applyEdit gotoEOL (editor AskToSaveFilenameEdit (Just 1) $
                                            T.pack $ maybe "" id $ s^.canvasPath)
+
+handleDragFinished :: AppState -> Name -> EventM Name AppState
+handleDragFinished s n =
+    case n of
+        Canvas ->
+            case s^.tool of
+                t | isBox t -> do
+                    c' <- liftIO $ merge (s^.drawing) (s^.drawingOverlay)
+                    return $ s & drawing .~ c'
+                _ -> return s
+        _ -> return s
 
 increaseCanvasSize :: AppState -> EventM Name AppState
 increaseCanvasSize s =

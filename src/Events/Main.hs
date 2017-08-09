@@ -4,7 +4,6 @@ module Events.Main
 where
 
 import Brick
-import Control.Monad.Trans (liftIO)
 import Data.Char (isDigit)
 import qualified Graphics.Vty as V
 import Lens.Micro.Platform
@@ -13,7 +12,6 @@ import Types
 import Draw
 import Util
 import Events.Common
-import Canvas (merge)
 
 handleMainEvent :: AppState -> BrickEvent Name AppEvent -> EventM Name (Next AppState)
 handleMainEvent s e = do
@@ -54,16 +52,7 @@ handleEvent s (VtyEvent (V.EvKey (V.KChar '-') [])) = do
 handleEvent s (VtyEvent (V.EvKey V.KEsc [])) = do
     continue $ s & dragging .~ Nothing
 handleEvent s (AppEvent (DragFinished n _ _)) = do
-    s' <- case n of
-        Canvas ->
-            case s^.tool of
-                t | isBox t -> do
-                    c' <- liftIO $ merge (s^.drawing) (s^.drawingOverlay)
-                    return $ s & drawing .~ c'
-                _ -> return s
-        _ -> return s
-
-    continue s'
+    continue =<< handleDragFinished s n
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'q') [])) = do
     quit True s
 handleEvent s (VtyEvent (V.EvKey (V.KChar c) [])) | isDigit c = do
