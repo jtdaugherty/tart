@@ -9,6 +9,7 @@ import Brick.Widgets.Border
 import Brick.Widgets.Border.Style
 import Brick.Widgets.Center
 import Data.Monoid ((<>))
+import Data.Maybe (catMaybes)
 import qualified Graphics.Vty as V
 import Lens.Micro.Platform
 
@@ -17,12 +18,14 @@ import UI.Common
 import Theme
 import Util
 import Canvas
+import Draw (boxCorners)
 
 drawMainUI :: AppState -> [Widget Name]
 drawMainUI s =
-    [ maybeHud s
-    , canvas s
-    ]
+    concat $ catMaybes [ Just [maybeHud s]
+                       , maybeDrawBox s
+                       , Just [canvas s]
+                       ]
 
 maybeHud :: AppState -> Widget Name
 maybeHud s =
@@ -101,3 +104,36 @@ canvasToImage a =
         getRow r = V.horizCat $ (uncurry $ flip V.char) <$> getCol r <$> [0..lastCol]
         getCol r c = canvasGetPixel a (c, r)
     in V.vertCat rows
+
+maybeDrawBox :: AppState -> Maybe [Widget Name]
+maybeDrawBox s = do
+    (n, l0, l1) <- s^.dragging
+    if n == Canvas && s^.tool == Box
+       then Just $ drawBox s l0 l1
+       else Nothing
+
+drawBox :: AppState -> Location -> Location -> [Widget Name]
+drawBox s a b =
+    -- Generate the list of columns and rows that make up the box
+    let (ul, lr) = boxCorners a b
+        height = lr^._2 - ul^._2 + 1
+        width = lr^._1 - ul^._1 + 1
+        upperLeft = (ul^._1 + can0, ul^._2 + can1)
+        horiz = replicate (width - 2) '-'
+        corner = "+"
+        topBottom = V.string (currentPaletteAttribute s) $
+                      if width <= 1
+                         then corner
+                         else corner <> horiz <> corner
+        leftRight = V.charFill (currentPaletteAttribute s) '|' 1 (height - 2)
+        Just cExtent = s^.canvasExtent
+        Location (can0, can1) = extentUpperLeft cExtent
+    in catMaybes [ Just $ translateBy (Location upperLeft) $ raw topBottom
+                 , if height > 1
+                      then Just $ translateBy (Location $ upperLeft & _2 %~ (+ (height - 1))) $ raw topBottom
+                      else Nothing
+                 , Just $ translateBy (Location $ upperLeft & _2 %~ succ) $ raw leftRight
+                 , if width > 1
+                      then Just $ translateBy (Location $ upperLeft & _2 %~ succ & _1 %~ (+ (width - 1))) $ raw leftRight
+                      else Nothing
+                 ]

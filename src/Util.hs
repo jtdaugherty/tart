@@ -49,6 +49,7 @@ tools :: [(Tool, Int)]
 tools =
     [ (Freehand, 1)
     , (Recolor, 2)
+    , (Box, 3)
     , (Eraser, 0)
     ]
 

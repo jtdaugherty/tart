@@ -51,8 +51,15 @@ handleEvent s (VtyEvent (V.EvKey (V.KChar '-') [])) = do
     continue =<< decreaseCanvasSize s
 handleEvent s (VtyEvent (V.EvKey V.KEsc [])) = do
     continue $ s & dragging .~ Nothing
-handleEvent s (AppEvent (DragFinished _ _ _)) = do
-    continue s
+handleEvent s (AppEvent (DragFinished n a b)) = do
+    s' <- case n of
+        Canvas ->
+            case s^.tool of
+                Box -> drawBox a b s
+                _ -> return s
+        _ -> return s
+
+    continue s'
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'q') [])) = do
     quit True s
 handleEvent s (VtyEvent (V.EvKey (V.KChar c) [])) | isDigit c = do
