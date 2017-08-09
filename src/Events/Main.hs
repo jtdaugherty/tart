@@ -4,6 +4,7 @@ module Events.Main
 where
 
 import Brick
+import Brick.Widgets.Border.Style
 import Data.Char (isDigit)
 import qualified Graphics.Vty as V
 import Lens.Micro.Platform
@@ -55,7 +56,7 @@ handleEvent s (AppEvent (DragFinished n a b)) = do
     s' <- case n of
         Canvas ->
             case s^.tool of
-                Box -> drawBox a b s
+                Box -> drawBox ascii a b s
                 _ -> return s
         _ -> return s
 

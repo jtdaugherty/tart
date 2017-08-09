@@ -10,6 +10,7 @@ module Draw
 where
 
 import Brick
+import Brick.Widgets.Border.Style
 import Data.Monoid ((<>))
 import Lens.Micro.Platform
 import Control.Monad.Trans (liftIO)
@@ -59,26 +60,23 @@ recolorAtPoint point s = do
     let c = fst $ canvasGetPixel (s^.drawing) point
     drawAtPoint' point c (currentPaletteAttribute s) s
 
-drawBox :: Location -> Location -> AppState -> EventM Name AppState
-drawBox a b s = do
+drawBox :: BorderStyle -> Location -> Location -> AppState -> EventM Name AppState
+drawBox bs a b s = do
     let attr = currentPaletteAttribute s
-        corner = '+'
-        vert = '|'
-        horiz = '-'
         (ul, lr) = boxCorners a b
         (ll, ur) = ( (ul^._1, lr^._2)
                    , (lr^._1, ul^._2)
                    )
-        top =    (, horiz, attr) <$> (, ul^._2) <$> [ul^._1 + 1..ur^._1 - 1]
-        bottom = (, horiz, attr) <$> (, ll^._2) <$> [ll^._1 + 1..lr^._1 - 1]
-        left =   (, vert, attr)  <$> (ul^._1, ) <$> [ul^._2 + 1..ll^._2 - 1]
-        right =  (, vert, attr)  <$> (ur^._1, ) <$> [ur^._2 + 1..lr^._2 - 1]
+        top =    (, bsHorizontal bs, attr) <$> (, ul^._2) <$> [ul^._1 + 1..ur^._1 - 1]
+        bottom = (, bsHorizontal bs, attr) <$> (, ll^._2) <$> [ll^._1 + 1..lr^._1 - 1]
+        left =   (, bsVertical bs, attr)  <$> (ul^._1, ) <$> [ul^._2 + 1..ll^._2 - 1]
+        right =  (, bsVertical bs, attr)  <$> (ur^._1, ) <$> [ur^._2 + 1..lr^._2 - 1]
 
         -- Draw the corners
-        pixels = [ (ul, corner, attr)
-                 , (lr, corner, attr)
-                 , (ll, corner, attr)
-                 , (ur, corner, attr)
+        pixels = [ (ul, bsCornerTL bs, attr)
+                 , (lr, bsCornerBR bs, attr)
+                 , (ll, bsCornerBL bs, attr)
+                 , (ur, bsCornerTR bs, attr)
                  ] <>
                  -- Draw the top and bottom
                  top <>
