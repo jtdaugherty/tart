@@ -183,7 +183,9 @@ checkForMouseSupport = do
 resizeCanvas :: AppState -> (Int, Int) -> EventM n AppState
 resizeCanvas s newSz = do
     c <- liftIO $ resizeFrom (s^.drawing) newSz
+    o <- liftIO $ resizeFrom (s^.drawingOverlay) newSz
     return $ s & drawing .~ c
+               & drawingOverlay .~ o
                & canvasOffset .~ (Location $ newSz & each %~ (`div` 2))
                & canvasDirty .~ (canvasSize c /= canvasSize (s^.drawing))
 
