@@ -7,7 +7,6 @@ where
 import Brick
 import Brick.Widgets.Border
 import Brick.Widgets.Border.Style
-import Data.Monoid ((<>))
 import Lens.Micro.Platform
 import qualified Graphics.Vty as V
 import qualified Data.Vector as Vec
@@ -46,5 +45,4 @@ drawPalette s isFgPalette =
         idxs = [0..Vec.length pal-1]
         entries = mkEntry <$> idxs
         mkEntry i = clickable (mkName i) $
-                    (str $ (show i) <> ":") <+>
                     drawPaletteEntry s i 6 isFgPalette

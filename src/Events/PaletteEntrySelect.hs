@@ -4,10 +4,6 @@ module Events.PaletteEntrySelect
 where
 
 import Brick
-import Data.Char (isDigit)
-import Lens.Micro.Platform
-import qualified Graphics.Vty as V
-import qualified Data.Vector as Vec
 
 import Types
 import Util
@@ -30,15 +26,6 @@ handleEvent s (MouseDown (FgPaletteEntry idx) _ _ _) = do
     continue $ setFgPaletteIndex s idx
 handleEvent s (MouseDown (BgPaletteEntry idx) _ _ _) = do
     continue $ setBgPaletteIndex s idx
-handleEvent s (VtyEvent (V.EvKey (V.KChar c) [])) | isDigit c = do
-    let idx = read [c]
-    case idx >= 0 && idx < Vec.length (s^.palette) of
-        False -> continue s
-        True -> case s^.mode of
-            FgPaletteEntrySelect -> continue $ setFgPaletteIndex s idx
-            BgPaletteEntrySelect -> continue $ setBgPaletteIndex s idx
-            _ -> continue s
-
 handleEvent s (MouseUp _ _ _) =
     -- Ignore mouse-up events so we don't go back to Main mode. This
     -- includes mouse-up events generated in this mode, in addition to
