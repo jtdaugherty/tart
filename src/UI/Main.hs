@@ -85,6 +85,7 @@ drawPaletteSelector s isFg =
 canvas :: AppState -> Widget Name
 canvas s =
     centerAbout (s^.canvasOffset) $
+    updateAttrMap (applyAttrMappings [(borderAttr, fg V.white)]) $
     border $
     clickable Canvas $
     raw $ canvasToImage (s^.drawing) (isJust $ s^.dragging) (s^.drawingOverlay)
