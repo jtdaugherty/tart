@@ -100,34 +100,46 @@ writeCanvas path c = do
 ppCanvas :: Bool -> Canvas -> String
 ppCanvas emitSequences c =
     let ppLine pairs = concat $ ppPair <$> pairs
-        ppChange _ | not emitSequences = ""
-        ppChange NoChange              = ""
-        ppChange (Set color)           = "\ESC[" <> colorCode color <> "m"
-        ppChange Clear                 = "\ESC[0m"
+        ppChange _ _ | not emitSequences = ""
+        ppChange _ NoChange              = ""
+        ppChange b (Set color)           = colorCode b color
+        ppChange _ Clear                 = "\ESC[0m"
         ppPair ((fChange, bChange), str) =
-            ppChange fChange <> ppChange bChange <> str
+            -- If both are to be cleared, emit a single clear.
+            let fg = ppChange True  fChange
+                bg = ppChange False bChange
+                ctrlseq = if fChange == bChange && fChange == Clear
+                             then fg
+                             else if fChange == Clear
+                                  then fg <> bg
+                                  else if bChange == Clear
+                                       then bg <> fg
+                                       else fg <> bg
+            in ctrlseq <> str
     in unlines $ ppLine <$> rleEncode c
 
-colorCode :: V.Color -> String
-colorCode (V.Color240 _) = "" -- not yet implemented
-colorCode (V.ISOColor w) =
-    case w of
-        0  -> "0;30" -- "black"
-        1  -> "0;31" -- "red"
-        2  -> "0;32" -- "green"
-        3  -> "0;33" -- "yellow"
-        4  -> "0;34" -- "blue"
-        5  -> "0;35" -- "magenta"
-        6  -> "0;36" -- "cyan"
-        7  -> "0;37" -- "white"
-        8  -> "1;30" -- "brightBlack"
-        9  -> "1;31" -- "brightRed"
-        10 -> "1;32" -- "brightGreen"
-        11 -> "1;33" -- "brightYellow"
-        12 -> "1;34" -- "brightBlue"
-        13 -> "1;35" -- "brightMagenta"
-        14 -> "1;36" -- "brightCyan"
-        15 -> "1;37" -- "brightWhite"
+colorCode :: Bool -> V.Color -> String
+colorCode f (V.Color240 w) =
+    "\ESC[" <> if f then "38" else "48" <> ";5;" <> show w <> "m"
+colorCode f (V.ISOColor w) =
+    let c = if f then "38" else "48"
+    in case w of
+        0  -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "black"
+        1  -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "red"
+        2  -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "green"
+        3  -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "yellow"
+        4  -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "blue"
+        5  -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "magenta"
+        6  -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "cyan"
+        7  -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "white"
+        8  -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "brightBlack"
+        9  -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "brightRed"
+        10 -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "brightGreen"
+        11 -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "brightYellow"
+        12 -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "brightBlue"
+        13 -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "brightMagenta"
+        14 -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "brightCyan"
+        15 -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "brightWhite"
         _  -> "" -- "unknown"
 
 decodeCanvas :: Canvas -> [[(Char, V.Attr)]]
