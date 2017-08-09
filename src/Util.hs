@@ -68,7 +68,7 @@ quit ask s = do
                     else do
                         liftIO $ writeCanvas p $ s^.drawing
                         liftIO $ writeCanvasPlain (p <> ".plain.txt") $ s^.drawing
-                        liftIO $ writeCanvasForTerminal (p <> ".ansi.txt") $ s^.drawing
+                        liftIO $ writeCanvasForTerminal (p <> ".color.txt") $ s^.drawing
                         halt s
         False -> halt s
 
