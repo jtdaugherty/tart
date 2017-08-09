@@ -43,7 +43,7 @@ defaultPalette = Vec.fromList
     ]
 
 initialCanvasSize :: (Int, Int)
-initialCanvasSize = (20, 10)
+initialCanvasSize = (40, 17)
 
 mkInitialState :: BChan AppEvent -> Maybe (FilePath, Canvas) -> IO AppState
 mkInitialState chan mc = do
