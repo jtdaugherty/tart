@@ -15,6 +15,7 @@ import Data.Monoid ((<>))
 import Lens.Micro.Platform
 import Control.Monad.Trans (liftIO)
 import qualified Graphics.Vty as V
+import qualified Data.Vector as Vec
 
 import Types
 import Canvas
@@ -37,7 +38,31 @@ drawWithCurrentTool point s =
                             drawBox bs l0 l1 drawingOverlay $
                                      s & drawingOverlay .~ o
                         _ -> return s
+        Eyedropper ->
+            -- Read the pixel at the canvas location. Set the
+            -- application state's current drawing character and colors
+            -- from it.
+            let (ch, attr) = canvasGetPixel (s^.drawing) point
+            in return $ s & drawCharacter .~ ch
+                          & drawFgPaletteIndex .~ findFgPaletteEntry attr s
+                          & drawBgPaletteIndex .~ findBgPaletteEntry attr s
         _ -> return s
+
+findFgPaletteEntry :: V.Attr -> AppState -> Int
+findFgPaletteEntry a s =
+    let fgc = case V.attrForeColor a of
+          V.KeepCurrent -> Nothing
+          V.Default -> Nothing
+          V.SetTo c -> Just c
+    in maybe 0 id $ Vec.findIndex (== fgc) (s^.palette)
+
+findBgPaletteEntry :: V.Attr -> AppState -> Int
+findBgPaletteEntry a s =
+    let bgc = case V.attrBackColor a of
+          V.KeepCurrent -> Nothing
+          V.Default -> Nothing
+          V.SetTo c -> Just c
+    in maybe 0 id $ Vec.findIndex (== bgc) (s^.palette)
 
 drawAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
 drawAtPoint point s =

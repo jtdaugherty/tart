@@ -21,25 +21,25 @@ import UI
 import Theme
 import Canvas
 
-defaultPalette :: Vec.Vector PaletteEntry
+defaultPalette :: Vec.Vector (Maybe V.Color)
 defaultPalette = Vec.fromList
-    [ PaletteEntry id id
-    , PaletteEntry (`V.withForeColor` V.white   ) (`V.withBackColor` V.white)
-    , PaletteEntry (`V.withForeColor` V.brightWhite   ) (`V.withBackColor` V.brightWhite)
-    , PaletteEntry (`V.withForeColor` V.black   ) (`V.withBackColor` V.black)
-    , PaletteEntry (`V.withForeColor` V.brightBlack   ) (`V.withBackColor` V.brightBlack)
-    , PaletteEntry (`V.withForeColor` V.blue    ) (`V.withBackColor` V.blue)
-    , PaletteEntry (`V.withForeColor` V.brightBlue    ) (`V.withBackColor` V.brightBlue)
-    , PaletteEntry (`V.withForeColor` V.red     ) (`V.withBackColor` V.red)
-    , PaletteEntry (`V.withForeColor` V.brightRed     ) (`V.withBackColor` V.brightRed)
-    , PaletteEntry (`V.withForeColor` V.magenta ) (`V.withBackColor` V.magenta)
-    , PaletteEntry (`V.withForeColor` V.brightMagenta ) (`V.withBackColor` V.brightMagenta)
-    , PaletteEntry (`V.withForeColor` V.green   ) (`V.withBackColor` V.green)
-    , PaletteEntry (`V.withForeColor` V.brightGreen   ) (`V.withBackColor` V.brightGreen)
-    , PaletteEntry (`V.withForeColor` V.cyan    ) (`V.withBackColor` V.cyan)
-    , PaletteEntry (`V.withForeColor` V.brightCyan    ) (`V.withBackColor` V.brightCyan)
-    , PaletteEntry (`V.withForeColor` V.yellow  ) (`V.withBackColor` V.yellow)
-    , PaletteEntry (`V.withForeColor` V.brightYellow  ) (`V.withBackColor` V.brightYellow)
+    [ Nothing -- default attribute
+    , Just V.white
+    , Just V.brightWhite
+    , Just V.black
+    , Just V.brightBlack
+    , Just V.blue
+    , Just V.brightBlue
+    , Just V.red
+    , Just V.brightRed
+    , Just V.magenta
+    , Just V.brightMagenta
+    , Just V.green
+    , Just V.brightGreen
+    , Just V.cyan
+    , Just V.brightCyan
+    , Just V.yellow
+    , Just V.brightYellow
     ]
 
 initialCanvasSize :: (Int, Int)

@@ -5,7 +5,6 @@ module Types
   , Coord
   , Pixel
   , Tool(..)
-  , PaletteEntry(..)
   , AppEvent(..)
   , isBox
   , getToolBorderStyle
@@ -82,6 +81,7 @@ data Tool = Freehand
           | BoxUnicode
           | BoxRounded
           | Recolor
+          | Eyedropper
           | Eraser
           deriving (Eq, Show, Ord)
 
@@ -92,6 +92,7 @@ toolName BoxUnicode = "Box (Unicode)"
 toolName BoxRounded = "box (Rounded)"
 toolName Recolor = "Re-color"
 toolName Eraser = "Eraser"
+toolName Eyedropper = "Eyedropper"
 
 isBox :: Tool -> Bool
 isBox = (`elem` [BoxAscii, BoxUnicode, BoxRounded])
@@ -106,11 +107,6 @@ type Coord = (Int, Int)
 
 type Pixel = (Char, V.Attr)
 
-data PaletteEntry =
-    PaletteEntry { paletteFg :: V.Attr -> V.Attr
-                 , paletteBg :: V.Attr -> V.Attr
-                 }
-
 data AppState =
     AppState { _drawing                 :: Canvas
              , _drawingOverlay          :: Canvas
@@ -120,7 +116,7 @@ data AppState =
              , _drawCharacter           :: Char
              , _tool                    :: Tool
              , _showHud                 :: Bool
-             , _palette                 :: Vec.Vector PaletteEntry
+             , _palette                 :: Vec.Vector (Maybe V.Color)
              , _fgPaletteSelectorExtent :: Maybe (Extent Name)
              , _bgPaletteSelectorExtent :: Maybe (Extent Name)
              , _toolSelectorExtent      :: Maybe (Extent Name)

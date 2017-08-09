@@ -53,6 +53,7 @@ tools =
     , (BoxAscii, 3)
     , (BoxUnicode, 4)
     , (BoxRounded, 5)
+    , (Eyedropper, 6)
     , (Eraser, 0)
     ]
 
@@ -205,6 +206,10 @@ resizeCanvas s newSz = do
 
 currentPaletteAttribute :: AppState -> V.Attr
 currentPaletteAttribute s =
-    let PaletteEntry mkFg _ = Vec.unsafeIndex (s^.palette) (s^.drawFgPaletteIndex)
-        PaletteEntry _ mkBg = Vec.unsafeIndex (s^.palette) (s^.drawBgPaletteIndex)
-    in mkFg $ mkBg V.defAttr
+    let fgEntry = Vec.unsafeIndex (s^.palette) (s^.drawFgPaletteIndex)
+        bgEntry = Vec.unsafeIndex (s^.palette) (s^.drawBgPaletteIndex)
+        applyFg Nothing = id
+        applyFg (Just c) = (`V.withForeColor` c)
+        applyBg Nothing = id
+        applyBg (Just c) = (`V.withBackColor` c)
+    in applyFg fgEntry $ applyBg bgEntry V.defAttr
