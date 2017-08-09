@@ -25,6 +25,7 @@ drawWithCurrentTool point s =
     case s^.tool of
         Freehand -> drawAtPoint point s
         Eraser   -> eraseAtPoint point s
+        Recolor  -> recolorAtPoint point s
 
 drawAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
 drawAtPoint point s =
@@ -40,6 +41,11 @@ drawAtPoint' point ch attr s = do
 eraseAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
 eraseAtPoint point s =
     drawAtPoint' point ' ' V.defAttr s
+
+recolorAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
+recolorAtPoint point s = do
+    let c = fst $ canvasGetPixel (s^.drawing) point
+    drawAtPoint' point c (currentPaletteAttribute s) s
 
 currentPaletteAttribute :: AppState -> V.Attr
 currentPaletteAttribute s =

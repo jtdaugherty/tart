@@ -65,6 +65,7 @@ data Name = Canvas
           deriving (Eq, Show, Ord)
 
 data Tool = Freehand
+          | Recolor
           | Eraser
           deriving (Eq, Show, Ord)
 

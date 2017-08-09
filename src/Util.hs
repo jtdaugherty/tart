@@ -46,6 +46,7 @@ import Canvas
 tools :: [(Tool, Int)]
 tools =
     [ (Freehand, 1)
+    , (Recolor, 2)
     , (Eraser, 0)
     ]
 
