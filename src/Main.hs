@@ -2,6 +2,8 @@ module Main where
 
 import Control.Monad (void)
 import Brick
+import Brick.BChan (newBChan)
+import qualified Graphics.Vty as V
 import System.Environment (getArgs)
 import System.Exit (exitFailure)
 import Data.Monoid ((<>))
@@ -25,4 +27,7 @@ main = do
                 Right c -> return $ Just (f, c)
         _ -> return Nothing
 
-    (void . defaultMain application) =<< mkInitialState c
+    chan <- newBChan 10
+    let mkVty = V.mkVty =<< V.standardIOConfig
+
+    (void . customMain mkVty (Just chan) application) =<< mkInitialState chan c

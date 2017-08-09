@@ -12,14 +12,14 @@ import Draw
 import Util
 import Events.Common
 
-handleMainEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
+handleMainEvent :: AppState -> BrickEvent Name AppEvent -> EventM Name (Next AppState)
 handleMainEvent s e = do
     result <- handleCommonEvent s e
     case result of
         Just s' -> continue s'
         Nothing -> handleEvent s e
 
-handleEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
+handleEvent :: AppState -> BrickEvent Name AppEvent -> EventM Name (Next AppState)
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'w') [])) = do
     continue $ canvasMoveDown s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 's') [])) = do
@@ -48,6 +48,8 @@ handleEvent s (VtyEvent (V.EvKey (V.KChar '+') [])) = do
     continue =<< increaseCanvasSize s
 handleEvent s (VtyEvent (V.EvKey (V.KChar '-') [])) = do
     continue =<< decreaseCanvasSize s
+handleEvent s (AppEvent (DragFinished _ _ _)) = do
+    continue s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'q') [])) = do
     quit True s
 handleEvent s (VtyEvent (V.EvKey (V.KChar c) [])) | isDigit c = do

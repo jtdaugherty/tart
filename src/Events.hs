@@ -4,6 +4,8 @@ module Events
 where
 
 import Brick
+import Brick.BChan (writeBChan)
+import Control.Monad.Trans (liftIO)
 import Lens.Micro.Platform
 import qualified Graphics.Vty as V
 
@@ -15,24 +17,30 @@ import Events.ToolSelect
 import Events.CanvasSizePrompt
 import Events.AskToSave
 
-handleEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
+handleEvent :: AppState -> BrickEvent Name AppEvent -> EventM Name (Next AppState)
 handleEvent s (VtyEvent (V.EvResize _ _)) = do
     continue =<< updateExtents s
 handleEvent s e = do
     s' <- updateExtents s
 
-    let next = case e of
+    next <- case e of
           MouseDown n _ _ l ->
               case s'^.dragging of
                   Nothing ->
-                      Just (e, s' & dragging .~ Just (n, l, l))
+                      return $ Just (e, s' & dragging .~ Just (n, l, l))
                   Just (n', start, _) | n == n' ->
-                      Just (e, s' & dragging .~ Just (n, start, l))
-                  _ -> Nothing
-          MouseUp _ _ _ ->
-              Just (e, s' & dragging .~ Nothing)
+                      return $ Just (e, s' & dragging .~ Just (n, start, l))
+                  _ ->
+                      return $ Nothing
+          MouseUp _ _ _ -> do
+              case s'^.dragging of
+                  Nothing -> return ()
+                  Just (n, l0, l1) -> do
+                      let ev = DragFinished n l0 l1
+                      liftIO $ writeBChan (s^.appEventChannel) ev
+              return $ Just (e, s' & dragging .~ Nothing)
           _ ->
-              Just (e, s')
+              return $ Just (e, s')
 
     case next of
         Nothing -> continue s'

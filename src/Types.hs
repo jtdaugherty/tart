@@ -6,6 +6,7 @@ module Types
   , Pixel
   , Tool(..)
   , PaletteEntry(..)
+  , AppEvent(..)
 
   , AppState(..)
   , drawing
@@ -27,10 +28,12 @@ module Types
   , canvasPath
   , canvasDirty
   , askToSaveFilenameEdit
+  , appEventChannel
   )
 where
 
 import Brick (Extent, Location)
+import Brick.BChan (BChan)
 import Brick.Focus
 import Brick.Widgets.Edit (Editor)
 import qualified Data.Text as T
@@ -39,6 +42,10 @@ import qualified Data.Vector as Vec
 import qualified Graphics.Vty as V
 
 import Canvas
+
+data AppEvent =
+    DragFinished Name Location Location
+    deriving (Eq)
 
 data Mode = Main
           | CharacterSelect
@@ -98,6 +105,7 @@ data AppState =
              , _canvasPath              :: Maybe FilePath
              , _canvasDirty             :: Bool
              , _askToSaveFilenameEdit   :: Editor T.Text Name
+             , _appEventChannel         :: BChan AppEvent
              }
 
 makeLenses ''AppState

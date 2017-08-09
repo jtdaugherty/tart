@@ -11,6 +11,7 @@ import qualified Data.Vector as Vec
 import Lens.Micro.Platform
 
 import Brick
+import Brick.BChan (BChan)
 import Brick.Focus
 import Brick.Widgets.Edit (editor)
 
@@ -44,8 +45,8 @@ defaultPalette = Vec.fromList
 initialCanvasSize :: (Int, Int)
 initialCanvasSize = (20, 10)
 
-mkInitialState :: Maybe (FilePath, Canvas) -> IO AppState
-mkInitialState mc = do
+mkInitialState :: BChan AppEvent -> Maybe (FilePath, Canvas) -> IO AppState
+mkInitialState chan mc = do
     (c, fp) <- case mc of
         Nothing -> (, Nothing) <$> newCanvas initialCanvasSize
         Just (fp, c) -> return (c, Just fp)
@@ -72,9 +73,10 @@ mkInitialState mc = do
                       , _canvasPath              = fp
                       , _canvasDirty             = False
                       , _askToSaveFilenameEdit   = editor AskToSaveFilenameEdit (Just 1) ""
+                      , _appEventChannel         = chan
                       }
 
-application :: App AppState () Name
+application :: App AppState AppEvent Name
 application =
     App { appDraw = drawUI
         , appChooseCursor = \s locs ->
