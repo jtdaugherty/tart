@@ -14,6 +14,7 @@ module Canvas
   , writeCanvasPlain
   , readCanvas
   , merge
+  , clearCanvas
 
   , blankPixel
   , encodePixel
@@ -58,6 +59,15 @@ writeCanvasForTerminal path c = writeFile path $ ppCanvas True c
 
 writeCanvasPlain :: FilePath -> Canvas -> IO ()
 writeCanvasPlain path c = writeFile path $ ppCanvas False c
+
+clearCanvas :: Canvas -> IO Canvas
+clearCanvas c = do
+    let (width, height) = canvasSize c
+    forM_ [0..width-1] $ \w ->
+        forM_ [0..height-1] $ \h -> do
+            A.writeArray (mut c) (w, h) blankPixel
+    f <- A.unsafeFreeze (mut c)
+    return $ c { immut = f }
 
 readCanvas :: FilePath -> IO (Either String Canvas)
 readCanvas path = do

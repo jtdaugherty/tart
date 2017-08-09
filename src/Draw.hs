@@ -3,7 +3,6 @@ module Draw
   ( drawWithCurrentTool
   , drawAtPoint
   , eraseAtPoint
-  , clearCanvas
   , boxCorners
   , drawBox
   )
