@@ -9,11 +9,11 @@ where
 import Brick
 import Lens.Micro.Platform
 import Control.Monad.Trans (liftIO)
-import qualified Data.Vector as Vec
 import qualified Graphics.Vty as V
 
 import Types
 import Canvas
+import Util
 
 clearCanvas :: AppState -> EventM Name AppState
 clearCanvas s = do
@@ -46,9 +46,3 @@ recolorAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
 recolorAtPoint point s = do
     let c = fst $ canvasGetPixel (s^.drawing) point
     drawAtPoint' point c (currentPaletteAttribute s) s
-
-currentPaletteAttribute :: AppState -> V.Attr
-currentPaletteAttribute s =
-    let PaletteEntry mkFg _ = Vec.unsafeIndex (s^.palette) (s^.drawFgPaletteIndex)
-        PaletteEntry _ mkBg = Vec.unsafeIndex (s^.palette) (s^.drawBgPaletteIndex)
-    in mkFg $ mkBg V.defAttr

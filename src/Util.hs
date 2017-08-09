@@ -12,6 +12,7 @@ module Util
   , beginCanvasSizePrompt
   , tryResizeCanvas
   , quit
+  , currentPaletteAttribute
 
   , canvasMoveDown
   , canvasMoveUp
@@ -30,6 +31,7 @@ import Control.Monad (when)
 import Control.Monad.Trans (liftIO)
 import Data.Monoid ((<>))
 import qualified Graphics.Vty as V
+import qualified Data.Vector as Vec
 import qualified Data.Text as T
 import System.Exit (exitFailure)
 import Lens.Micro.Platform
@@ -183,3 +185,9 @@ resizeCanvas s newSz = do
     return $ s & drawing .~ c
                & canvasOffset .~ (Location $ newSz & each %~ (`div` 2))
                & canvasDirty .~ (canvasSize c /= canvasSize (s^.drawing))
+
+currentPaletteAttribute :: AppState -> V.Attr
+currentPaletteAttribute s =
+    let PaletteEntry mkFg _ = Vec.unsafeIndex (s^.palette) (s^.drawFgPaletteIndex)
+        PaletteEntry _ mkBg = Vec.unsafeIndex (s^.palette) (s^.drawBgPaletteIndex)
+    in mkFg $ mkBg V.defAttr
