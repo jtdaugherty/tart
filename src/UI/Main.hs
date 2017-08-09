@@ -21,15 +21,9 @@ import Canvas
 
 drawMainUI :: AppState -> [Widget Name]
 drawMainUI s =
-    [ maybeHud s
+    [ hud s
     , canvas s
     ]
-
-maybeHud :: AppState -> Widget Name
-maybeHud s =
-    case s^.showHud of
-        False -> emptyWidget
-        True -> hud s
 
 hud :: AppState -> Widget Name
 hud s =

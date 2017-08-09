@@ -15,7 +15,6 @@ module Types
   , drawingOverlay
   , mode
   , tool
-  , showHud
   , drawFgPaletteIndex
   , drawBgPaletteIndex
   , palette
@@ -115,7 +114,6 @@ data AppState =
              , _drawBgPaletteIndex      :: Int
              , _drawCharacter           :: Char
              , _tool                    :: Tool
-             , _showHud                 :: Bool
              , _palette                 :: Vec.Vector (Maybe V.Color)
              , _fgPaletteSelectorExtent :: Maybe (Extent Name)
              , _bgPaletteSelectorExtent :: Maybe (Extent Name)

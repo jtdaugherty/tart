@@ -58,7 +58,6 @@ mkInitialState chan mc = do
                       , _mode                    = Main
                       , _tool                    = Freehand
                       , _drawCharacter           = '*'
-                      , _showHud                 = True
                       , _drawFgPaletteIndex      = 0
                       , _drawBgPaletteIndex      = 0
                       , _palette                 = defaultPalette

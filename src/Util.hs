@@ -150,22 +150,13 @@ tryResizeCanvas s = do
         _ -> return s
 
 beginToolSelect :: AppState -> AppState
-beginToolSelect s =
-    if s^.showHud
-    then setMode ToolSelect s
-    else s
+beginToolSelect = setMode ToolSelect
 
 beginFgPaletteSelect :: AppState -> AppState
-beginFgPaletteSelect s =
-    if s^.showHud
-    then setMode FgPaletteEntrySelect s
-    else s
+beginFgPaletteSelect = setMode FgPaletteEntrySelect
 
 beginBgPaletteSelect :: AppState -> AppState
-beginBgPaletteSelect s =
-    if s^.showHud
-    then setMode BgPaletteEntrySelect s
-    else s
+beginBgPaletteSelect = setMode BgPaletteEntrySelect
 
 setTool :: AppState -> Tool -> AppState
 setTool s t = s & tool .~ t
