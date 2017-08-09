@@ -1,6 +1,14 @@
 tart - terminal art program
 ===========================
 
+```
+ _____  _    ____ _____  _
+(_   _)/ \  |    (_   _)| |
+  | | / ^ \ |  O  || |  |_|
+  | |/ ___ \|  _ < | |   _
+  |_|_/   \_|_| \_\|_|  |_|
+```
+
 Tart is a program that provides an image-editor-like interface to
 creating ASCII art.
 
