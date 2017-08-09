@@ -6,6 +6,7 @@ module Canvas
   , newCanvas
   , canvasSize
   , canvasSetPixel
+  , canvasSetMany
   , canvasGetPixel
   , resizeFrom
   , writeCanvas
@@ -198,6 +199,15 @@ canvasSize = size
 canvasGetPixel :: Canvas -> (Int, Int) -> (Char, V.Attr)
 canvasGetPixel c point =
     decodePixel $ (immut c) I.! point
+
+canvasSetMany :: Canvas -> [((Int, Int), Char, V.Attr)] -> IO Canvas
+canvasSetMany c pixels = do
+    forM_ pixels $ \(point, ch, attr) -> do
+        A.writeArray (mut c) point $ encodePixel ch attr
+
+    f <- A.freeze (mut c)
+    return $ c { immut = f
+               }
 
 canvasSetPixel :: Canvas -> (Int, Int) -> Char -> V.Attr -> IO Canvas
 canvasSetPixel c point ch attr = do
