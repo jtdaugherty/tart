@@ -22,12 +22,13 @@ handleEvent s e = do
     s' <- updateExtents s
 
     let next = case e of
-          MouseDown n _ _ _ ->
-              if s'^.dragging == Nothing
-              then Just (e, s' & dragging .~ Just n)
-              else if Just n == s'^.dragging
-                   then Just (e, s')
-                   else Nothing
+          MouseDown n _ _ l ->
+              case s'^.dragging of
+                  Nothing ->
+                      Just (e, s' & dragging .~ Just (n, l, l))
+                  Just (n', start, _) | n == n' ->
+                      Just (e, s' & dragging .~ Just (n, start, l))
+                  _ -> Nothing
           MouseUp _ _ _ ->
               Just (e, s' & dragging .~ Nothing)
           _ ->

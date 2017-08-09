@@ -90,7 +90,7 @@ data AppState =
              , _fgPaletteSelectorExtent :: Maybe (Extent Name)
              , _bgPaletteSelectorExtent :: Maybe (Extent Name)
              , _toolSelectorExtent      :: Maybe (Extent Name)
-             , _dragging                :: Maybe Name
+             , _dragging                :: Maybe (Name, Location, Location)
              , _canvasSizeWidthEdit     :: Editor T.Text Name
              , _canvasSizeHeightEdit    :: Editor T.Text Name
              , _canvasSizeFocus         :: FocusRing Name
