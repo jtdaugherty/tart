@@ -77,6 +77,8 @@ mkInitialState chan mc = do
                       , _canvasDirty             = False
                       , _askToSaveFilenameEdit   = editor AskToSaveFilenameEdit (Just 1) ""
                       , _appEventChannel         = chan
+                      , _textEntered             = ""
+                      , _textEntryStart          = (0, 0)
                       }
 
 application :: App AppState AppEvent Name
@@ -89,6 +91,8 @@ application =
                     showCursorNamed cur locs
                 AskToSave ->
                     showCursorNamed AskToSaveFilenameEdit locs
+                TextEntry ->
+                    showCursorNamed TextEntryCursor locs
                 _ -> Nothing
         , appHandleEvent = handleEvent
         , appStartEvent = \s -> do

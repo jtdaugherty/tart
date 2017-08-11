@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Util
   ( checkForMouseSupport
   , setTool
@@ -10,6 +11,7 @@ module Util
   , increaseCanvasSize
   , decreaseCanvasSize
   , beginCanvasSizePrompt
+  , beginTextEntry
   , tryResizeCanvas
   , quit
   , currentPaletteAttribute
@@ -55,6 +57,7 @@ tools =
     , (BoxRounded, 5)
     , (FloodFill, 6)
     , (Eyedropper, 7)
+    , (TextString, 8)
     , (Eraser, 0)
     ]
 
@@ -82,6 +85,11 @@ askToSave s =
     setMode AskToSave $
         s & askToSaveFilenameEdit .~ applyEdit gotoEOL (editor AskToSaveFilenameEdit (Just 1) $
                                            T.pack $ maybe "" id $ s^.canvasPath)
+
+beginTextEntry :: (Int, Int) -> AppState -> AppState
+beginTextEntry start s =
+    setMode TextEntry $ s & textEntryStart .~ start
+                          & textEntered .~ ""
 
 handleDragFinished :: AppState -> Name -> EventM Name AppState
 handleDragFinished s n =

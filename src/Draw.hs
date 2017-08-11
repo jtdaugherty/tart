@@ -7,6 +7,8 @@ module Draw
   , eraseAtPoint
   , boxCorners
   , drawBox
+  , drawTextAtPoint
+  , truncateEnteredText
   )
 where
 
@@ -15,6 +17,7 @@ import Brick.Widgets.Border.Style
 import Data.Monoid ((<>))
 import Lens.Micro.Platform
 import Control.Monad.Trans (liftIO)
+import qualified Data.Text as T
 import qualified Graphics.Vty as V
 import qualified Data.Vector as Vec
 
@@ -29,6 +32,7 @@ drawWithCurrentTool point s =
         Eraser   -> eraseAtPoint point s
         Recolor  -> recolorAtPoint point s
         FloodFill -> floodFillAtPoint point s
+        TextString -> return $ beginTextEntry point s
         t | isBox t -> do
             case s^.dragging of
                 Nothing -> return s
@@ -49,6 +53,24 @@ drawWithCurrentTool point s =
                           & drawFgPaletteIndex .~ findFgPaletteEntry attr s
                           & drawBgPaletteIndex .~ findBgPaletteEntry attr s
         _ -> return s
+
+truncateEnteredText :: AppState -> T.Text
+truncateEnteredText s =
+    let startCol = s^.textEntryStart._1
+        t = s^.textEntered
+        maxCol = min ((canvasSize (s^.drawing))^._1 - 1)
+                     (startCol + T.length t - 1)
+        safe = T.take (maxCol - startCol + 1) t
+    in safe
+
+drawTextAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
+drawTextAtPoint point s = do
+    let attr = currentPaletteAttribute s
+        (startCol, row) = point
+        pixs = zip ([startCol..]) (T.unpack $ truncateEnteredText s)
+        many = mkEntry <$> pixs
+        mkEntry (col, ch) = ((col, row), ch, attr)
+    drawMany many drawing s
 
 findFgPaletteEntry :: V.Attr -> AppState -> Int
 findFgPaletteEntry a s =

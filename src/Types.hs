@@ -32,6 +32,8 @@ module Types
   , canvasDirty
   , askToSaveFilenameEdit
   , appEventChannel
+  , textEntered
+  , textEntryStart
   )
 where
 
@@ -58,6 +60,7 @@ data Mode = Main
           | ToolSelect
           | CanvasSizePrompt
           | AskToSave
+          | TextEntry
           deriving (Eq, Show)
 
 data Name = Canvas
@@ -73,6 +76,7 @@ data Name = Canvas
           | CanvasSizeWidthEdit
           | CanvasSizeHeightEdit
           | AskToSaveFilenameEdit
+          | TextEntryCursor
           deriving (Eq, Show, Ord)
 
 data Tool = Freehand
@@ -83,6 +87,7 @@ data Tool = Freehand
           | Eyedropper
           | FloodFill
           | Eraser
+          | TextString
           deriving (Eq, Show, Ord)
 
 toolName :: Tool -> String
@@ -94,6 +99,7 @@ toolName Recolor = "Re-color"
 toolName Eraser = "Eraser"
 toolName Eyedropper = "Eyedropper"
 toolName FloodFill = "Flood fill"
+toolName TextString = "Text string"
 
 isBox :: Tool -> Bool
 isBox = (`elem` [BoxAscii, BoxUnicode, BoxRounded])
@@ -130,6 +136,8 @@ data AppState =
              , _canvasDirty             :: Bool
              , _askToSaveFilenameEdit   :: Editor T.Text Name
              , _appEventChannel         :: BChan AppEvent
+             , _textEntered             :: T.Text
+             , _textEntryStart          :: (Int, Int)
              }
 
 makeLenses ''AppState
