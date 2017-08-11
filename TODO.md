@@ -20,6 +20,13 @@
 - Paste?
 
 -----------------------------------------------------------------
+Tool options:
+ - separate toolbar at bottom of screen that has context-sensitive
+   options for the selected tool
+ - Move box style here
+ - Eraser can also have additional options
+
+-----------------------------------------------------------------
 Dealing with the larger color space:
 
 - UI shows "favorite" colors, list can be grown by the user
