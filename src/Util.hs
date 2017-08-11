@@ -18,6 +18,7 @@ module Util
   , handleDragFinished
   , getBoxBorderStyle
   , beginBoxStyleSelect
+  , writeCanvasFiles
 
   , canvasMoveDown
   , canvasMoveUp
@@ -86,11 +87,15 @@ quit ask s = do
                     if ask
                     then continue $ askToSave s
                     else do
-                        liftIO $ writeCanvas p $ s^.drawing
-                        liftIO $ writeCanvasPlain (p <> ".plain.txt") $ s^.drawing
-                        liftIO $ writeCanvasForTerminal (p <> ".color.txt") $ s^.drawing
+                        liftIO $ writeCanvasFiles p (s^.drawing)
                         halt s
         False -> halt s
+
+writeCanvasFiles :: FilePath -> Canvas -> IO ()
+writeCanvasFiles f c = do
+    writeCanvas f c
+    writeCanvasPlain (f <> ".plain.txt") c
+    writeCanvasForTerminal (f <> ".color.txt") c
 
 askToSave :: AppState -> AppState
 askToSave s =

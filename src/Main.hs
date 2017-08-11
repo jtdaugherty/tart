@@ -87,9 +87,7 @@ main = do
             case configOutput cfg of
                 Nothing -> return $ Just (Nothing, c)
                 Just output -> do
-                    writeCanvas output c
-                    writeCanvasPlain (output <> ".plain.txt") c
-                    writeCanvasForTerminal (output <> ".color.txt") c
+                    writeCanvasFiles output c
                     exitSuccess
         Nothing ->
             case rest of
