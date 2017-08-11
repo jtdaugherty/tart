@@ -18,12 +18,7 @@
 - Import from plain text file
 - Paste?
 
------------------------------------------------------------------
-Tool options:
- - separate toolbar at bottom of screen that has context-sensitive
-   options for the selected tool
- - Move box style here
- - Eraser can also have additional options
+- Additional eraser options (size, or drag region to erase?)
 
 -----------------------------------------------------------------
 Dealing with the larger color space:
