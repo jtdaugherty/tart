@@ -105,7 +105,7 @@ floodFillAtPoint point s =
                | pix /= targetPix -> return st
                | otherwise -> do
                    d' <- liftIO $ canvasSetPixel (st^.drawing) p fillCh fillAttr
-                   go (down p) (st & drawing .~ d') >>=
+                   go (down p) (st & drawing .~ d' & canvasDirty .~ True) >>=
                        go (up p) >>=
                        go (left p) >>=
                        go (right p)
