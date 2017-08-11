@@ -91,14 +91,14 @@ data Tool = Freehand
           deriving (Eq, Show, Ord)
 
 toolName :: Tool -> String
-toolName Freehand = "Freehand"
-toolName BoxAscii = "Box (ASCII)"
+toolName Freehand   = "Freehand"
+toolName BoxAscii   = "Box (ASCII)"
 toolName BoxUnicode = "Box (Unicode)"
 toolName BoxRounded = "box (Rounded)"
-toolName Recolor = "Re-color"
-toolName Eraser = "Eraser"
+toolName Recolor    = "Re-color"
+toolName Eraser     = "Eraser"
 toolName Eyedropper = "Eyedropper"
-toolName FloodFill = "Flood fill"
+toolName FloodFill  = "Flood fill"
 toolName TextString = "Text string"
 
 isBox :: Tool -> Bool
