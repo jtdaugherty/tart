@@ -1,6 +1,7 @@
 
-- One box tool w/settings rather than one tool per border style
 - Better quit/save UX ('q' -> 'y/n' instead of 'q' -> 'Esc')
+
+- Smart combining box characters - extra metadata in canvas?
 
 - Let user pick RGB colors
 
