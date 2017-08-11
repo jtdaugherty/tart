@@ -10,9 +10,28 @@ tart - terminal art program
 ```
 
 Tart is a program that provides an image-editor-like interface to
-creating ASCII art.
+creating ASCII art. The best way to see how your ASCII art is going to
+look in the terminal is to draw it in the terminal where it will be
+displayed!
 
 ![](screenshots/0.png)
+
+Features
+========
+
+- Image-editor-like interface
+- Load and save ASCII art files (binary)
+- Save plain versions of ASCII art for embedding in documents
+- Save color versions of ASCII art with terminal escape sequences for
+  printing to terminals
+- Import existing plaintext files as the basis for new ASCII art files
+- Drawing tools: freehand, box, flood fill
+- Utility tools: re-color, eyedropper, eraser
+- Multiple graphical styles for boxes
+- Character selection for freehand and flood fill tools
+- Set foreground and background color independently
+- Set arbitrary canvas size
+- Full mouse interaction and keyboard shortcuts
 
 How It Works
 ============
