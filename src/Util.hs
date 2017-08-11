@@ -53,7 +53,8 @@ tools =
     , (BoxAscii, 3)
     , (BoxUnicode, 4)
     , (BoxRounded, 5)
-    , (Eyedropper, 6)
+    , (FloodFill, 6)
+    , (Eyedropper, 7)
     , (Eraser, 0)
     ]
 

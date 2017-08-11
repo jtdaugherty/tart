@@ -7,7 +7,6 @@
 - Extra drawing primitives:
   - circles
   - lines (click and drag)
-  - fill?!
   - text strings
 
 - Undo / redo

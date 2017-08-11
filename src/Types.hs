@@ -81,6 +81,7 @@ data Tool = Freehand
           | BoxRounded
           | Recolor
           | Eyedropper
+          | FloodFill
           | Eraser
           deriving (Eq, Show, Ord)
 
@@ -92,6 +93,7 @@ toolName BoxRounded = "box (Rounded)"
 toolName Recolor = "Re-color"
 toolName Eraser = "Eraser"
 toolName Eyedropper = "Eyedropper"
+toolName FloodFill = "Flood fill"
 
 isBox :: Tool -> Bool
 isBox = (`elem` [BoxAscii, BoxUnicode, BoxRounded])

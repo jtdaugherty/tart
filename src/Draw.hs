@@ -1,3 +1,4 @@
+{-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE TupleSections #-}
 module Draw
@@ -27,6 +28,7 @@ drawWithCurrentTool point s =
         Freehand -> drawAtPoint point s
         Eraser   -> eraseAtPoint point s
         Recolor  -> recolorAtPoint point s
+        FloodFill -> floodFillAtPoint point s
         t | isBox t -> do
             case s^.dragging of
                 Nothing -> return s
@@ -63,6 +65,30 @@ findBgPaletteEntry a s =
           V.Default -> Nothing
           V.SetTo c -> Just c
     in maybe 0 id $ Vec.findIndex (== bgc) (s^.palette)
+
+floodFillAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
+floodFillAtPoint point s =
+    let fillAttr = currentPaletteAttribute s
+        fillCh = s^.drawCharacter
+        fillPix = (fillCh, fillAttr)
+        targetPix = canvasGetPixel (s^.drawing) point
+        (w, h) = canvasSize (s^.drawing)
+        up    = (& _2 %~ (max 0 . pred))
+        down  = (& _2 %~ (min (h-1) . succ))
+        left  = (& _1 %~ (max 0 . pred))
+        right = (& _1 %~ (min (w-1) . succ))
+        go p st = do
+            let pix = canvasGetPixel (st^.drawing) p
+            if | pix == fillPix -> return st
+               | pix /= targetPix -> return st
+               | otherwise -> do
+                   d' <- liftIO $ canvasSetPixel (st^.drawing) p fillCh fillAttr
+                   go (down p) (st & drawing .~ d') >>=
+                       go (up p) >>=
+                       go (left p) >>=
+                       go (right p)
+
+    in go point s
 
 drawAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
 drawAtPoint point s =
