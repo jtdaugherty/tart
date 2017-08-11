@@ -88,7 +88,11 @@ canvas s =
     updateAttrMap (applyAttrMappings [(borderAttr, fg V.white)]) $
     border $
     clickable Canvas $
-    raw $ canvasToImage (s^.drawing) (isJust $ s^.dragging) (s^.drawingOverlay)
+    raw $ canvasToImage (s^.drawing) (shouldUseOverlay s) (s^.drawingOverlay)
+
+shouldUseOverlay :: AppState -> Bool
+shouldUseOverlay s =
+    isJust $ s^.dragging
 
 canvasToImage :: Canvas -> Bool -> Canvas -> V.Image
 canvasToImage a useOverlay overlay =
