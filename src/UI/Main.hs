@@ -21,16 +21,16 @@ import Canvas
 
 drawMainUI :: AppState -> [Widget Name]
 drawMainUI s =
-    [ hud s
+    [ topHud s
+    , bottomHud s
     , canvas s
     ]
 
-hud :: AppState -> Widget Name
-hud s =
+topHud :: AppState -> Widget Name
+topHud s =
     let fgPal = drawPaletteSelector s True
         bgPal = drawPaletteSelector s False
         toolbarEntries = [ padLeft (Pad 1) $ drawToolSelector s
-                         , drawChar s
                          , fgPal
                          , bgPal
                          , drawCanvasSize s
@@ -39,10 +39,33 @@ hud s =
             Nothing -> "<unsaved>"
             Just p -> p
         modified = if not $ s^.canvasDirty then "" else "*"
-    in clickable Hud $
+    in clickable TopHud $
        vBox [ hCenter $ padLeft (Pad 1) $ hBox $ padRight (Pad 1) <$> toolbarEntries
             , hBox [borderElem bsHorizontal <+> str ("[" <> filename <> modified <> "]") <+> hBorder]
             ]
+
+bottomHud :: AppState -> Widget Name
+bottomHud s =
+    let toolHuds = [ (Freehand, freehandHud)
+                   , (FloodFill, floodfillHud)
+                   ]
+    in case lookup (s^.tool) toolHuds of
+        Nothing -> emptyWidget
+        Just f ->
+            Widget Fixed Fixed $ do
+                ctx <- getContext
+                let hOff = ctx^.availHeightL - 4
+                render $
+                    translateBy (Location (0, hOff)) $
+                    clickable BottomHud $
+                    hBorderWithLabel (str $ toolName $ s^.tool) <=>
+                    (hCenter $ f s)
+
+freehandHud :: AppState -> Widget Name
+freehandHud s = drawChar s
+
+floodfillHud :: AppState -> Widget Name
+floodfillHud s = drawChar s
 
 drawCanvasSize :: AppState -> Widget Name
 drawCanvasSize s =

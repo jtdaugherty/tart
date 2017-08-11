@@ -64,7 +64,8 @@ data Mode = Main
           deriving (Eq, Show)
 
 data Name = Canvas
-          | Hud
+          | TopHud
+          | BottomHud
           | ToolSelector
           | ToolSelectorEntry Tool
           | CharSelector

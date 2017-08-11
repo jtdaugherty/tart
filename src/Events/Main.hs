@@ -60,8 +60,10 @@ handleEvent s (VtyEvent (V.EvKey (V.KChar c) [])) | isDigit c = do
     case filter ((== idx) . snd) tools of
         [(t, _)] -> continue $ setMode Main $ setTool s t
         _ -> continue s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 'c') [])) =
-    continue $ beginCharacterSelect s
-handleEvent s (MouseDown CharSelector _ _ _) = do
-    continue $ beginCharacterSelect s
+handleEvent s (VtyEvent (V.EvKey (V.KChar 'c') []))
+    | s^.tool `elem` [Freehand, FloodFill] =
+        continue $ beginCharacterSelect s
+handleEvent s (MouseDown CharSelector _ _ _)
+    | s^.tool `elem` [Freehand, FloodFill] =
+        continue $ beginCharacterSelect s
 handleEvent s _ = continue s
