@@ -43,6 +43,8 @@ handleEvent s (MouseDown BgSelector _ _ _) = do
     continue $ beginBgPaletteSelect s
 handleEvent s (MouseDown ToolSelector _ _ _) = do
     continue $ beginToolSelect s
+handleEvent s (MouseDown BoxStyleSelector _ _ _) = do
+    continue $ beginBoxStyleSelect s
 handleEvent s (MouseDown Canvas _ _ (Location l)) = do
     continue =<< drawWithCurrentTool l s
 handleEvent s (VtyEvent (V.EvKey (V.KChar '+') [])) = do

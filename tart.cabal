@@ -25,6 +25,7 @@ executable tart
                        Events.CanvasSizePrompt
                        Events.AskToSave
                        Events.TextEntry
+                       Events.BoxStyleSelect
                        UI
                        UI.Main
                        UI.Common
@@ -34,6 +35,7 @@ executable tart
                        UI.CanvasSizePrompt
                        UI.AskToSave
                        UI.TextEntry
+                       UI.BoxStyleSelect
                        Util
                        Theme
                        Types

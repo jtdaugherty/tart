@@ -16,6 +16,8 @@ module Util
   , quit
   , currentPaletteAttribute
   , handleDragFinished
+  , getBoxBorderStyle
+  , beginBoxStyleSelect
 
   , canvasMoveDown
   , canvasMoveUp
@@ -23,6 +25,7 @@ module Util
   , canvasMoveRight
 
   , tools
+  , boxStyles
 
   , beginCharacterSelect
   , cancelCharacterSelect
@@ -44,6 +47,7 @@ import Text.Read (readMaybe)
 import Brick
 import Brick.Focus
 import Brick.Widgets.Edit (editor, applyEdit, getEditContents)
+import Brick.Widgets.Border.Style
 
 import Types
 import Canvas
@@ -52,14 +56,22 @@ tools :: [(Tool, Int)]
 tools =
     [ (Freehand, 1)
     , (Recolor, 2)
-    , (BoxAscii, 3)
-    , (BoxUnicode, 4)
-    , (BoxRounded, 5)
-    , (FloodFill, 6)
-    , (Eyedropper, 7)
-    , (TextString, 8)
+    , (Box, 3)
+    , (FloodFill, 4)
+    , (Eyedropper, 5)
+    , (TextString, 6)
     , (Eraser, 0)
     ]
+
+boxStyles :: [(String, BorderStyle)]
+boxStyles =
+    [ ("ASCII", ascii)
+    , ("Unicode", unicode)
+    , ("Unicode rounded", unicodeRounded)
+    ]
+
+getBoxBorderStyle :: AppState -> (String, BorderStyle)
+getBoxBorderStyle s = boxStyles !! (s^.boxStyleIndex)
 
 quit :: Bool -> AppState -> EventM Name (Next AppState)
 quit ask s = do
@@ -96,7 +108,7 @@ handleDragFinished s n =
     case n of
         Canvas ->
             case s^.tool of
-                t | isBox t -> do
+                Box -> do
                     c' <- liftIO $ merge (s^.drawing) (s^.drawingOverlay)
                     o' <- liftIO $ clearCanvas (s^.drawingOverlay)
                     return $ s & drawing .~ c'
@@ -162,6 +174,9 @@ tryResizeCanvas s = do
 
 beginToolSelect :: AppState -> AppState
 beginToolSelect = setMode ToolSelect
+
+beginBoxStyleSelect :: AppState -> AppState
+beginBoxStyleSelect = setMode BoxStyleSelect
 
 beginFgPaletteSelect :: AppState -> AppState
 beginFgPaletteSelect = setMode FgPaletteEntrySelect

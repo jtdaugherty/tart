@@ -1,6 +1,7 @@
 module UI.Main
   ( drawMainUI
   , toolSelectorEntryWidth
+  , boxStyleSelectorEntryWidth
   )
 where
 
@@ -48,6 +49,7 @@ bottomHud :: AppState -> Widget Name
 bottomHud s =
     let toolHuds = [ (Freehand, freehandHud)
                    , (FloodFill, floodfillHud)
+                   , (Box, boxHud)
                    ]
     in case lookup (s^.tool) toolHuds of
         Nothing -> emptyWidget
@@ -66,6 +68,20 @@ freehandHud s = drawChar s
 
 floodfillHud :: AppState -> Widget Name
 floodfillHud s = drawChar s
+
+boxStyleSelectorEntryWidth :: Int
+boxStyleSelectorEntryWidth = 20
+
+boxHud :: AppState -> Widget Name
+boxHud = drawBoxStyleSelector
+
+drawBoxStyleSelector :: AppState -> Widget Name
+drawBoxStyleSelector s =
+    let styleName = fst $ getBoxBorderStyle s
+    in clickable BoxStyleSelector $
+       borderWithLabel (str "Box St" <+> (withDefAttr keybindingAttr $ str "y") <+> str "le") $
+       hLimit boxStyleSelectorEntryWidth $
+       hCenter $ str styleName
 
 drawCanvasSize :: AppState -> Widget Name
 drawCanvasSize s =

@@ -14,6 +14,7 @@ import UI.ToolSelect
 import UI.CanvasSizePrompt
 import UI.AskToSave
 import UI.TextEntry
+import UI.BoxStyleSelect
 
 drawUI :: AppState -> [Widget Name]
 drawUI s =
@@ -26,3 +27,4 @@ drawUI s =
         CanvasSizePrompt     -> drawCanvasSizePromptUI s
         AskToSave            -> drawAskToSaveUI s
         TextEntry            -> drawTextEntryUI s
+        BoxStyleSelect       -> drawBoxStyleSelectUI s

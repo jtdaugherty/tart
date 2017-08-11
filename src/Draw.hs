@@ -33,13 +33,13 @@ drawWithCurrentTool point s =
         Recolor  -> recolorAtPoint point s
         FloodFill -> floodFillAtPoint point s
         TextString -> return $ beginTextEntry point s
-        t | isBox t -> do
+        Box -> do
             case s^.dragging of
                 Nothing -> return s
                 Just (n, l0, l1) ->
                     case n of
                         Canvas -> do
-                            let bs = getToolBorderStyle t
+                            let bs = snd $ getBoxBorderStyle s
                             o <- liftIO $ clearCanvas (s^.drawingOverlay)
                             drawBox bs l0 l1 drawingOverlay $
                                      s & drawingOverlay .~ o
@@ -52,7 +52,6 @@ drawWithCurrentTool point s =
             in return $ s & drawCharacter .~ ch
                           & drawFgPaletteIndex .~ findFgPaletteEntry attr s
                           & drawBgPaletteIndex .~ findBgPaletteEntry attr s
-        _ -> return s
 
 truncateEnteredText :: AppState -> T.Text
 truncateEnteredText s =

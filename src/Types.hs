@@ -6,8 +6,6 @@ module Types
   , Pixel
   , Tool(..)
   , AppEvent(..)
-  , isBox
-  , getToolBorderStyle
   , toolName
 
   , AppState(..)
@@ -22,6 +20,7 @@ module Types
   , fgPaletteSelectorExtent
   , bgPaletteSelectorExtent
   , toolSelectorExtent
+  , boxStyleSelectorExtent
   , canvasExtent
   , dragging
   , canvasSizeWidthEdit
@@ -34,6 +33,7 @@ module Types
   , appEventChannel
   , textEntered
   , textEntryStart
+  , boxStyleIndex
   )
 where
 
@@ -41,7 +41,6 @@ import Brick (Extent, Location)
 import Brick.BChan (BChan)
 import Brick.Focus
 import Brick.Widgets.Edit (Editor)
-import Brick.Widgets.Border.Style
 import qualified Data.Text as T
 import Lens.Micro.TH
 import qualified Data.Vector as Vec
@@ -58,6 +57,7 @@ data Mode = Main
           | FgPaletteEntrySelect
           | BgPaletteEntrySelect
           | ToolSelect
+          | BoxStyleSelect
           | CanvasSizePrompt
           | AskToSave
           | TextEntry
@@ -73,17 +73,17 @@ data Name = Canvas
           | BgSelector
           | FgPaletteEntry Int
           | BgPaletteEntry Int
+          | BoxStyleSelectorEntry Int
           | ResizeCanvas
           | CanvasSizeWidthEdit
           | CanvasSizeHeightEdit
           | AskToSaveFilenameEdit
           | TextEntryCursor
+          | BoxStyleSelector
           deriving (Eq, Show, Ord)
 
 data Tool = Freehand
-          | BoxAscii
-          | BoxUnicode
-          | BoxRounded
+          | Box
           | Recolor
           | Eyedropper
           | FloodFill
@@ -93,23 +93,12 @@ data Tool = Freehand
 
 toolName :: Tool -> String
 toolName Freehand   = "Freehand"
-toolName BoxAscii   = "Box (ASCII)"
-toolName BoxUnicode = "Box (Unicode)"
-toolName BoxRounded = "box (Rounded)"
+toolName Box        = "Box"
 toolName Recolor    = "Re-color"
 toolName Eraser     = "Eraser"
 toolName Eyedropper = "Eyedropper"
 toolName FloodFill  = "Flood fill"
 toolName TextString = "Text string"
-
-isBox :: Tool -> Bool
-isBox = (`elem` [BoxAscii, BoxUnicode, BoxRounded])
-
-getToolBorderStyle :: Tool -> BorderStyle
-getToolBorderStyle BoxAscii = ascii
-getToolBorderStyle BoxUnicode = unicode
-getToolBorderStyle BoxRounded = unicodeRounded
-getToolBorderStyle _ = ascii
 
 type Coord = (Int, Int)
 
@@ -127,6 +116,7 @@ data AppState =
              , _fgPaletteSelectorExtent :: Maybe (Extent Name)
              , _bgPaletteSelectorExtent :: Maybe (Extent Name)
              , _toolSelectorExtent      :: Maybe (Extent Name)
+             , _boxStyleSelectorExtent  :: Maybe (Extent Name)
              , _canvasExtent            :: Maybe (Extent Name)
              , _dragging                :: Maybe (Name, Location, Location)
              , _canvasSizeWidthEdit     :: Editor T.Text Name
@@ -139,6 +129,7 @@ data AppState =
              , _appEventChannel         :: BChan AppEvent
              , _textEntered             :: T.Text
              , _textEntryStart          :: (Int, Int)
+             , _boxStyleIndex           :: Int
              }
 
 makeLenses ''AppState

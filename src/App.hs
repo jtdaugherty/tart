@@ -64,6 +64,7 @@ mkInitialState chan mc = do
                       , _fgPaletteSelectorExtent = Nothing
                       , _bgPaletteSelectorExtent = Nothing
                       , _toolSelectorExtent      = Nothing
+                      , _boxStyleSelectorExtent  = Nothing
                       , _canvasExtent            = Nothing
                       , _dragging                = Nothing
                       , _canvasSizeWidthEdit     = editor CanvasSizeWidthEdit (Just 1) ""
@@ -79,6 +80,7 @@ mkInitialState chan mc = do
                       , _appEventChannel         = chan
                       , _textEntered             = ""
                       , _textEntryStart          = (0, 0)
+                      , _boxStyleIndex           = 0
                       }
 
 application :: App AppState AppEvent Name
