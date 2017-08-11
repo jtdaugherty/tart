@@ -15,6 +15,7 @@ module Canvas
   , readCanvas
   , merge
   , clearCanvas
+  , canvasFromText
 
   , blankPixel
   , encodePixel
@@ -53,6 +54,23 @@ newCanvas sz = do
     draw <- A.newArray arrayBounds blankPixel
     drawFreeze <- A.freeze draw
     return $ Canvas draw drawFreeze sz
+
+canvasFromText :: String -> IO Canvas
+canvasFromText s = do
+    let ls = convertTab <$> lines s
+        convertTab l = concat $ convertTabChar <$> l
+        convertTabChar '\t' = replicate 8 ' '
+        convertTabChar c = [c]
+        height = length ls
+        width = maximum $ length <$> ls
+        pixs = concat $ mkRowPixels <$> zip [0..] ls
+        mkRowPixels (rowNum, row) =
+            mkPixel rowNum <$> zip [0..] row
+        mkPixel rowNum (colNum, ch) =
+            ((colNum, rowNum), ch, V.defAttr)
+
+    c <- newCanvas (width, height)
+    canvasSetMany c pixs
 
 writeCanvasForTerminal :: FilePath -> Canvas -> IO ()
 writeCanvasForTerminal path c = writeFile path $ ppCanvas True c

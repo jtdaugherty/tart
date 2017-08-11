@@ -16,7 +16,6 @@
 - Layers
 
 - Import from plain text file
-- Stdin?
 - Paste?
 
 -----------------------------------------------------------------

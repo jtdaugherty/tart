@@ -45,11 +45,11 @@ defaultPalette = Vec.fromList
 initialCanvasSize :: (Int, Int)
 initialCanvasSize = (40, 17)
 
-mkInitialState :: BChan AppEvent -> Maybe (FilePath, Canvas) -> IO AppState
+mkInitialState :: BChan AppEvent -> Maybe (Maybe FilePath, Canvas) -> IO AppState
 mkInitialState chan mc = do
     (c, fp) <- case mc of
         Nothing -> (, Nothing) <$> newCanvas initialCanvasSize
-        Just (fp, c) -> return (c, Just fp)
+        Just (fp, c) -> return (c, fp)
 
     overlay <- newCanvas (canvasSize c)
 
