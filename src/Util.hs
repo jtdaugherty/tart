@@ -19,6 +19,7 @@ module Util
   , getBoxBorderStyle
   , beginBoxStyleSelect
   , writeCanvasFiles
+  , resizeCanvas
 
   , canvasMoveDown
   , canvasMoveUp

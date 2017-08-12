@@ -67,8 +67,16 @@ pasteTextAtPoint :: (Int, Int) -> AppState -> T.Text -> EventM Name AppState
 pasteTextAtPoint point s t = do
     let ls = T.lines t
         (startCol, startRow) = point
+        pasteWidth = maximum $ T.length <$> ls
+        pasteHeight = length ls
+        (oldWidth, oldHeight) = canvasSize (s^.drawing)
+        newSize = ( max oldWidth pasteWidth
+                  , max oldHeight pasteHeight
+                  )
         pairs = zip [startRow..] ls
-    foldM (\st (row, line) -> drawTextAtPoint (startCol, row) line st) s pairs
+
+    s' <- resizeCanvas s newSize
+    foldM (\st (row, line) -> drawTextAtPoint (startCol, row) line st) s' pairs
 
 drawTextAtPoint :: (Int, Int) -> T.Text -> AppState -> EventM Name AppState
 drawTextAtPoint point t s = do
