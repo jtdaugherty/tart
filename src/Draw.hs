@@ -9,6 +9,7 @@ module Draw
   , drawBox
   , drawTextAtPoint
   , truncateText
+  , pasteTextAtPoint
   )
 where
 
@@ -17,6 +18,7 @@ import Brick.Widgets.Border.Style
 import Data.Monoid ((<>))
 import Lens.Micro.Platform
 import Control.Monad.Trans (liftIO)
+import Control.Monad (foldM)
 import qualified Data.Text as T
 import qualified Graphics.Vty as V
 import qualified Data.Vector as Vec
@@ -60,6 +62,13 @@ truncateText point t s =
                      (startCol + T.length t - 1)
         safe = T.take (maxCol - startCol + 1) t
     in safe
+
+pasteTextAtPoint :: (Int, Int) -> AppState -> T.Text -> EventM Name AppState
+pasteTextAtPoint point s t = do
+    let ls = T.lines t
+        (startCol, startRow) = point
+        pairs = zip [startRow..] ls
+    foldM (\st (row, line) -> drawTextAtPoint (startCol, row) line st) s pairs
 
 drawTextAtPoint :: (Int, Int) -> T.Text -> AppState -> EventM Name AppState
 drawTextAtPoint point t s = do

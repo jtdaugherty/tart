@@ -7,6 +7,7 @@ import Brick
 import Data.Char (isDigit)
 import qualified Graphics.Vty as V
 import Lens.Micro.Platform
+import Data.Text.Encoding (decodeUtf8)
 
 import Types
 import Draw
@@ -53,6 +54,8 @@ handleEvent s (VtyEvent (V.EvKey (V.KChar '-') [])) = do
     continue =<< decreaseCanvasSize s
 handleEvent s (VtyEvent (V.EvKey V.KEsc [])) = do
     continue $ s & dragging .~ Nothing
+handleEvent s (VtyEvent (V.EvPaste bytes)) = do
+    continue =<< pasteTextAtPoint (0, 0) s (decodeUtf8 bytes)
 handleEvent s (AppEvent (DragFinished n _ _)) = do
     continue =<< handleDragFinished s n
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'q') [])) = do

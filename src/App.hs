@@ -100,6 +100,7 @@ application =
         , appStartEvent = \s -> do
             vty <- getVtyHandle
             V.setMode (V.outputIface vty) V.Mouse True
+            V.setMode (V.outputIface vty) V.BracketedPaste True
             return s
         , appAttrMap = const theme
         }

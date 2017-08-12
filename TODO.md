@@ -15,8 +15,6 @@
 
 - Layers
 
-- Paste?
-
 - Additional eraser options (size, or drag region to erase?)
 
 -----------------------------------------------------------------
