@@ -26,4 +26,5 @@ textOverlay s =
                                    & _2 %~ (+ (p^._2))
     in translateBy off $
        showCursor TextEntryCursor (Location (T.length t, 0)) $
-       (raw $ V.string (currentPaletteAttribute s) (T.unpack (truncateEnteredText s)))
+       (raw $ V.string (currentPaletteAttribute s)
+           (T.unpack (truncateText (s^.textEntryStart) (s^.textEntered) s)))

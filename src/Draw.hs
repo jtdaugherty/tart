@@ -8,7 +8,7 @@ module Draw
   , boxCorners
   , drawBox
   , drawTextAtPoint
-  , truncateEnteredText
+  , truncateText
   )
 where
 
@@ -53,20 +53,19 @@ drawWithCurrentTool point s =
                           & drawFgPaletteIndex .~ findFgPaletteEntry attr s
                           & drawBgPaletteIndex .~ findBgPaletteEntry attr s
 
-truncateEnteredText :: AppState -> T.Text
-truncateEnteredText s =
-    let startCol = s^.textEntryStart._1
-        t = s^.textEntered
+truncateText :: (Int, Int) -> T.Text -> AppState -> T.Text
+truncateText point t s =
+    let startCol = point^._1
         maxCol = min ((canvasSize (s^.drawing))^._1 - 1)
                      (startCol + T.length t - 1)
         safe = T.take (maxCol - startCol + 1) t
     in safe
 
-drawTextAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
-drawTextAtPoint point s = do
+drawTextAtPoint :: (Int, Int) -> T.Text -> AppState -> EventM Name AppState
+drawTextAtPoint point t s = do
     let attr = currentPaletteAttribute s
         (startCol, row) = point
-        pixs = zip ([startCol..]) (T.unpack $ truncateEnteredText s)
+        pixs = zip ([startCol..]) (T.unpack $ truncateText point t s)
         many = mkEntry <$> pixs
         mkEntry (col, ch) = ((col, row), ch, attr)
     drawMany many drawing s
@@ -120,7 +119,7 @@ drawMany pixels which s = do
     let arr = s^.which
     arr' <- liftIO $ canvasSetMany arr pixels
     return $ s & which .~ arr'
-               & canvasDirty .~ True
+               & canvasDirty %~ (|| (not $ null pixels))
 
 drawAtPoint' :: (Int, Int) -> Char -> V.Attr -> AppState -> EventM Name AppState
 drawAtPoint' point ch attr s = do
