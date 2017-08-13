@@ -24,7 +24,7 @@ import qualified Graphics.Vty as V
 import qualified Data.Vector as Vec
 
 import Types
-import Canvas
+import Tart.Canvas
 import Util
 
 drawWithCurrentTool :: (Int, Int) -> AppState -> EventM Name AppState

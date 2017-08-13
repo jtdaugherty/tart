@@ -52,7 +52,7 @@ import Brick.Widgets.Edit (editor, applyEdit, getEditContents)
 import Brick.Widgets.Border.Style
 
 import Types
-import Canvas
+import Tart.Canvas
 
 tools :: [(Tool, Int)]
 tools =

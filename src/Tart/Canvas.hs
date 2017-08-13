@@ -1,7 +1,7 @@
 {-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE BinaryLiterals #-}
-module Canvas
+module Tart.Canvas
   ( Canvas
   , newCanvas
   , canvasSize

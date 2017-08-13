@@ -19,7 +19,7 @@ import Types
 import Events
 import UI
 import Theme
-import Canvas
+import Tart.Canvas
 
 defaultPalette :: Vec.Vector (Maybe V.Color)
 defaultPalette = Vec.fromList

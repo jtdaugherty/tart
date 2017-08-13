@@ -46,7 +46,7 @@ import Lens.Micro.TH
 import qualified Data.Vector as Vec
 import qualified Graphics.Vty as V
 
-import Canvas
+import Tart.Canvas
 
 data AppEvent =
     DragFinished Name Location Location

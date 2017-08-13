@@ -18,7 +18,7 @@ import Types
 import UI.Common
 import Theme
 import Util
-import Canvas
+import Tart.Canvas
 
 drawMainUI :: AppState -> [Widget Name]
 drawMainUI s =

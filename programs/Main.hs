@@ -13,7 +13,7 @@ import System.Directory (doesFileExist)
 
 import App
 import Util
-import Canvas
+import Tart.Canvas
 
 data Option = Import FilePath
             | Output FilePath
