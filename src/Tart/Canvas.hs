@@ -160,24 +160,10 @@ colorCode f (V.Color240 w) =
     "\ESC[" <> if f then "38" else "48" <> ";5;" <> show w <> "m"
 colorCode f (V.ISOColor w) =
     let c = if f then "38" else "48"
-    in case w of
-        0  -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "black"
-        1  -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "red"
-        2  -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "green"
-        3  -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "yellow"
-        4  -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "blue"
-        5  -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "magenta"
-        6  -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "cyan"
-        7  -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "white"
-        8  -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "brightBlack"
-        9  -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "brightRed"
-        10 -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "brightGreen"
-        11 -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "brightYellow"
-        12 -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "brightBlue"
-        13 -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "brightMagenta"
-        14 -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "brightCyan"
-        15 -> "\ESC[" <> c <> ";5;" <> show w <> "m" -- "brightWhite"
-        _  -> "" -- "unknown"
+        valid v = v >= 0 && v <= 15
+    in if valid w
+       then "\ESC[" <> c <> ";5;" <> show w <> "m"
+       else ""
 
 decodeCanvas :: Canvas -> [[(Char, V.Attr)]]
 decodeCanvas c =
