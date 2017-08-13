@@ -17,10 +17,6 @@ module Tart.Canvas
   , clearCanvas
   , canvasFromText
   , canvasToImage
-
-  , blankPixel
-  , encodePixel
-  , decodePixel
   )
 where
 
