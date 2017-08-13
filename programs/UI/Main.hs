@@ -138,28 +138,3 @@ canvas s =
 shouldUseOverlay :: AppState -> Bool
 shouldUseOverlay s =
     isJust $ s^.dragging
-
--- | Create a Vty image from a list of canvas layers, with the topmost
--- layer being the first canvas in the list. A pixel in the final image
--- is set by looking for the first non-blank pixel in the canvas list,
--- starting at the beginning.
-canvasToImage :: [Canvas] -> V.Image
-canvasToImage [] = V.emptyImage
-canvasToImage cs =
-    let sizes = canvasSize <$> cs
-        smallestSize = ( minimum $ fst <$> sizes
-                       , minimum $ snd <$> sizes
-                       )
-        (lastCol, lastRow) = smallestSize & each %~ pred
-        blank = decodePixel blankPixel
-        rows = getRow <$> [0..lastRow]
-        getRow r = V.horizCat $ (uncurry $ flip V.char) <$> getCol r <$> [0..lastCol]
-        getCol r c = findPixel (c, r) cs
-        findPixel _ [] = error "BUG: canvasToImage got no layers"
-        findPixel point [l] = canvasGetPixel l point
-        findPixel point (l:ls) =
-            let pix = canvasGetPixel l point
-            in if pix == blank
-               then findPixel point ls
-               else pix
-    in V.vertCat rows
