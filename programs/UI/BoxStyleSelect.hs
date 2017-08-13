@@ -23,12 +23,15 @@ drawBoxStyleSelector :: Extent Name -> [Widget Name]
 drawBoxStyleSelector ext =
     [borderHack, body]
     where
-        borderHack = translateBy (extentUpperLeft ext) bottomBorder
+        borderHack = translateBy l bottomBorder
+        l = Location ( fst $ loc $ extentUpperLeft ext
+                     , (snd $ extentSize ext) + (snd $ loc $ extentUpperLeft ext) - 1
+                     )
         bottomBorder = hBox [ borderElem bsIntersectL
                             , hLimit toolSelectorEntryWidth hBorder
                             , borderElem bsIntersectR
                             ]
-        body = translateBy (extentUpperLeft ext & _2 %~ (subtract (1 + length boxStyles))) $
+        body = translateBy l $
                border $ vBox entries
         entries = mkEntry <$> zip [0..] boxStyles
         mkEntry (i, (n, _)) =

@@ -23,7 +23,6 @@ import Tart.Canvas
 drawMainUI :: AppState -> [Widget Name]
 drawMainUI s =
     [ topHud s
-    , bottomHud s
     , canvas s
     ]
 
@@ -31,37 +30,31 @@ topHud :: AppState -> Widget Name
 topHud s =
     let fgPal = drawPaletteSelector s True
         bgPal = drawPaletteSelector s False
-        toolbarEntries = [ padLeft (Pad 1) $ drawToolSelector s
+        toolbarEntries = [ drawToolSelector s
                          , fgPal
                          , bgPal
                          , drawCanvasSize s
+                         , vLimit 1 $ fill ' '
+                         , toolHud s
                          ]
         filename = case s^.canvasPath of
             Nothing -> "<unsaved>"
             Just p -> p
         modified = if not $ s^.canvasDirty then "" else "*"
     in clickable TopHud $
-       vBox [ hCenter $ padLeft (Pad 1) $ hBox $ padRight (Pad 1) <$> toolbarEntries
+       vBox [ (padLeft (Pad 1) $ hBox $ padRight (Pad 1) <$> toolbarEntries)
             , hBox [borderElem bsHorizontal <+> str ("[" <> filename <> modified <> "]") <+> hBorder]
             ]
 
-bottomHud :: AppState -> Widget Name
-bottomHud s =
+toolHud :: AppState -> Widget Name
+toolHud s =
     let toolHuds = [ (Freehand, freehandHud)
                    , (FloodFill, floodfillHud)
                    , (Box, boxHud)
                    ]
     in case lookup (s^.tool) toolHuds of
         Nothing -> emptyWidget
-        Just f ->
-            Widget Fixed Fixed $ do
-                ctx <- getContext
-                let hOff = ctx^.availHeightL - 4
-                render $
-                    translateBy (Location (0, hOff)) $
-                    clickable BottomHud $
-                    hBorderWithLabel (str $ toolName $ s^.tool) <=>
-                    (hCenter $ f s)
+        Just f -> f s
 
 freehandHud :: AppState -> Widget Name
 freehandHud s = drawChar s
