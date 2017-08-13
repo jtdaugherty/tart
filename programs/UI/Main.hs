@@ -88,7 +88,7 @@ drawCanvasSize s =
     let (width, height) = canvasSize $ s^.drawing
     in clickable ResizeCanvas $
        borderWithLabel (str "Can" <+> (withDefAttr keybindingAttr (str "v")) <+> str "as") $
-       str $ show width <> " columns, " <> show height <> " rows"
+       hLimit 8 $ hCenter (str $ show width <> "x" <> show height)
 
 drawChar :: AppState -> Widget Name
 drawChar s =
