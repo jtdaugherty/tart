@@ -324,6 +324,9 @@ merge dest src = do
 -- layer being the first canvas in the list. A pixel in the final image
 -- is set by looking for the first non-blank pixel in the canvas list,
 -- starting at the beginning.
+--
+-- The result will be as high as the least tall input canvas, and as
+-- wide as the least wide input canvas.
 canvasToImage :: [Canvas] -> V.Image
 canvasToImage [] = V.emptyImage
 canvasToImage cs =
