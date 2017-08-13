@@ -226,11 +226,7 @@ canvasSetMany c pixels = do
                }
 
 canvasSetPixel :: Canvas -> (Int, Int) -> Char -> V.Attr -> IO Canvas
-canvasSetPixel c point ch attr = do
-    A.writeArray (mut c) point $ encodePixel ch attr
-    f <- A.freeze (mut c)
-    return $ c { immut = f
-               }
+canvasSetPixel c point ch attr = canvasSetMany c [(point, ch, attr)]
 
 blankPixel :: Word64
 blankPixel = encodePixel ' ' V.defAttr
