@@ -28,7 +28,7 @@ drawBoxStyleSelector ext =
                      , (snd $ extentSize ext) + (snd $ loc $ extentUpperLeft ext) - 1
                      )
         bottomBorder = hBox [ borderElem bsIntersectL
-                            , hLimit toolSelectorEntryWidth hBorder
+                            , hLimit boxStyleSelectorEntryWidth hBorder
                             , borderElem bsIntersectR
                             ]
         body = translateBy l $

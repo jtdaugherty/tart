@@ -31,11 +31,11 @@ topHud s =
     let fgPal = drawPaletteSelector s True
         bgPal = drawPaletteSelector s False
         toolbarEntries = [ drawToolSelector s
+                         , toolHud s
+                         , vLimit 1 $ fill ' '
                          , fgPal
                          , bgPal
                          , drawCanvasSize s
-                         , vLimit 1 $ fill ' '
-                         , toolHud s
                          ]
         filename = case s^.canvasPath of
             Nothing -> "<unsaved>"
@@ -63,7 +63,7 @@ floodfillHud :: AppState -> Widget Name
 floodfillHud s = drawChar s
 
 boxStyleSelectorEntryWidth :: Int
-boxStyleSelectorEntryWidth = 20
+boxStyleSelectorEntryWidth = 18
 
 boxHud :: AppState -> Widget Name
 boxHud = drawBoxStyleSelector
