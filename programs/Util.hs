@@ -1,3 +1,4 @@
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Util
   ( checkForMouseSupport
@@ -92,9 +93,12 @@ increaseRepaintSize = (& repaintSize %~ succ)
 decreaseRepaintSize :: AppState -> AppState
 decreaseRepaintSize = (& repaintSize %~ (max 1 . pred))
 
-pushUndo :: [((Int, Int), (Char, V.Attr))] -> AppState -> AppState
+pushUndo :: [((Int, Int), (Char, V.Attr))]
+         -> AppState
+         -> AppState
 pushUndo [] s = s
 pushUndo l s = s & undoStack %~ (l:)
+                 & redoStack .~ []
 
 quit :: Bool -> AppState -> EventM Name (Next AppState)
 quit ask s = do

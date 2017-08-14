@@ -9,8 +9,6 @@
   - circles
   - lines (click and drag)
 
-- Redo
-
 - HTML output mode?
 
 - Layers

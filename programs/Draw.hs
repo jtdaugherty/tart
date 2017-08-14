@@ -11,6 +11,7 @@ module Draw
   , truncateText
   , pasteTextAtPoint
   , undo
+  , redo
   )
 where
 
@@ -34,8 +35,19 @@ undo s =
         [] -> return s
         (next:rest) -> do
             let next' = (\(p, (ch, attr)) -> (p, ch, attr)) <$> next
-            s' <- drawMany False next' drawing s
+            (s', old) <- drawMany next' drawing s
             return $ s' & undoStack .~ rest
+                        & redoStack %~ (old:)
+
+redo :: AppState -> EventM Name AppState
+redo s =
+    case s^.redoStack of
+        [] -> return s
+        (next:rest) -> do
+            let next' = (\(p, (ch, attr)) -> (p, ch, attr)) <$> next
+            (s', old) <- drawMany next' drawing s
+            return $ s' & redoStack .~ rest
+                        & undoStack %~ (old:)
 
 drawWithCurrentTool :: (Int, Int) -> AppState -> EventM Name AppState
 drawWithCurrentTool point s =
@@ -53,8 +65,9 @@ drawWithCurrentTool point s =
                         Canvas -> do
                             let bs = snd $ getBoxBorderStyle s
                             o <- liftIO $ clearCanvas (s^.drawingOverlay)
-                            drawBox False bs l0 l1 drawingOverlay $
+                            (s', old) <- drawBox bs l0 l1 drawingOverlay $
                                      s & drawingOverlay .~ o
+                            return $ pushUndo old s'
                         _ -> return s
         Eyedropper ->
             -- Read the pixel at the canvas location. Set the
@@ -95,7 +108,8 @@ drawTextAtPoint point t s = do
         pixs = zip ([startCol..]) (T.unpack $ truncateText point t s)
         many = mkEntry <$> pixs
         mkEntry (col, ch) = ((col, row), ch, attr)
-    drawMany True many drawing s
+    (s', old) <- drawMany many drawing s
+    return $ pushUndo old s'
 
 findFgPaletteEntry :: V.Attr -> AppState -> Int
 findFgPaletteEntry a s =
@@ -147,20 +161,22 @@ drawAtPoint point s =
     drawAtPoint' point (s^.drawCharacter) (currentPaletteAttribute s) s
 
 drawAtPoint' :: (Int, Int) -> Char -> V.Attr -> AppState -> EventM Name AppState
-drawAtPoint' point ch attr s = drawMany True [(point, ch, attr)] drawing s
+drawAtPoint' point ch attr s = do
+    (s', old) <- drawMany [(point, ch, attr)] drawing s
+    return $ pushUndo old s'
 
-drawMany :: Bool -> [((Int, Int), Char, V.Attr)] -> Lens' AppState Canvas -> AppState -> EventM Name AppState
-drawMany allowUndo pixels which s = do
+drawMany :: [((Int, Int), Char, V.Attr)]
+         -> Lens' AppState Canvas
+         -> AppState
+         -> EventM Name (AppState, [((Int, Int), (Char, V.Attr))])
+drawMany pixels which s = do
     let arr = s^.which
         old = getOld <$> pixels
         getOld (oldLoc, _, _) = (oldLoc, canvasGetPixel (s^.which) oldLoc)
-        maybePushUndo = if allowUndo
-                        then pushUndo old
-                        else id
     arr' <- liftIO $ canvasSetMany arr pixels
-    return $ maybePushUndo $
-        s & which .~ arr'
-          & canvasDirty %~ (|| (not $ null pixels))
+    let newSt = s & which .~ arr'
+                  & canvasDirty %~ (|| (not $ null pixels))
+    return (newSt, old)
 
 makeBoxAboutPoint :: (Int, Int) -> Int -> [(Int, Int)]
 makeBoxAboutPoint point sz =
@@ -178,7 +194,8 @@ eraseAtPoint :: (Int, Int) -> Int -> AppState -> EventM Name AppState
 eraseAtPoint point sz s = do
     let points = makeBoxAboutPoint point sz
         pixels = (, ' ', V.defAttr) <$> points
-    drawMany True pixels drawing s
+    (s', old) <- drawMany pixels drawing s
+    return $ pushUndo old s'
 
 repaintAtPoint :: (Int, Int) -> Int -> AppState -> EventM Name AppState
 repaintAtPoint point sz s = do
@@ -187,16 +204,16 @@ repaintAtPoint point sz s = do
         getPixel p = let old = canvasGetPixel (s^.drawing) p
                      in (p, old^._1, attr)
         pixels = getPixel <$> points
-    drawMany True pixels drawing s
+    (s', old) <- drawMany pixels drawing s
+    return $ pushUndo old s'
 
-drawBox :: Bool
-        -> BorderStyle
+drawBox :: BorderStyle
         -> Location
         -> Location
         -> Lens' AppState Canvas
         -> AppState
-        -> EventM Name AppState
-drawBox allowUndo bs a b which s = do
+        -> EventM Name (AppState, [((Int, Int), (Char, V.Attr))])
+drawBox bs a b which s = do
     let attr = currentPaletteAttribute s
         (ul, lr) = boxCorners a b
         (ll, ur) = ( (ul^._1, lr^._2)
@@ -232,7 +249,7 @@ drawBox allowUndo bs a b which s = do
                  left <>
                  right
 
-    drawMany allowUndo pixels which s
+    drawMany pixels which s
 
 boxCorners :: Location -> Location -> ((Int, Int), (Int, Int))
 boxCorners (Location (a0, a1)) (Location (b0, b1)) =

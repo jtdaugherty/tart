@@ -84,6 +84,7 @@ mkInitialState chan mc = do
                       , _eraserSize              = 1
                       , _repaintSize             = 1
                       , _undoStack               = []
+                      , _redoStack               = []
                       }
 
 application :: App AppState AppEvent Name

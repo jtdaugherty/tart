@@ -35,6 +35,7 @@ module Types
   , eraserSize
   , repaintSize
   , undoStack
+  , redoStack
   )
 where
 
@@ -134,6 +135,7 @@ data AppState =
              , _eraserSize              :: Int
              , _repaintSize             :: Int
              , _undoStack               :: [[((Int, Int), (Char, V.Attr))]]
+             , _redoStack               :: [[((Int, Int), (Char, V.Attr))]]
              }
 
 makeLenses ''AppState
