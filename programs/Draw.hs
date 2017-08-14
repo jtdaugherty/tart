@@ -145,19 +145,23 @@ drawAtPoint' point ch attr s = do
     return $ s & drawing .~ arr'
                & canvasDirty .~ True
 
+makeBoxAboutPoint :: (Int, Int) -> Int -> [(Int, Int)]
+makeBoxAboutPoint point sz =
+    if sz <= 0
+       then []
+       else let len = (sz * 2) - 1
+                off = negate $ sz - 1
+                noOffset = [(c, r) | r <- [0..len-1], c <- [0..len-1]]
+                addOffset (c, r) = (c + off + point^._1
+                                   ,r + off + point^._2
+                                   )
+            in addOffset <$> noOffset
+
 eraseAtPoint :: (Int, Int) -> Int -> AppState -> EventM Name AppState
-eraseAtPoint point sz s | sz > 0 = do
-    -- Generate a box of pixels centered on the erasure point. The side
-    -- length is always odd, so we can center it on the erasure point.
-    let len = (sz * 2) - 1
-        off = negate $ sz - 1
-        noOffset = [(c, r) | r <- [0..len-1], c <- [0..len-1]]
-        addOffset (c, r) = (c + off + point^._1
-                           ,r + off + point^._2
-                           )
-        pixels = (, ' ', V.defAttr) <$> addOffset <$> noOffset
+eraseAtPoint point sz s = do
+    let points = makeBoxAboutPoint point sz
+        pixels = (, ' ', V.defAttr) <$> points
     drawMany pixels drawing s
-eraseAtPoint _ _ s = return s
 
 recolorAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
 recolorAtPoint point s = do
