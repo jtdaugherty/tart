@@ -215,11 +215,18 @@ canvasGetPixel c point =
 canvasSetMany :: Canvas -> [((Int, Int), Char, V.Attr)] -> IO Canvas
 canvasSetMany c pixels = do
     forM_ pixels $ \(point, ch, attr) -> do
-        A.writeArray (mut c) point $ encodePixel ch attr
+        valid <- isValidPoint point (mut c)
+        when valid $ A.writeArray (mut c) point $ encodePixel ch attr
 
     f <- A.freeze (mut c)
     return $ c { immut = f
                }
+
+isValidPoint :: (Int, Int) -> IOUArray (Int, Int) Word64 -> IO Bool
+isValidPoint (c, r) arr = do
+    ((loC, loR), (hiC, hiR)) <- A.getBounds arr
+    return $ r >= loR && c >= loC &&
+             r <= hiR && c <= hiC
 
 canvasSetPixel :: Canvas -> (Int, Int) -> Char -> V.Attr -> IO Canvas
 canvasSetPixel c point ch attr = canvasSetMany c [(point, ch, attr)]
