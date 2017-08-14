@@ -34,6 +34,7 @@ module Types
   , textEntered
   , textEntryStart
   , boxStyleIndex
+  , eraserSize
   )
 where
 
@@ -130,6 +131,7 @@ data AppState =
              , _textEntered             :: T.Text
              , _textEntryStart          :: (Int, Int)
              , _boxStyleIndex           :: Int
+             , _eraserSize              :: Int
              }
 
 makeLenses ''AppState

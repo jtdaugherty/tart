@@ -81,6 +81,7 @@ mkInitialState chan mc = do
                       , _textEntered             = ""
                       , _textEntryStart          = (0, 0)
                       , _boxStyleIndex           = 0
+                      , _eraserSize              = 1
                       }
 
 application :: App AppState AppEvent Name

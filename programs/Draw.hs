@@ -31,7 +31,7 @@ drawWithCurrentTool :: (Int, Int) -> AppState -> EventM Name AppState
 drawWithCurrentTool point s =
     case s^.tool of
         Freehand -> drawAtPoint point s
-        Eraser   -> eraseAtPoint point s
+        Eraser   -> eraseAtPoint point (s^.eraserSize) s
         Recolor  -> recolorAtPoint point s
         FloodFill -> floodFillAtPoint point s
         TextString -> return $ beginTextEntry point s
@@ -145,9 +145,19 @@ drawAtPoint' point ch attr s = do
     return $ s & drawing .~ arr'
                & canvasDirty .~ True
 
-eraseAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
-eraseAtPoint point s =
-    drawAtPoint' point ' ' V.defAttr s
+eraseAtPoint :: (Int, Int) -> Int -> AppState -> EventM Name AppState
+eraseAtPoint point sz s | sz > 0 = do
+    -- Generate a box of pixels centered on the erasure point. The side
+    -- length is always odd, so we can center it on the erasure point.
+    let len = (sz * 2) - 1
+        off = negate $ sz - 1
+        noOffset = [(c, r) | r <- [0..len-1], c <- [0..len-1]]
+        addOffset (c, r) = (c + off + point^._1
+                           ,r + off + point^._2
+                           )
+        pixels = (, ' ', V.defAttr) <$> addOffset <$> noOffset
+    drawMany pixels drawing s
+eraseAtPoint _ _ s = return s
 
 recolorAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
 recolorAtPoint point s = do
