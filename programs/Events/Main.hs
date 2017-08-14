@@ -45,15 +45,11 @@ handleEvent s (MouseDown BgSelector _ _ _) = do
 handleEvent s (MouseDown ToolSelector _ _ _) = do
     continue $ beginToolSelect s
 handleEvent s (VtyEvent (V.EvKey (V.KChar '>') [])) = do
-    continue $ case s^.tool of
-        Eraser -> increaseEraserSize s
-        _ -> s
+    continue $ whenTool s [Eraser] increaseEraserSize
 handleEvent s (MouseDown IncreaseEraserSize _ _ _) = do
     continue $ increaseEraserSize s
 handleEvent s (VtyEvent (V.EvKey (V.KChar '<') [])) = do
-    continue $ case s^.tool of
-        Eraser -> decreaseEraserSize s
-        _ -> s
+    continue $ whenTool s [Eraser] decreaseEraserSize
 handleEvent s (MouseDown DecreaseEraserSize _ _ _) = do
     continue $ decreaseEraserSize s
 handleEvent s (MouseDown BoxStyleSelector _ _ _) = do
@@ -77,10 +73,11 @@ handleEvent s (VtyEvent (V.EvKey (V.KChar c) [])) | isDigit c = do
     case filter ((== idx) . snd) tools of
         [(t, _)] -> continue $ setMode Main $ setTool s t
         _ -> continue s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 'c') []))
-    | s^.tool `elem` [Freehand, FloodFill] =
-        continue $ beginCharacterSelect s
-handleEvent s (MouseDown CharSelector _ _ _)
-    | s^.tool `elem` [Freehand, FloodFill] =
-        continue $ beginCharacterSelect s
+handleEvent s (VtyEvent (V.EvKey (V.KChar 'c') [])) =
+    continue $ whenTool s [Freehand, FloodFill] beginCharacterSelect
+handleEvent s (MouseDown CharSelector _ _ _) =
+    continue $ whenTool s [Freehand, FloodFill] beginCharacterSelect
 handleEvent s _ = continue s
+
+whenTool :: AppState -> [Tool] -> (AppState -> AppState) -> AppState
+whenTool s ts f = if s^.tool `elem` ts then f s else s
