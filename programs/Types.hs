@@ -81,6 +81,8 @@ data Name = Canvas
           | AskToSaveFilenameEdit
           | TextEntryCursor
           | BoxStyleSelector
+          | IncreaseEraserSize
+          | DecreaseEraserSize
           deriving (Eq, Show, Ord)
 
 data Tool = Freehand

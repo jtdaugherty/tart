@@ -15,8 +15,6 @@
 
 - Layers
 
-- Additional eraser options (size, or drag region to erase?)
-
 -----------------------------------------------------------------
 Dealing with the larger color space:
 

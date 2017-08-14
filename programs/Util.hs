@@ -20,6 +20,8 @@ module Util
   , beginBoxStyleSelect
   , writeCanvasFiles
   , resizeCanvas
+  , increaseEraserSize
+  , decreaseEraserSize
 
   , canvasMoveDown
   , canvasMoveUp
@@ -74,6 +76,12 @@ boxStyles =
 
 getBoxBorderStyle :: AppState -> (String, BorderStyle)
 getBoxBorderStyle s = boxStyles !! (s^.boxStyleIndex)
+
+increaseEraserSize :: AppState -> AppState
+increaseEraserSize = (& eraserSize %~ succ)
+
+decreaseEraserSize :: AppState -> AppState
+decreaseEraserSize = (& eraserSize %~ (max 1 . pred))
 
 quit :: Bool -> AppState -> EventM Name (Next AppState)
 quit ask s = do
