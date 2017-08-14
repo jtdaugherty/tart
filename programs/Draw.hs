@@ -32,7 +32,7 @@ drawWithCurrentTool point s =
     case s^.tool of
         Freehand -> drawAtPoint point s
         Eraser   -> eraseAtPoint point (s^.eraserSize) s
-        Recolor  -> recolorAtPoint point s
+        Recolor  -> recolorAtPoint point (s^.recolorSize) s
         FloodFill -> floodFillAtPoint point s
         TextString -> return $ beginTextEntry point s
         Box -> do
@@ -163,10 +163,14 @@ eraseAtPoint point sz s = do
         pixels = (, ' ', V.defAttr) <$> points
     drawMany pixels drawing s
 
-recolorAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
-recolorAtPoint point s = do
-    let c = fst $ canvasGetPixel (s^.drawing) point
-    drawAtPoint' point c (currentPaletteAttribute s) s
+recolorAtPoint :: (Int, Int) -> Int -> AppState -> EventM Name AppState
+recolorAtPoint point sz s = do
+    let points = makeBoxAboutPoint point sz
+        attr = currentPaletteAttribute s
+        getPixel p = let old = canvasGetPixel (s^.drawing) p
+                     in (p, old^._1, attr)
+        pixels = getPixel <$> points
+    drawMany pixels drawing s
 
 drawBox :: BorderStyle
         -> Location

@@ -22,6 +22,8 @@ module Util
   , resizeCanvas
   , increaseEraserSize
   , decreaseEraserSize
+  , increaseRecolorSize
+  , decreaseRecolorSize
 
   , canvasMoveDown
   , canvasMoveUp
@@ -82,6 +84,12 @@ increaseEraserSize = (& eraserSize %~ succ)
 
 decreaseEraserSize :: AppState -> AppState
 decreaseEraserSize = (& eraserSize %~ (max 1 . pred))
+
+increaseRecolorSize :: AppState -> AppState
+increaseRecolorSize = (& recolorSize %~ succ)
+
+decreaseRecolorSize :: AppState -> AppState
+decreaseRecolorSize = (& recolorSize %~ (max 1 . pred))
 
 quit :: Bool -> AppState -> EventM Name (Next AppState)
 quit ask s = do

@@ -52,6 +52,7 @@ toolHud s =
                    , (FloodFill, floodfillHud)
                    , (Box, boxHud)
                    , (Eraser, eraserHud)
+                   , (Recolor, recolorHud)
                    ]
     in case lookup (s^.tool) toolHuds of
         Nothing -> emptyWidget
@@ -72,12 +73,22 @@ boxHud = drawBoxStyleSelector
 eraserHud :: AppState -> Widget Name
 eraserHud = drawEraserSize
 
+recolorHud :: AppState -> Widget Name
+recolorHud = drawRecolorSize
+
 drawEraserSize :: AppState -> Widget Name
 drawEraserSize s =
     let inc = clickable IncreaseEraserSize $ withDefAttr keybindingAttr $ str ">>"
         dec = clickable DecreaseEraserSize $ withDefAttr keybindingAttr $ str "<<"
     in borderWithLabel (str "Size") $
        dec <+> (hLimit 5 $ hCenter $ str $ show $ s^.eraserSize) <+> inc
+
+drawRecolorSize :: AppState -> Widget Name
+drawRecolorSize s =
+    let inc = clickable IncreaseRecolorSize $ withDefAttr keybindingAttr $ str ">>"
+        dec = clickable DecreaseRecolorSize $ withDefAttr keybindingAttr $ str "<<"
+    in borderWithLabel (str "Size") $
+       dec <+> (hLimit 5 $ hCenter $ str $ show $ s^.recolorSize) <+> inc
 
 drawBoxStyleSelector :: AppState -> Widget Name
 drawBoxStyleSelector s =
