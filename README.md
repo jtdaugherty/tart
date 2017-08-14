@@ -25,7 +25,7 @@ Features
 - Save color versions of ASCII art with terminal escape sequences for
   printing to terminals
 - Import existing plaintext files as the basis for new ASCII art files
-- Drawing tools: freehand, box, flood fill
+- Drawing tools: freehand, box, flood fill, text string
 - Utility tools: repaint, eyedropper, eraser
 - Multiple graphical styles for boxes
 - Character selection for freehand and flood fill tools
