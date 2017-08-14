@@ -36,6 +36,8 @@ undo s =
         (next:rest) -> do
             let next' = (\(p, (ch, attr)) -> (p, ch, attr)) <$> next
             (s', old) <- drawMany next' drawing s
+            -- Avoid using pushUndo here, since it blows away the redo
+            -- stack.
             return $ s' & undoStack .~ rest
                         & redoStack %~ (old:)
 
