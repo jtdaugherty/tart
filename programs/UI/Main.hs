@@ -72,7 +72,7 @@ drawBoxStyleSelector :: AppState -> Widget Name
 drawBoxStyleSelector s =
     let styleName = fst $ getBoxBorderStyle s
     in clickable BoxStyleSelector $
-       borderWithLabel (str "Box St" <+> (withDefAttr keybindingAttr $ str "y") <+> str "le") $
+       borderWithLabel (str "Box Style") $
        hLimit boxStyleSelectorEntryWidth $
        hCenter $ str styleName
 
