@@ -2,8 +2,6 @@
 module Types
   ( Mode(..)
   , Name(..)
-  , Coord
-  , Pixel
   , Tool(..)
   , AppEvent(..)
   , toolName
@@ -105,10 +103,6 @@ toolName Eraser     = "Eraser"
 toolName Eyedropper = "Eyedropper"
 toolName FloodFill  = "Flood fill"
 toolName TextString = "Text string"
-
-type Coord = (Int, Int)
-
-type Pixel = (Char, V.Attr)
 
 data AppState =
     AppState { _drawing                 :: Canvas
