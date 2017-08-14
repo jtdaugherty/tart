@@ -112,7 +112,7 @@ drawPaletteSelector s isFg =
         curIdx = if isFg then s^.drawFgPaletteIndex
                          else s^.drawBgPaletteIndex
         selName = if isFg then FgSelector else BgSelector
-        curColor = drawPaletteEntry s curIdx 4 isFg
+        curColor = drawPaletteEntry s curIdx 4
 
 canvas :: AppState -> Widget Name
 canvas s =

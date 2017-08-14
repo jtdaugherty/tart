@@ -13,15 +13,14 @@ import qualified Data.Vector as Vec
 
 import Types
 
-drawPaletteEntry :: AppState -> Int -> Int -> Bool -> Widget Name
-drawPaletteEntry s idx width isFg =
+drawPaletteEntry :: AppState -> Int -> Int -> Widget Name
+drawPaletteEntry s idx width =
     let pal = s^.palette
         entry = Vec.unsafeIndex pal idx
         attr = case entry of
             Nothing -> V.defAttr
-            Just c -> if isFg then V.defAttr `V.withForeColor` c
-                              else V.defAttr `V.withBackColor` c
-        ch = if isFg then s^.drawCharacter else ' '
+            Just c -> V.defAttr `V.withBackColor` c
+        ch = ' '
     in raw $ V.string attr (replicate width ch)
 
 drawPalette :: AppState -> Bool -> [Widget Name]
@@ -47,4 +46,4 @@ drawPalette s isFgPalette =
         idxs = [0..Vec.length pal-1]
         entries = mkEntry <$> idxs
         mkEntry i = clickable (mkName i) $
-                    drawPaletteEntry s i 6 isFgPalette
+                    drawPaletteEntry s i 6
