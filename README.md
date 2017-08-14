@@ -33,6 +33,7 @@ Features
 - Set arbitrary canvas size
 - Full mouse interaction and keyboard shortcuts
 - Paste text from clipboard into canvas
+- Undo (`u` key) / redo (`r` key)
 
 How It Works
 ============
