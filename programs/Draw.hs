@@ -10,6 +10,7 @@ module Draw
   , drawTextAtPoint
   , truncateText
   , pasteTextAtPoint
+  , undo
   )
 where
 
@@ -27,6 +28,15 @@ import Types
 import Tart.Canvas
 import Util
 
+undo :: AppState -> EventM Name AppState
+undo s =
+    case s^.undoStack of
+        [] -> return s
+        (next:rest) -> do
+            let next' = (\(p, (ch, attr)) -> (p, ch, attr)) <$> next
+            s' <- drawMany False next' drawing s
+            return $ s' & undoStack .~ rest
+
 drawWithCurrentTool :: (Int, Int) -> AppState -> EventM Name AppState
 drawWithCurrentTool point s =
     case s^.tool of
@@ -43,7 +53,7 @@ drawWithCurrentTool point s =
                         Canvas -> do
                             let bs = snd $ getBoxBorderStyle s
                             o <- liftIO $ clearCanvas (s^.drawingOverlay)
-                            drawBox bs l0 l1 drawingOverlay $
+                            drawBox False bs l0 l1 drawingOverlay $
                                      s & drawingOverlay .~ o
                         _ -> return s
         Eyedropper ->
@@ -85,7 +95,7 @@ drawTextAtPoint point t s = do
         pixs = zip ([startCol..]) (T.unpack $ truncateText point t s)
         many = mkEntry <$> pixs
         mkEntry (col, ch) = ((col, row), ch, attr)
-    drawMany many drawing s
+    drawMany True many drawing s
 
 findFgPaletteEntry :: V.Attr -> AppState -> Int
 findFgPaletteEntry a s =
@@ -104,7 +114,7 @@ findBgPaletteEntry a s =
     in maybe 0 id $ Vec.findIndex (== bgc) (s^.palette)
 
 floodFillAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
-floodFillAtPoint point s =
+floodFillAtPoint point s = do
     let fillAttr = currentPaletteAttribute s
         fillCh = s^.drawCharacter
         fillPix = (fillCh, fillAttr)
@@ -114,36 +124,43 @@ floodFillAtPoint point s =
         down  = (& _2 %~ (min (h-1) . succ))
         left  = (& _1 %~ (max 0 . pred))
         right = (& _1 %~ (min (w-1) . succ))
-        go p st = do
+
+        go :: (Int, Int) -> (AppState, [((Int, Int), (Char, V.Attr))]) -> EventM Name (AppState, [((Int, Int), (Char, V.Attr))])
+        go p (st, uBuf) = do
             let pix = canvasGetPixel (st^.drawing) p
-            if | pix == fillPix -> return st
-               | pix /= targetPix -> return st
+            if | pix == fillPix -> return (st, uBuf)
+               | pix /= targetPix -> return (st, uBuf)
                | otherwise -> do
+                   let old = canvasGetPixel (st^.drawing) p
                    d' <- liftIO $ canvasSetPixel (st^.drawing) p fillCh fillAttr
-                   go (down p) (st & drawing .~ d' & canvasDirty .~ True) >>=
+                   let newSt = st & drawing .~ d' & canvasDirty .~ True
+                   go (down p) (newSt, (p, old):uBuf) >>=
                        go (up p) >>=
                        go (left p) >>=
                        go (right p)
 
-    in go point s
+    (finalSt, undoBuf) <- go point (s, [])
+    return $ pushUndo undoBuf finalSt
 
 drawAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
 drawAtPoint point s =
     drawAtPoint' point (s^.drawCharacter) (currentPaletteAttribute s) s
 
-drawMany :: [((Int, Int), Char, V.Attr)] -> Lens' AppState Canvas -> AppState -> EventM Name AppState
-drawMany pixels which s = do
-    let arr = s^.which
-    arr' <- liftIO $ canvasSetMany arr pixels
-    return $ s & which .~ arr'
-               & canvasDirty %~ (|| (not $ null pixels))
-
 drawAtPoint' :: (Int, Int) -> Char -> V.Attr -> AppState -> EventM Name AppState
-drawAtPoint' point ch attr s = do
-    let arr = s^.drawing
-    arr' <- liftIO $ canvasSetPixel arr point ch attr
-    return $ s & drawing .~ arr'
-               & canvasDirty .~ True
+drawAtPoint' point ch attr s = drawMany True [(point, ch, attr)] drawing s
+
+drawMany :: Bool -> [((Int, Int), Char, V.Attr)] -> Lens' AppState Canvas -> AppState -> EventM Name AppState
+drawMany allowUndo pixels which s = do
+    let arr = s^.which
+        old = getOld <$> pixels
+        getOld (oldLoc, _, _) = (oldLoc, canvasGetPixel (s^.which) oldLoc)
+        maybePushUndo = if allowUndo
+                        then pushUndo old
+                        else id
+    arr' <- liftIO $ canvasSetMany arr pixels
+    return $ maybePushUndo $
+        s & which .~ arr'
+          & canvasDirty %~ (|| (not $ null pixels))
 
 makeBoxAboutPoint :: (Int, Int) -> Int -> [(Int, Int)]
 makeBoxAboutPoint point sz =
@@ -161,7 +178,7 @@ eraseAtPoint :: (Int, Int) -> Int -> AppState -> EventM Name AppState
 eraseAtPoint point sz s = do
     let points = makeBoxAboutPoint point sz
         pixels = (, ' ', V.defAttr) <$> points
-    drawMany pixels drawing s
+    drawMany True pixels drawing s
 
 repaintAtPoint :: (Int, Int) -> Int -> AppState -> EventM Name AppState
 repaintAtPoint point sz s = do
@@ -170,15 +187,16 @@ repaintAtPoint point sz s = do
         getPixel p = let old = canvasGetPixel (s^.drawing) p
                      in (p, old^._1, attr)
         pixels = getPixel <$> points
-    drawMany pixels drawing s
+    drawMany True pixels drawing s
 
-drawBox :: BorderStyle
+drawBox :: Bool
+        -> BorderStyle
         -> Location
         -> Location
         -> Lens' AppState Canvas
         -> AppState
         -> EventM Name AppState
-drawBox bs a b which s = do
+drawBox allowUndo bs a b which s = do
     let attr = currentPaletteAttribute s
         (ul, lr) = boxCorners a b
         (ll, ur) = ( (ul^._1, lr^._2)
@@ -214,7 +232,7 @@ drawBox bs a b which s = do
                  left <>
                  right
 
-    drawMany pixels which s
+    drawMany allowUndo pixels which s
 
 boxCorners :: Location -> Location -> ((Int, Int), (Int, Int))
 boxCorners (Location (a0, a1)) (Location (b0, b1)) =

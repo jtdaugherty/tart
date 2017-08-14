@@ -20,10 +20,11 @@ module Tart.Canvas
   )
 where
 
-import Control.Monad (forM_, replicateM, when)
+import Control.Monad (forM_, forM, replicateM, when)
 import Data.Bits
 import Data.Word (Word64)
 import Data.Monoid ((<>))
+import Data.Maybe (catMaybes)
 import Data.List (reverse)
 import Data.Char (isSpace)
 import qualified Graphics.Vty as V
@@ -242,7 +243,8 @@ resizeFrom old newSz = do
         False -> return old
         True -> do
             new <- newCanvas newSz
-            merge new old
+            (c, _) <- merge new old
+            return c
 
 encodePixel :: Char -> V.Attr -> Word64
 encodePixel c a =
@@ -291,19 +293,25 @@ decodeAttrColor v =
        then V.SetTo $ V.Color240 color
        else V.SetTo $ V.ISOColor color
 
-merge :: Canvas -> Canvas -> IO Canvas
+merge :: Canvas -> Canvas -> IO (Canvas, [((Int, Int), (Char, V.Attr))])
 merge dest src = do
     let (width, height) = (min srcW destW, min srcH destH)
         (srcW, srcH) = canvasSize src
         (destW, destH) = canvasSize dest
-    forM_ [0..width-1] $ \w ->
-        forM_ [0..height-1] $ \h -> do
+
+    undoBuf <- forM [0..width-1] $ \w ->
+        forM [0..height-1] $ \h -> do
             let pix = (immut src) I.! (w, h)
-            when (pix /= blankPixel) $
-                A.writeArray (mut dest) (w, h) pix
+            case pix /= blankPixel of
+                True -> do
+                    old <- A.readArray (mut dest) (w, h)
+                    A.writeArray (mut dest) (w, h) pix
+                    return $ Just ((w, h), decodePixel old)
+                False ->
+                    return Nothing
 
     f <- A.unsafeFreeze $ mut dest
-    return $ dest { immut = f }
+    return (dest { immut = f }, catMaybes $ concat undoBuf)
 
 -- | Create a Vty image from a list of canvas layers, with the topmost
 -- layer being the first canvas in the list. A pixel in the final image

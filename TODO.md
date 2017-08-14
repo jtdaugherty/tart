@@ -9,7 +9,7 @@
   - circles
   - lines (click and drag)
 
-- Undo / redo
+- Redo
 
 - HTML output mode?
 

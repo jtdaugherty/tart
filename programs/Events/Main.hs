@@ -78,6 +78,8 @@ handleEvent s (AppEvent (DragFinished n _ _)) = do
     continue =<< handleDragFinished s n
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'q') [])) = do
     quit True s
+handleEvent s (VtyEvent (V.EvKey (V.KChar 'u') [])) = do
+    continue =<< undo s
 handleEvent s (VtyEvent (V.EvKey (V.KChar c) [])) | isDigit c = do
     let idx = read [c]
     case filter ((== idx) . snd) tools of

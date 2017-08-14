@@ -24,6 +24,7 @@ module Util
   , decreaseEraserSize
   , increaseRepaintSize
   , decreaseRepaintSize
+  , pushUndo
 
   , canvasMoveDown
   , canvasMoveUp
@@ -91,6 +92,10 @@ increaseRepaintSize = (& repaintSize %~ succ)
 decreaseRepaintSize :: AppState -> AppState
 decreaseRepaintSize = (& repaintSize %~ (max 1 . pred))
 
+pushUndo :: [((Int, Int), (Char, V.Attr))] -> AppState -> AppState
+pushUndo [] s = s
+pushUndo l s = s & undoStack %~ (l:)
+
 quit :: Bool -> AppState -> EventM Name (Next AppState)
 quit ask s = do
     case (s^.canvasDirty) of
@@ -131,9 +136,10 @@ handleDragFinished s n =
         Canvas ->
             case s^.tool of
                 Box -> do
-                    c' <- liftIO $ merge (s^.drawing) (s^.drawingOverlay)
+                    (c', old) <- liftIO $ merge (s^.drawing) (s^.drawingOverlay)
                     o' <- liftIO $ clearCanvas (s^.drawingOverlay)
-                    return $ s & drawing .~ c'
+                    return $ pushUndo old $
+                             s & drawing .~ c'
                                & drawingOverlay .~ o'
                 _ -> return s
         _ -> return s
