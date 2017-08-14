@@ -44,8 +44,16 @@ handleEvent s (MouseDown BgSelector _ _ _) = do
     continue $ beginBgPaletteSelect s
 handleEvent s (MouseDown ToolSelector _ _ _) = do
     continue $ beginToolSelect s
+handleEvent s (VtyEvent (V.EvKey (V.KChar '>') [])) = do
+    continue $ case s^.tool of
+        Eraser -> increaseEraserSize s
+        _ -> s
 handleEvent s (MouseDown IncreaseEraserSize _ _ _) = do
     continue $ increaseEraserSize s
+handleEvent s (VtyEvent (V.EvKey (V.KChar '<') [])) = do
+    continue $ case s^.tool of
+        Eraser -> decreaseEraserSize s
+        _ -> s
 handleEvent s (MouseDown DecreaseEraserSize _ _ _) = do
     continue $ decreaseEraserSize s
 handleEvent s (MouseDown BoxStyleSelector _ _ _) = do
