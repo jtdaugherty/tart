@@ -14,7 +14,7 @@ creating ASCII art. The best way to see how your ASCII art is going to
 look in the terminal is to draw it in the terminal where it will be
 displayed!
 
-![](screenshots/0.png)
+![](screenshots/1.png)
 
 Features
 ========
