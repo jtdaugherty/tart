@@ -35,7 +35,7 @@ module Types
   , textEntryStart
   , boxStyleIndex
   , eraserSize
-  , recolorSize
+  , repaintSize
   )
 where
 
@@ -84,13 +84,13 @@ data Name = Canvas
           | BoxStyleSelector
           | IncreaseEraserSize
           | DecreaseEraserSize
-          | IncreaseRecolorSize
-          | DecreaseRecolorSize
+          | IncreaseRepaintSize
+          | DecreaseRepaintSize
           deriving (Eq, Show, Ord)
 
 data Tool = Freehand
           | Box
-          | Recolor
+          | Repaint
           | Eyedropper
           | FloodFill
           | Eraser
@@ -100,7 +100,7 @@ data Tool = Freehand
 toolName :: Tool -> String
 toolName Freehand   = "Freehand"
 toolName Box        = "Box"
-toolName Recolor    = "Re-color"
+toolName Repaint    = "Repaint"
 toolName Eraser     = "Eraser"
 toolName Eyedropper = "Eyedropper"
 toolName FloodFill  = "Flood fill"
@@ -137,7 +137,7 @@ data AppState =
              , _textEntryStart          :: (Int, Int)
              , _boxStyleIndex           :: Int
              , _eraserSize              :: Int
-             , _recolorSize             :: Int
+             , _repaintSize             :: Int
              }
 
 makeLenses ''AppState

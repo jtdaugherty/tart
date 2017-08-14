@@ -32,7 +32,7 @@ drawWithCurrentTool point s =
     case s^.tool of
         Freehand -> drawAtPoint point s
         Eraser   -> eraseAtPoint point (s^.eraserSize) s
-        Recolor  -> recolorAtPoint point (s^.recolorSize) s
+        Repaint  -> repaintAtPoint point (s^.repaintSize) s
         FloodFill -> floodFillAtPoint point s
         TextString -> return $ beginTextEntry point s
         Box -> do
@@ -163,8 +163,8 @@ eraseAtPoint point sz s = do
         pixels = (, ' ', V.defAttr) <$> points
     drawMany pixels drawing s
 
-recolorAtPoint :: (Int, Int) -> Int -> AppState -> EventM Name AppState
-recolorAtPoint point sz s = do
+repaintAtPoint :: (Int, Int) -> Int -> AppState -> EventM Name AppState
+repaintAtPoint point sz s = do
     let points = makeBoxAboutPoint point sz
         attr = currentPaletteAttribute s
         getPixel p = let old = canvasGetPixel (s^.drawing) p

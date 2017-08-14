@@ -22,8 +22,8 @@ module Util
   , resizeCanvas
   , increaseEraserSize
   , decreaseEraserSize
-  , increaseRecolorSize
-  , decreaseRecolorSize
+  , increaseRepaintSize
+  , decreaseRepaintSize
 
   , canvasMoveDown
   , canvasMoveUp
@@ -60,13 +60,13 @@ import Tart.Canvas
 
 tools :: [(Tool, Int)]
 tools =
-    [ (Freehand, 1)
-    , (Recolor, 2)
-    , (Box, 3)
-    , (FloodFill, 4)
-    , (Eyedropper, 5)
-    , (TextString, 6)
-    , (Eraser, 0)
+    [ (Freehand  , 1)
+    , (Box       , 2)
+    , (FloodFill , 3)
+    , (TextString, 4)
+    , (Repaint   , 5)
+    , (Eyedropper, 6)
+    , (Eraser    , 0)
     ]
 
 boxStyles :: [(String, BorderStyle)]
@@ -85,11 +85,11 @@ increaseEraserSize = (& eraserSize %~ succ)
 decreaseEraserSize :: AppState -> AppState
 decreaseEraserSize = (& eraserSize %~ (max 1 . pred))
 
-increaseRecolorSize :: AppState -> AppState
-increaseRecolorSize = (& recolorSize %~ succ)
+increaseRepaintSize :: AppState -> AppState
+increaseRepaintSize = (& repaintSize %~ succ)
 
-decreaseRecolorSize :: AppState -> AppState
-decreaseRecolorSize = (& recolorSize %~ (max 1 . pred))
+decreaseRepaintSize :: AppState -> AppState
+decreaseRepaintSize = (& repaintSize %~ (max 1 . pred))
 
 quit :: Bool -> AppState -> EventM Name (Next AppState)
 quit ask s = do
