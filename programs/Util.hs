@@ -80,7 +80,6 @@ styleBindings :: [(Char, V.Style)]
 styleBindings =
     [ ('!', V.bold)
     , ('@', V.underline)
-    , ('#', V.standout)
     , ('$', V.blink)
     , ('%', V.dim)
     , ('^', V.reverseVideo)
