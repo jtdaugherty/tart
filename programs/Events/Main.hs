@@ -52,6 +52,18 @@ handleEvent s (MouseDown IncreaseRepaintSize _ _ _) = do
     continue $ increaseRepaintSize s
 handleEvent s (MouseDown DecreaseRepaintSize _ _ _) = do
     continue $ decreaseRepaintSize s
+handleEvent s (MouseDown _ V.BScrollUp _ _) = do
+    let f = case s^.tool of
+              Repaint -> increaseRepaintSize
+              Eraser -> increaseEraserSize
+              _ -> id
+    continue $ f s
+handleEvent s (MouseDown _ V.BScrollDown _ _) = do
+    let f = case s^.tool of
+              Repaint -> decreaseRepaintSize
+              Eraser -> decreaseEraserSize
+              _ -> id
+    continue $ f s
 handleEvent s (VtyEvent (V.EvKey (V.KChar '>') [])) = do
     continue $ case s^.tool of
         Eraser -> increaseEraserSize s
