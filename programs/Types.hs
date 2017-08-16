@@ -4,6 +4,7 @@ module Types
   , Name(..)
   , Tool(..)
   , AppEvent(..)
+  , Action(..)
   , toolName
 
   , AppState(..)
@@ -53,6 +54,10 @@ import Tart.Canvas
 data AppEvent =
     DragFinished Name Location Location
     deriving (Eq)
+
+data Action =
+    SetPixels [((Int, Int), (Char, V.Attr))]
+    deriving (Eq, Show)
 
 data Mode = Main
           | CharacterSelect
@@ -134,8 +139,8 @@ data AppState =
              , _boxStyleIndex           :: Int
              , _eraserSize              :: Int
              , _repaintSize             :: Int
-             , _undoStack               :: [[((Int, Int), (Char, V.Attr))]]
-             , _redoStack               :: [[((Int, Int), (Char, V.Attr))]]
+             , _undoStack               :: [[Action]]
+             , _redoStack               :: [[Action]]
              }
 
 makeLenses ''AppState

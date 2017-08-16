@@ -33,23 +33,35 @@ undo :: AppState -> EventM Name AppState
 undo s =
     case s^.undoStack of
         [] -> return s
-        (next:rest) -> do
-            let next' = (\(p, (ch, attr)) -> (p, ch, attr)) <$> next
-            (s', old) <- drawMany next' drawing s
-            -- Avoid using pushUndo here, since it blows away the redo
-            -- stack.
-            return $ s' & undoStack .~ rest
-                        & redoStack %~ (old:)
+        (actions:rest) -> do
+            let go st [] old = return (st, old)
+                go st (a:as) old = do
+                    (st', old') <- applyAction st a
+                    go st' as (old' <> old)
+
+            (finalSt, undoActs) <- go s actions []
+            return $ finalSt & undoStack .~ rest
+                             & redoStack %~ (undoActs:)
 
 redo :: AppState -> EventM Name AppState
 redo s =
     case s^.redoStack of
         [] -> return s
-        (next:rest) -> do
-            let next' = (\(p, (ch, attr)) -> (p, ch, attr)) <$> next
-            (s', old) <- drawMany next' drawing s
-            return $ s' & redoStack .~ rest
-                        & undoStack %~ (old:)
+        (actions:rest) -> do
+            let go st [] old = return (st, old)
+                go st (a:as) old = do
+                    (st', old') <- applyAction st a
+                    go st' as (old' <> old)
+
+            (finalSt, undoActs) <- go s actions []
+            return $ finalSt & redoStack .~ rest
+                             & undoStack %~ (undoActs:)
+
+applyAction :: AppState -> Action -> EventM Name (AppState, [Action])
+applyAction s (SetPixels ps) = do
+    let old' = (\(p, (ch, attr)) -> (p, ch, attr)) <$> ps
+    (s', old) <- drawMany old' drawing s
+    return (s', old)
 
 drawWithCurrentTool :: (Int, Int) -> AppState -> EventM Name AppState
 drawWithCurrentTool point s =
@@ -156,7 +168,7 @@ floodFillAtPoint point s = do
                        go (right p)
 
     (finalSt, undoBuf) <- go point (s, [])
-    return $ pushUndo undoBuf finalSt
+    return $ pushUndo [SetPixels undoBuf] finalSt
 
 drawAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
 drawAtPoint point s =
@@ -170,7 +182,7 @@ drawAtPoint' point ch attr s = do
 drawMany :: [((Int, Int), Char, V.Attr)]
          -> Lens' AppState Canvas
          -> AppState
-         -> EventM Name (AppState, [((Int, Int), (Char, V.Attr))])
+         -> EventM Name (AppState, [Action])
 drawMany pixels which s = do
     let arr = s^.which
         old = getOld <$> pixels
@@ -178,7 +190,7 @@ drawMany pixels which s = do
     arr' <- liftIO $ canvasSetMany arr pixels
     let newSt = s & which .~ arr'
                   & canvasDirty %~ (|| (not $ null pixels))
-    return (newSt, old)
+    return (newSt, [SetPixels old])
 
 makeBoxAboutPoint :: (Int, Int) -> Int -> [(Int, Int)]
 makeBoxAboutPoint point sz =
@@ -214,7 +226,7 @@ drawBox :: BorderStyle
         -> Location
         -> Lens' AppState Canvas
         -> AppState
-        -> EventM Name (AppState, [((Int, Int), (Char, V.Attr))])
+        -> EventM Name (AppState, [Action])
 drawBox bs a b which s = do
     let attr = currentPaletteAttribute s
         (ul, lr) = boxCorners a b

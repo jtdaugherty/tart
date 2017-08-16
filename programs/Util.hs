@@ -93,9 +93,7 @@ increaseRepaintSize = (& repaintSize %~ succ)
 decreaseRepaintSize :: AppState -> AppState
 decreaseRepaintSize = (& repaintSize %~ (max 1 . pred))
 
-pushUndo :: [((Int, Int), (Char, V.Attr))]
-         -> AppState
-         -> AppState
+pushUndo :: [Action] -> AppState -> AppState
 pushUndo [] s = s
 pushUndo l s = s & undoStack %~ (l:)
                  & redoStack .~ []
@@ -142,7 +140,7 @@ handleDragFinished s n =
                 Box -> do
                     (c', old) <- liftIO $ merge (s^.drawing) (s^.drawingOverlay)
                     o' <- liftIO $ clearCanvas (s^.drawingOverlay)
-                    return $ pushUndo old $
+                    return $ pushUndo [SetPixels old] $
                              s & drawing .~ c'
                                & drawingOverlay .~ o'
                 _ -> return s
