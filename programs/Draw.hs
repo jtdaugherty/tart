@@ -93,6 +93,12 @@ drawWithCurrentTool point s =
             in return $ s & drawCharacter .~ ch
                           & drawFgPaletteIndex .~ findFgPaletteEntry attr s
                           & drawBgPaletteIndex .~ findBgPaletteEntry attr s
+                          & drawStyle .~ styleWord (V.attrStyle attr)
+
+styleWord :: V.MaybeDefault V.Style -> V.Style
+styleWord V.KeepCurrent = 0
+styleWord V.Default = 0
+styleWord (V.SetTo s) = s
 
 truncateText :: (Int, Int) -> T.Text -> AppState -> T.Text
 truncateText point t s =
