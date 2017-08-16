@@ -235,7 +235,7 @@ repaintAtPoint point sz s = do
     let points = makeBoxAboutPoint point sz
         attr = currentPaletteAttribute s
         getPixel p = let old = canvasGetPixel (s^.drawing) p
-                     in (p, old^._1, attr)
+                     in (p, old^._1, attr { V.attrStyle = V.attrStyle $ old^._2 })
         pixels = getPixel <$> points
     (s', old) <- drawMany pixels drawing s
     return $ pushUndo old s'
