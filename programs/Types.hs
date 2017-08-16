@@ -57,6 +57,7 @@ data AppEvent =
 
 data Action =
     SetPixels [((Int, Int), (Char, V.Attr))]
+    | ClearCanvasDirty
     deriving (Eq, Show)
 
 data Mode = Main

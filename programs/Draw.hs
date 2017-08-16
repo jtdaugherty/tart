@@ -24,6 +24,7 @@ import Control.Monad (foldM)
 import qualified Data.Text as T
 import qualified Graphics.Vty as V
 import qualified Data.Vector as Vec
+import Data.Maybe (catMaybes)
 
 import Types
 import Tart.Canvas
@@ -58,6 +59,7 @@ redo s =
                              & undoStack %~ (undoActs:)
 
 applyAction :: AppState -> Action -> EventM Name (AppState, [Action])
+applyAction s ClearCanvasDirty = return (s & canvasDirty .~ False, [])
 applyAction s (SetPixels ps) = do
     let old' = (\(p, (ch, attr)) -> (p, ch, attr)) <$> ps
     (s', old) <- drawMany old' drawing s
@@ -168,7 +170,12 @@ floodFillAtPoint point s = do
                        go (right p)
 
     (finalSt, undoBuf) <- go point (s, [])
-    return $ pushUndo [SetPixels undoBuf] finalSt
+    let prevDirty = s^.canvasDirty
+        newDirty = s^.canvasDirty
+        d = if prevDirty /= newDirty
+            then Just ClearCanvasDirty
+            else Nothing
+    return $ pushUndo (catMaybes [Just $ SetPixels undoBuf, d]) finalSt
 
 drawAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
 drawAtPoint point s =
@@ -188,9 +195,15 @@ drawMany pixels which s = do
         old = getOld <$> pixels
         getOld (oldLoc, _, _) = (oldLoc, canvasGetPixel (s^.which) oldLoc)
     arr' <- liftIO $ canvasSetMany arr pixels
-    let newSt = s & which .~ arr'
-                  & canvasDirty %~ (|| (not $ null pixels))
-    return (newSt, [SetPixels old])
+    let prevDirty = s^.canvasDirty
+        newDirty = not $ null pixels
+        newSt = s & which .~ arr'
+                  & canvasDirty .~ (prevDirty || newDirty)
+    return (newSt, catMaybes [ Just $ SetPixels old
+                             , if prevDirty /= newDirty
+                               then Just ClearCanvasDirty
+                               else Nothing
+                             ])
 
 makeBoxAboutPoint :: (Int, Int) -> Int -> [(Int, Int)]
 makeBoxAboutPoint point sz =
