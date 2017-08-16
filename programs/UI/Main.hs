@@ -2,6 +2,7 @@ module UI.Main
   ( drawMainUI
   , toolSelectorEntryWidth
   , boxStyleSelectorEntryWidth
+  , styleSelectorEntryWidth
   )
 where
 
@@ -30,11 +31,13 @@ topHud :: AppState -> Widget Name
 topHud s =
     let fgPal = drawPaletteSelector s True
         bgPal = drawPaletteSelector s False
+        stySel = drawStyleSelector s
         toolbarEntries = [ drawToolSelector s
                          , toolHud s
                          , vLimit 1 $ fill ' '
                          , fgPal
                          , bgPal
+                         , stySel
                          , drawCanvasSize s
                          ]
         filename = case s^.canvasPath of
@@ -67,6 +70,9 @@ floodfillHud s = drawChar s
 boxStyleSelectorEntryWidth :: Int
 boxStyleSelectorEntryWidth = 18
 
+styleSelectorEntryWidth :: Int
+styleSelectorEntryWidth = 7
+
 boxHud :: AppState -> Widget Name
 boxHud = drawBoxStyleSelector
 
@@ -97,6 +103,13 @@ drawBoxStyleSelector s =
        borderWithLabel (str "Box Style") $
        hLimit boxStyleSelectorEntryWidth $
        hCenter $ str styleName
+
+drawStyleSelector :: AppState -> Widget Name
+drawStyleSelector s =
+    clickable StyleSelector $
+    borderWithLabel (str "Style") $
+    hLimit styleSelectorEntryWidth $
+    hCenter $ raw $ V.string (V.defAttr `V.withStyle` (s^.drawStyle)) "demo"
 
 drawCanvasSize :: AppState -> Widget Name
 drawCanvasSize s =

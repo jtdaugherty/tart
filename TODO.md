@@ -13,6 +13,10 @@
 
 - Layers
 
+- Preserve style information in RLE encoding / color disk file output
+
+- Permit style changes during text entry (per-character styling)
+
 -----------------------------------------------------------------
 Dealing with the larger color space:
 

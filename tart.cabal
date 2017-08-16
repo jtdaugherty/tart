@@ -39,6 +39,7 @@ executable tart
                        Events.AskToSave
                        Events.TextEntry
                        Events.BoxStyleSelect
+                       Events.StyleSelect
                        UI
                        UI.Main
                        UI.Common
@@ -49,6 +50,7 @@ executable tart
                        UI.AskToSave
                        UI.TextEntry
                        UI.BoxStyleSelect
+                       UI.StyleSelect
                        Util
                        Theme
                        Types

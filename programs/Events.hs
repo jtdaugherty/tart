@@ -18,6 +18,7 @@ import Events.CanvasSizePrompt
 import Events.AskToSave
 import Events.TextEntry
 import Events.BoxStyleSelect
+import Events.StyleSelect
 
 handleEvent :: AppState -> BrickEvent Name AppEvent -> EventM Name (Next AppState)
 handleEvent s (VtyEvent (V.EvResize _ _)) = do
@@ -57,6 +58,7 @@ handleEvent s e = do
                 AskToSave            -> handleAskToSaveEvent st ev
                 TextEntry            -> handleTextEntryEvent st ev
                 BoxStyleSelect       -> handleBoxStyleSelectEvent st ev
+                StyleSelect          -> handleStyleSelectEvent st ev
 
 updateExtents :: AppState -> EventM Name AppState
 updateExtents s = do
@@ -65,9 +67,11 @@ updateExtents s = do
     tsExtent <- lookupExtent ToolSelector
     cExtent <- lookupExtent Canvas
     bsExtent <- lookupExtent BoxStyleSelector
+    ssExtent <- lookupExtent StyleSelector
 
     return $ s & fgPaletteSelectorExtent .~ fgExtent
                & bgPaletteSelectorExtent .~ bgExtent
                & toolSelectorExtent      .~ tsExtent
                & canvasExtent            .~ cExtent
                & boxStyleSelectorExtent  .~ bsExtent
+               & styleSelectorExtent     .~ ssExtent

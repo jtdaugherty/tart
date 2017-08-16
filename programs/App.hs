@@ -65,6 +65,7 @@ mkInitialState chan mc = do
                       , _bgPaletteSelectorExtent = Nothing
                       , _toolSelectorExtent      = Nothing
                       , _boxStyleSelectorExtent  = Nothing
+                      , _styleSelectorExtent     = Nothing
                       , _canvasExtent            = Nothing
                       , _dragging                = Nothing
                       , _canvasSizeWidthEdit     = editor CanvasSizeWidthEdit (Just 1) ""
@@ -85,6 +86,7 @@ mkInitialState chan mc = do
                       , _repaintSize             = 1
                       , _undoStack               = []
                       , _redoStack               = []
+                      , _drawStyle               = noStyle
                       }
 
 application :: App AppState AppEvent Name

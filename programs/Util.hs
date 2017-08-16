@@ -19,6 +19,7 @@ module Util
   , handleDragFinished
   , getBoxBorderStyle
   , beginBoxStyleSelect
+  , beginStyleSelect
   , writeCanvasFiles
   , resizeCanvas
   , increaseEraserSize
@@ -26,6 +27,9 @@ module Util
   , increaseRepaintSize
   , decreaseRepaintSize
   , pushUndo
+  , toggleStyleFromKey
+  , isStyleKey
+  , styleBindings
 
   , canvasMoveDown
   , canvasMoveUp
@@ -51,6 +55,7 @@ import System.Exit (exitFailure)
 import Lens.Micro.Platform
 import Data.Text.Zipper (gotoEOL)
 import Text.Read (readMaybe)
+import Data.Maybe (isJust)
 
 import Brick
 import Brick.Focus
@@ -70,6 +75,29 @@ tools =
     , (Eyedropper, 6)
     , (Eraser    , 0)
     ]
+
+styleBindings :: [(Char, V.Style)]
+styleBindings =
+    [ ('!', V.bold)
+    , ('@', V.underline)
+    , ('#', V.standout)
+    , ('$', V.blink)
+    , ('%', V.dim)
+    , ('^', V.reverseVideo)
+    ]
+
+isStyleKey :: V.Event -> Bool
+isStyleKey (V.EvKey (V.KChar c) []) =
+    isJust $ lookup c styleBindings
+isStyleKey _ = False
+
+toggleStyleFromKey :: V.Event -> AppState -> AppState
+toggleStyleFromKey e s =
+    if isStyleKey e
+    then let V.EvKey (V.KChar c) _ = e
+             Just sty = lookup c styleBindings
+         in s & drawStyle %~ toggleStyle sty
+    else s
 
 boxStyles :: [(String, BorderStyle)]
 boxStyles =
@@ -208,6 +236,9 @@ beginToolSelect = setMode ToolSelect
 beginBoxStyleSelect :: AppState -> AppState
 beginBoxStyleSelect = setMode BoxStyleSelect
 
+beginStyleSelect :: AppState -> AppState
+beginStyleSelect = setMode StyleSelect
+
 beginFgPaletteSelect :: AppState -> AppState
 beginFgPaletteSelect = setMode FgPaletteEntrySelect
 
@@ -259,4 +290,4 @@ currentPaletteAttribute s =
         applyFg (Just c) = (`V.withForeColor` c)
         applyBg Nothing = id
         applyBg (Just c) = (`V.withBackColor` c)
-    in applyFg fgEntry $ applyBg bgEntry V.defAttr
+    in (applyFg fgEntry $ applyBg bgEntry V.defAttr) `V.withStyle` (s^.drawStyle)

@@ -22,6 +22,8 @@ handleMainEvent s e = do
         Nothing -> handleEvent s e
 
 handleEvent :: AppState -> BrickEvent Name AppEvent -> EventM Name (Next AppState)
+handleEvent s (VtyEvent e) | isStyleKey e =
+    continue $ toggleStyleFromKey e s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'w') [])) = do
     continue $ canvasMoveDown s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 's') [])) = do
@@ -76,6 +78,8 @@ handleEvent s (VtyEvent (V.EvKey (V.KChar '<') [])) = do
         _ -> s
 handleEvent s (MouseDown BoxStyleSelector _ _ _) = do
     continue $ beginBoxStyleSelect s
+handleEvent s (MouseDown StyleSelector _ _ _) = do
+    continue $ beginStyleSelect s
 handleEvent s (MouseDown Canvas _ _ (Location l)) = do
     continue =<< drawWithCurrentTool l s
 handleEvent s (VtyEvent (V.EvKey (V.KChar '+') [])) = do

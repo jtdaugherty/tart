@@ -262,14 +262,26 @@ decodePixel v =
 
 encodeAttribute :: V.Attr -> Word64
 encodeAttribute attr =
+    (encodeAttrStyle (V.attrStyle attr) `shiftL` 20) .|.
     (encodeAttrColor (V.attrForeColor attr) `shiftL` 10) .|.
     (encodeAttrColor (V.attrBackColor attr))
 
+encodeAttrStyle :: V.MaybeDefault V.Style -> Word64
+encodeAttrStyle V.Default = 0
+encodeAttrStyle V.KeepCurrent = 0
+encodeAttrStyle (V.SetTo s) = fromIntegral s
+
+decodeAttrStyle :: Word64 -> V.MaybeDefault V.Style
+decodeAttrStyle 0 = V.Default
+decodeAttrStyle v = V.SetTo $ fromIntegral v
+
 decodeAttribute :: Word64 -> V.Attr
 decodeAttribute v =
-    let attrMask = 2 ^ (10::Integer) - 1
-    in V.defAttr { V.attrForeColor = decodeAttrColor $ (v `shiftR` 10) .&. attrMask
-                 , V.attrBackColor = decodeAttrColor $ v .&. attrMask
+    let attrColorMask = 2 ^ (10::Integer) - 1
+        attrStyleMask = 2 ^ (8::Integer) - 1
+    in V.defAttr { V.attrStyle     = decodeAttrStyle $ (v `shiftR` 20) .&. attrStyleMask
+                 , V.attrForeColor = decodeAttrColor $ (v `shiftR` 10) .&. attrColorMask
+                 , V.attrBackColor = decodeAttrColor $ v .&. attrColorMask
                  }
 
 encodeAttrColor :: V.MaybeDefault V.Color -> Word64

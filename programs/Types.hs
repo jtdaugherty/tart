@@ -1,3 +1,4 @@
+{-# LANGUAGE BinaryLiterals #-}
 {-# LANGUAGE TemplateHaskell #-}
 module Types
   ( Mode(..)
@@ -6,6 +7,12 @@ module Types
   , AppEvent(..)
   , Action(..)
   , toolName
+
+  , noStyle
+  , setStyle
+  , clearStyle
+  , toggleStyle
+  , hasStyle
 
   , AppState(..)
   , drawing
@@ -20,6 +27,7 @@ module Types
   , bgPaletteSelectorExtent
   , toolSelectorExtent
   , boxStyleSelectorExtent
+  , styleSelectorExtent
   , canvasExtent
   , dragging
   , canvasSizeWidthEdit
@@ -37,9 +45,12 @@ module Types
   , repaintSize
   , undoStack
   , redoStack
+  , drawStyle
   )
 where
 
+import Data.Bits ((.&.), (.|.), complement)
+import Data.Word (Word8)
 import Brick (Extent, Location)
 import Brick.BChan (BChan)
 import Brick.Focus
@@ -65,6 +76,7 @@ data Mode = Main
           | FgPaletteEntrySelect
           | BgPaletteEntrySelect
           | ToolSelect
+          | StyleSelect
           | BoxStyleSelect
           | CanvasSizePrompt
           | AskToSave
@@ -79,6 +91,8 @@ data Name = Canvas
           | CharSelector
           | FgSelector
           | BgSelector
+          | StyleSelector
+          | StyleSelectorEntry V.Style
           | FgPaletteEntry Int
           | BgPaletteEntry Int
           | BoxStyleSelectorEntry Int
@@ -112,12 +126,35 @@ toolName Eyedropper = "Eyedropper"
 toolName FloodFill  = "Flood fill"
 toolName TextString = "Text string"
 
+newtype DrawStyle =
+    DrawStyle Word8
+    deriving (Eq, Show)
+
+setStyle :: V.Style -> V.Style -> V.Style
+setStyle a b = a .|. b
+
+toggleStyle :: V.Style -> V.Style -> V.Style
+toggleStyle a b =
+    if hasStyle a b
+    then clearStyle a b
+    else setStyle a b
+
+hasStyle :: V.Style -> V.Style -> Bool
+hasStyle a b = a .&. b /= 0
+
+clearStyle :: V.Style -> V.Style -> V.Style
+clearStyle old dest = dest .&. complement old
+
+noStyle :: V.Style
+noStyle = 0
+
 data AppState =
     AppState { _drawing                 :: Canvas
              , _drawingOverlay          :: Canvas
              , _mode                    :: Mode
              , _drawFgPaletteIndex      :: Int
              , _drawBgPaletteIndex      :: Int
+             , _drawStyle               :: V.Style
              , _drawCharacter           :: Char
              , _tool                    :: Tool
              , _palette                 :: Vec.Vector (Maybe V.Color)
@@ -125,6 +162,7 @@ data AppState =
              , _bgPaletteSelectorExtent :: Maybe (Extent Name)
              , _toolSelectorExtent      :: Maybe (Extent Name)
              , _boxStyleSelectorExtent  :: Maybe (Extent Name)
+             , _styleSelectorExtent     :: Maybe (Extent Name)
              , _canvasExtent            :: Maybe (Extent Name)
              , _dragging                :: Maybe (Name, Location, Location)
              , _canvasSizeWidthEdit     :: Editor T.Text Name
