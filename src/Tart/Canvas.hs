@@ -30,7 +30,6 @@ import Data.Char (isSpace)
 import qualified Graphics.Vty as V
 import qualified Data.Array.IArray as I
 import qualified Data.Array.MArray as A
-import qualified Data.Array.Unsafe as A
 import qualified Data.Binary as B
 import qualified Data.Binary.Put as B
 import qualified Data.Binary.Get as B
@@ -82,7 +81,7 @@ clearCanvas c = do
     forM_ [0..width-1] $ \w ->
         forM_ [0..height-1] $ \h -> do
             A.writeArray (mut c) (w, h) blankPixel
-    f <- A.unsafeFreeze (mut c)
+    f <- A.freeze (mut c)
     return $ c { immut = f }
 
 readCanvas :: FilePath -> IO (Either String Canvas)
@@ -112,7 +111,7 @@ readCanvas path = do
 
                    forM_ (zip idxs pixels) $ uncurry $ A.writeArray (mut c)
 
-                   f <- A.unsafeFreeze $ mut c
+                   f <- A.freeze $ mut c
                    return $ Right $ c { immut = f }
 
 writeCanvas :: FilePath -> Canvas -> IO ()
@@ -310,7 +309,7 @@ merge dest src = do
                 False ->
                     return Nothing
 
-    f <- A.unsafeFreeze $ mut dest
+    f <- A.freeze $ mut dest
     return (dest { immut = f }, catMaybes $ concat undoBuf)
 
 -- | Create a Vty image from a list of canvas layers, with the topmost
