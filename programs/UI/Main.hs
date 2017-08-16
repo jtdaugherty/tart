@@ -144,7 +144,7 @@ canvas s =
                   ]
              else [ s^.drawing
                   ]
-    in centerAbout (s^.canvasOffset) $
+    in centerAbout (s^.canvasOffset & _2 %~ pred) $
        updateAttrMap (applyAttrMappings [(borderAttr, fg V.white)]) $
        border $
        clickable Canvas $
