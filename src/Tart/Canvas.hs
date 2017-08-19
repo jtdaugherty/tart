@@ -300,7 +300,13 @@ decodePixel :: Word64 -> (Char, V.Attr)
 decodePixel v =
     let chBits = v .&. (2 ^ (32::Integer) - 1)
         attrBits = v `shiftR` 32
-    in (toEnum $ fromIntegral chBits, decodeAttribute attrBits)
+        attr = decodeAttribute attrBits
+        attr' = if ch == ' '
+                then attr { V.attrForeColor = V.Default
+                          }
+                else attr
+        ch = toEnum $ fromIntegral chBits
+    in (ch, attr')
 
 encodeAttribute :: V.Attr -> Word64
 encodeAttribute attr =
