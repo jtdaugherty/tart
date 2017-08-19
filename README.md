@@ -10,9 +10,7 @@ tart - terminal art program
 ```
 
 Tart is a program that provides an image-editor-like interface to
-creating ASCII art. The best way to see how your ASCII art is going to
-look in the terminal is to draw it in the terminal where it will be
-displayed!
+creating ASCII art - in the terminal, with your mouse!
 
 ![](screenshots/1.png)
 
