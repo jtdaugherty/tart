@@ -3,7 +3,6 @@ module UI.BoxStyleSelect
   )
 where
 
-import Data.Monoid ((<>))
 import Brick
 import Brick.Widgets.Border
 import Brick.Widgets.Border.Style
@@ -17,7 +16,7 @@ drawBoxStyleSelectUI :: AppState -> [Widget Name]
 drawBoxStyleSelectUI s =
     let Just ext = s^.boxStyleSelectorExtent
         toolSel = drawBoxStyleSelector ext
-    in toolSel <> drawMainUI s
+    in toolSel
 
 drawBoxStyleSelector :: Extent Name -> [Widget Name]
 drawBoxStyleSelector ext =

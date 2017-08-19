@@ -4,6 +4,7 @@ module UI
 where
 
 import Brick
+import Lens.Micro.Platform
 
 import Types
 import UI.Main
@@ -18,7 +19,11 @@ import UI.StyleSelect
 
 drawUI :: AppState -> [Widget Name]
 drawUI s =
-    case currentMode s of
+    concat $ drawMode s <$> s^.modes
+
+drawMode :: AppState -> Mode -> [Widget Name]
+drawMode s m =
+    case m of
         Main                 -> drawMainUI s
         FgPaletteEntrySelect -> drawPaletteEntrySelectUI s
         BgPaletteEntrySelect -> drawPaletteEntrySelectUI s

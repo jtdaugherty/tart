@@ -7,11 +7,10 @@ import Brick
 import Brick.Widgets.Center
 import Brick.Widgets.Border
 
-import UI.Main
 import Types
 
 drawCharacterSelectUI :: AppState -> [Widget Name]
-drawCharacterSelectUI s = prompt : drawMainUI s
+drawCharacterSelectUI _ = [prompt]
 
 prompt :: Widget Name
 prompt =

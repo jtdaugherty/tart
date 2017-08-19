@@ -1,3 +1,4 @@
+{-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE OverloadedStrings #-}
 module App
@@ -93,15 +94,14 @@ application :: App AppState AppEvent Name
 application =
     App { appDraw = drawUI
         , appChooseCursor = \s locs ->
-            case currentMode s of
-                CanvasSizePrompt -> do
-                    cur <- focusGetCurrent (s^.canvasSizeFocus)
-                    showCursorNamed cur locs
-                AskToSave ->
-                    showCursorNamed AskToSaveFilenameEdit locs
-                TextEntry ->
-                    showCursorNamed TextEntryCursor locs
-                _ -> Nothing
+            if | CanvasSizePrompt `elem` s^.modes -> do
+                   cur <- focusGetCurrent (s^.canvasSizeFocus)
+                   showCursorNamed cur locs
+               | AskToSave `elem` s^.modes ->
+                   showCursorNamed AskToSaveFilenameEdit locs
+               | TextEntry `elem` s^.modes ->
+                   showCursorNamed TextEntryCursor locs
+               | otherwise -> Nothing
         , appHandleEvent = handleEvent
         , appStartEvent = \s -> do
             vty <- getVtyHandle

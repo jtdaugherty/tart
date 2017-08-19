@@ -7,13 +7,11 @@ import Brick
 import qualified Graphics.Vty as V
 import Lens.Micro.Platform
 
-import UI.Main
 import Types
 import Draw
 
 drawTextEntryUI :: AppState -> [Widget Name]
-drawTextEntryUI s =
-    textOverlay s : drawMainUI s
+drawTextEntryUI s = [textOverlay s]
 
 textOverlay :: AppState -> Widget Name
 textOverlay s =

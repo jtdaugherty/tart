@@ -1,5 +1,6 @@
 module Events.Main
   ( handleMainEvent
+  , handleAttrEvent
   )
 where
 
@@ -19,7 +20,20 @@ handleMainEvent s e = do
     result <- handleCommonEvent s e
     case result of
         Just s' -> continue s'
-        Nothing -> handleEvent s e
+        Nothing -> do
+            result2 <- handleAttrEvent s e
+            case result2 of
+                Just s'' -> continue s''
+                Nothing -> handleEvent s e
+
+handleAttrEvent :: AppState -> BrickEvent Name AppEvent -> EventM Name (Maybe AppState)
+handleAttrEvent s (MouseDown FgSelector _ _ _) = do
+    return $ Just $ beginFgPaletteSelect s
+handleAttrEvent s (MouseDown BgSelector _ _ _) = do
+    return $ Just $ beginBgPaletteSelect s
+handleAttrEvent s (MouseDown StyleSelector _ _ _) = do
+    return $ Just $ beginStyleSelect s
+handleAttrEvent _ _ = return Nothing
 
 handleEvent :: AppState -> BrickEvent Name AppEvent -> EventM Name (Next AppState)
 handleEvent s (VtyEvent e) | isStyleKey e =
@@ -38,11 +52,7 @@ handleEvent s (MouseDown ResizeCanvas _ _ _) = do
     continue $ beginCanvasSizePrompt s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'f') [])) = do
     continue $ beginFgPaletteSelect s
-handleEvent s (MouseDown FgSelector _ _ _) = do
-    continue $ beginFgPaletteSelect s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'b') [])) = do
-    continue $ beginBgPaletteSelect s
-handleEvent s (MouseDown BgSelector _ _ _) = do
     continue $ beginBgPaletteSelect s
 handleEvent s (MouseDown ToolSelector _ _ _) = do
     continue $ beginToolSelect s
@@ -78,8 +88,6 @@ handleEvent s (VtyEvent (V.EvKey (V.KChar '<') [])) = do
         _ -> s
 handleEvent s (MouseDown BoxStyleSelector _ _ _) = do
     continue $ beginBoxStyleSelect s
-handleEvent s (MouseDown StyleSelector _ _ _) = do
-    continue $ beginStyleSelect s
 handleEvent s (MouseDown Canvas _ _ (Location l)) = do
     continue =<< drawWithCurrentTool l s
 handleEvent s (VtyEvent (V.EvKey (V.KChar '+') [])) = do

@@ -12,12 +12,10 @@ import Brick.Widgets.Border
 import Brick.Widgets.Center
 import Brick.Widgets.Edit
 
-import UI.Main
 import Types
 
 drawCanvasSizePromptUI :: AppState -> [Widget Name]
-drawCanvasSizePromptUI s =
-    drawPromptWindow s : drawMainUI s
+drawCanvasSizePromptUI s = [drawPromptWindow s]
 
 drawPromptWindow :: AppState -> Widget Name
 drawPromptWindow s =

@@ -3,7 +3,6 @@ module UI.StyleSelect
   )
 where
 
-import Data.Monoid ((<>))
 import Brick
 import Brick.Widgets.Border
 import Brick.Widgets.Border.Style
@@ -19,7 +18,7 @@ drawStyleSelectUI :: AppState -> [Widget Name]
 drawStyleSelectUI s =
     let Just ext = s^.styleSelectorExtent
         stySel = drawStyleSelector (s^.drawStyle) ext
-    in stySel <> drawMainUI s
+    in stySel
 
 drawStyleSelector :: V.Style -> Extent Name -> [Widget Name]
 drawStyleSelector curStyle ext =

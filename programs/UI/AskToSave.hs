@@ -11,13 +11,11 @@ import Brick.Widgets.Border
 import Brick.Widgets.Center
 import Brick.Widgets.Edit
 
-import UI.Main
 import Types
 import Theme
 
 drawAskToSaveUI :: AppState -> [Widget Name]
-drawAskToSaveUI s =
-    drawPromptWindow s : drawMainUI s
+drawAskToSaveUI s = [drawPromptWindow s]
 
 drawPromptWindow :: AppState -> Widget Name
 drawPromptWindow s =

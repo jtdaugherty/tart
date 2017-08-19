@@ -7,7 +7,6 @@ import Data.Monoid ((<>))
 import Brick
 
 import Types
-import UI.Main
 import UI.Common
 
 drawPaletteEntrySelectUI :: AppState -> [Widget Name]
@@ -17,4 +16,4 @@ drawPaletteEntrySelectUI s =
           BgPaletteEntrySelect -> False
           m -> error $ "BUG: should never get called in mode " <> show m
         pal = drawPalette s isFg
-    in pal <> drawMainUI s
+    in pal

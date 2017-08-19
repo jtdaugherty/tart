@@ -17,8 +17,7 @@ import Theme
 drawToolSelectUI :: AppState -> [Widget Name]
 drawToolSelectUI s =
     let Just ext = s^.toolSelectorExtent
-        toolSel = drawToolSelector ext
-    in toolSel <> drawMainUI s
+    in drawToolSelector ext
 
 drawToolSelector :: Extent Name -> [Widget Name]
 drawToolSelector ext =
