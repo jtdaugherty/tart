@@ -15,6 +15,8 @@
 
 - Permit style changes during text entry (per-character styling)
 
+- Add a keybinding to open the style selector
+
 -----------------------------------------------------------------
 Dealing with the larger color space:
 
