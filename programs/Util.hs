@@ -81,8 +81,8 @@ styleBindings :: [(Char, V.Style)]
 styleBindings =
     [ ('!', V.bold)
     , ('@', V.underline)
-    , ('$', V.blink)
-    , ('^', V.reverseVideo)
+    , ('#', V.blink)
+    , ('$', V.reverseVideo)
     ]
 
 isStyleKey :: V.Event -> Bool
