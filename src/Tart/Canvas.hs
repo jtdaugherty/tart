@@ -285,8 +285,16 @@ encodePixel c a =
     -- Convert attr color slots to 10-bit sequences (set bit, type bit, color bits)
     let low32Mask = 2 ^ (32::Integer) - 1
         c64 = fromIntegral $ fromEnum c
+        -- If we're encoding a blank pixel, always ignore the foreground
+        -- color. This avoids regions with different foreground colors
+        -- messing up flood filling operations even though, to the user,
+        -- that is surprising behavior.
+        a' = if c == ' '
+             then a { V.attrForeColor = V.Default
+                    }
+             else a
     in (c64 .&. low32Mask) .|.
-       (encodeAttribute a `shiftL` 32)
+       (encodeAttribute a' `shiftL` 32)
 
 decodePixel :: Word64 -> (Char, V.Attr)
 decodePixel v =
