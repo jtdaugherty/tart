@@ -29,7 +29,8 @@ Features
 - Utility tools: repaint, eyedropper, eraser
 - Multiple graphical styles for boxes
 - Character selection for freehand and flood fill tools
-- Set foreground and background color independently
+- Set foreground color, background color, and text style independently
+- Text styles: bold, blink, underline, reverse video
 - Set arbitrary canvas size
 - Full mouse interaction and keyboard shortcuts
 - Paste text from clipboard into canvas
