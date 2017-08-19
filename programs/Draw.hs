@@ -100,12 +100,12 @@ styleWord V.KeepCurrent = 0
 styleWord V.Default = 0
 styleWord (V.SetTo s) = s
 
-truncateText :: (Int, Int) -> T.Text -> AppState -> T.Text
+truncateText :: (Int, Int) -> [(Char, V.Attr)] -> AppState -> [(Char, V.Attr)]
 truncateText point t s =
     let startCol = point^._1
         maxCol = min ((canvasSize (s^.drawing))^._1 - 1)
-                     (startCol + T.length t - 1)
-        safe = T.take (maxCol - startCol + 1) t
+                     (startCol + length t - 1)
+        safe = take (maxCol - startCol + 1) t
     in safe
 
 pasteTextAtPoint :: (Int, Int) -> AppState -> T.Text -> EventM Name AppState
@@ -119,17 +119,17 @@ pasteTextAtPoint point s t = do
                   , max oldHeight pasteHeight
                   )
         pairs = zip [startRow..] ls
+        mkLine line = zip (T.unpack line) $ repeat $ currentPaletteAttribute s
 
     s' <- resizeCanvas s newSize
-    foldM (\st (row, line) -> drawTextAtPoint (startCol, row) line st) s' pairs
+    foldM (\st (row, line) -> drawTextAtPoint (startCol, row) (mkLine line) st) s' pairs
 
-drawTextAtPoint :: (Int, Int) -> T.Text -> AppState -> EventM Name AppState
+drawTextAtPoint :: (Int, Int) -> [(Char, V.Attr)] -> AppState -> EventM Name AppState
 drawTextAtPoint point t s = do
-    let attr = currentPaletteAttribute s
-        (startCol, row) = point
-        pixs = zip ([startCol..]) (T.unpack $ truncateText point t s)
+    let (startCol, row) = point
+        pixs = zip ([startCol..]) (truncateText point t s)
         many = mkEntry <$> pixs
-        mkEntry (col, ch) = ((col, row), ch, attr)
+        mkEntry (col, (ch, attr)) = ((col, row), ch, attr)
     (s', old) <- drawMany many drawing s
     return $ pushUndo old s'
 

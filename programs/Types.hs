@@ -173,7 +173,7 @@ data AppState =
              , _canvasDirty             :: Bool
              , _askToSaveFilenameEdit   :: Editor T.Text Name
              , _appEventChannel         :: BChan AppEvent
-             , _textEntered             :: T.Text
+             , _textEntered             :: [(Char, V.Attr)]
              , _textEntryStart          :: (Int, Int)
              , _boxStyleIndex           :: Int
              , _eraserSize              :: Int

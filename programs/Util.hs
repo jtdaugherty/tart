@@ -156,7 +156,7 @@ askToSave s =
 beginTextEntry :: (Int, Int) -> AppState -> AppState
 beginTextEntry start s =
     setMode TextEntry $ s & textEntryStart .~ start
-                          & textEntered .~ ""
+                          & textEntered .~ mempty
 
 handleDragFinished :: AppState -> Name -> EventM Name AppState
 handleDragFinished s n =
