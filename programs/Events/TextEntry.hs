@@ -15,12 +15,12 @@ import Draw
 handleTextEntryEvent :: AppState -> BrickEvent Name AppEvent -> EventM Name (Next AppState)
 handleTextEntryEvent s (VtyEvent (V.EvKey V.KEnter [])) = do
     -- Commit the text to the drawing and return to main mode
-    continue =<< drawTextAtPoint (s^.textEntryStart) (s^.textEntered) (setMode Main s)
+    continue =<< drawTextAtPoint (s^.textEntryStart) (s^.textEntered) (popMode s)
 handleTextEntryEvent s (VtyEvent (V.EvKey V.KBS [])) = do
     continue $ s & textEntered %~ (\t -> if null t then t else init t)
 handleTextEntryEvent s (VtyEvent (V.EvKey V.KEsc [])) =
     -- Cancel
-    continue $ setMode Main s
+    continue $ popMode s
 handleTextEntryEvent s (VtyEvent (V.EvKey (V.KChar c) [])) | c /= '\t' = do
     -- Enter character
     let s' = s & textEntered %~ (<> [(c, currentPaletteAttribute s)])

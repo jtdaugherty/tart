@@ -21,11 +21,11 @@ handleBoxStyleSelectEvent s e = do
 
 handleEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
 handleEvent s (MouseDown (BoxStyleSelectorEntry i) _ _ _) = do
-    continue $ setMode Main $ s & boxStyleIndex .~ i
+    continue $ popMode $ s & boxStyleIndex .~ i
 handleEvent s (VtyEvent (V.EvKey (V.KChar c) [])) | isDigit c = do
     let i = read [c]
     case i >= 0 && i < length boxStyles of
-        True -> continue $ setMode Main $ s & boxStyleIndex .~ i
+        True -> continue $ popMode $ s & boxStyleIndex .~ i
         False -> continue s
 handleEvent s (MouseUp _ _ _) =
     -- Ignore mouse-up events so we don't go back to Main mode. This
@@ -34,4 +34,4 @@ handleEvent s (MouseUp _ _ _) =
     -- from Main.
     continue s
 handleEvent s _ =
-    continue $ setMode Main s
+    continue $ popMode s

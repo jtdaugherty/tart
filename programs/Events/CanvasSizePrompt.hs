@@ -19,7 +19,7 @@ handleCanvasSizePromptEvent s (VtyEvent (V.EvKey (V.KChar '\t') [])) =
 handleCanvasSizePromptEvent s (VtyEvent (V.EvKey V.KBackTab [])) =
     continue $ s & canvasSizeFocus %~ focusPrev
 handleCanvasSizePromptEvent s (VtyEvent (V.EvKey V.KEsc [])) =
-    continue $ setMode Main s
+    continue $ popMode s
 handleCanvasSizePromptEvent s (VtyEvent (V.EvKey V.KEnter [])) =
     continue =<< tryResizeCanvas s
 handleCanvasSizePromptEvent s (VtyEvent e) =

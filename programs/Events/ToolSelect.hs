@@ -20,11 +20,11 @@ handleToolSelectEvent s e = do
 
 handleEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
 handleEvent s (MouseDown (ToolSelectorEntry t) _ _ _) = do
-    continue $ setMode Main $ setTool s t
+    continue $ popMode $ setTool s t
 handleEvent s (VtyEvent (V.EvKey (V.KChar c) [])) | isDigit c = do
     let idx = read [c]
     case filter ((== idx) . snd) tools of
-        [(t, _)] -> continue $ setMode Main $ setTool s t
+        [(t, _)] -> continue $ popMode $ setTool s t
         _ -> continue s
 handleEvent s (MouseUp _ _ _) =
     -- Ignore mouse-up events so we don't go back to Main mode. This
@@ -33,4 +33,4 @@ handleEvent s (MouseUp _ _ _) =
     -- from Main.
     continue s
 handleEvent s _ =
-    continue $ setMode Main s
+    continue $ popMode s

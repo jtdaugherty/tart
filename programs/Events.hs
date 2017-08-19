@@ -48,7 +48,7 @@ handleEvent s e = do
     case next of
         Nothing -> continue s'
         Just (ev, st) ->
-            case st^.mode of
+            case currentMode st of
                 Main                 -> handleMainEvent st ev
                 FgPaletteEntrySelect -> handlePaletteEntrySelectEvent st ev
                 BgPaletteEntrySelect -> handlePaletteEntrySelectEvent st ev

@@ -17,7 +17,8 @@ module Types
   , AppState(..)
   , drawing
   , drawingOverlay
-  , mode
+  , modes
+  , currentMode
   , tool
   , drawFgPaletteIndex
   , drawBgPaletteIndex
@@ -151,7 +152,7 @@ noStyle = 0
 data AppState =
     AppState { _drawing                 :: Canvas
              , _drawingOverlay          :: Canvas
-             , _mode                    :: Mode
+             , _modes                   :: [Mode]
              , _drawFgPaletteIndex      :: Int
              , _drawBgPaletteIndex      :: Int
              , _drawStyle               :: V.Style
@@ -183,3 +184,8 @@ data AppState =
              }
 
 makeLenses ''AppState
+
+currentMode :: AppState -> Mode
+currentMode s = case _modes s of
+    (m:_) -> m
+    _ -> error "BUG: currentMode: no modes!"

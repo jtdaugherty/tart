@@ -33,4 +33,4 @@ handleEvent s (MouseUp _ _ _) =
     -- from Main.
     continue s
 handleEvent s _ =
-    continue $ setMode Main s
+    continue $ popMode s

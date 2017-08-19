@@ -101,7 +101,7 @@ handleEvent s (VtyEvent (V.EvKey (V.KChar 'r') [])) = do
 handleEvent s (VtyEvent (V.EvKey (V.KChar c) [])) | isDigit c = do
     let idx = read [c]
     case filter ((== idx) . snd) tools of
-        [(t, _)] -> continue $ setMode Main $ setTool s t
+        [(t, _)] -> continue $ popMode $ setTool s t
         _ -> continue s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'c') [])) =
     continue $ whenTool s [Freehand, FloodFill] beginCharacterSelect

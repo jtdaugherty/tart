@@ -8,7 +8,8 @@ module Util
   , beginFgPaletteSelect
   , beginBgPaletteSelect
   , beginToolSelect
-  , setMode
+  , pushMode
+  , popMode
   , increaseCanvasSize
   , decreaseCanvasSize
   , beginCanvasSizePrompt
@@ -149,14 +150,14 @@ writeCanvasFiles f c = do
 
 askToSave :: AppState -> AppState
 askToSave s =
-    setMode AskToSave $
+    pushMode AskToSave $
         s & askToSaveFilenameEdit .~ applyEdit gotoEOL (editor AskToSaveFilenameEdit (Just 1) $
                                            T.pack $ maybe "" id $ s^.canvasPath)
 
 beginTextEntry :: (Int, Int) -> AppState -> AppState
 beginTextEntry start s =
-    setMode TextEntry $ s & textEntryStart .~ start
-                          & textEntered .~ mempty
+    pushMode TextEntry $ s & textEntryStart .~ start
+                           & textEntered .~ mempty
 
 handleDragFinished :: AppState -> Name -> EventM Name AppState
 handleDragFinished s n =
@@ -184,13 +185,16 @@ decreaseCanvasSize s =
         (canvasSize (s^.drawing) & _1 %~ (max 1 . (subtract 4))
                                  & _2 %~ (max 1 . (subtract 2)))
 
-setMode :: Mode -> AppState -> AppState
-setMode m s = s & mode .~ m
-                & dragging .~ Nothing
+pushMode :: Mode -> AppState -> AppState
+pushMode m s = s & modes %~ (m:)
+                 & dragging .~ Nothing
+
+popMode :: AppState -> AppState
+popMode s = s & modes %~ (\m -> if m == [Main] then m else tail m)
 
 beginCanvasSizePrompt :: AppState -> AppState
 beginCanvasSizePrompt s =
-    setMode CanvasSizePrompt $
+    pushMode CanvasSizePrompt $
         s & canvasSizeFocus .~ focusRing [ CanvasSizeWidthEdit
                                          , CanvasSizeHeightEdit
                                          ]
@@ -225,41 +229,41 @@ tryResizeCanvas s = do
                      <*> (readMaybe $ T.unpack hStr)
     case result of
         Just (w, h) | w > 0 && h > 0 -> do
-            resizeCanvas (setMode Main s) (w, h)
+            resizeCanvas (popMode s) (w, h)
         _ -> return s
 
 beginToolSelect :: AppState -> AppState
-beginToolSelect = setMode ToolSelect
+beginToolSelect = pushMode ToolSelect
 
 beginBoxStyleSelect :: AppState -> AppState
-beginBoxStyleSelect = setMode BoxStyleSelect
+beginBoxStyleSelect = pushMode BoxStyleSelect
 
 beginStyleSelect :: AppState -> AppState
-beginStyleSelect = setMode StyleSelect
+beginStyleSelect = pushMode StyleSelect
 
 beginFgPaletteSelect :: AppState -> AppState
-beginFgPaletteSelect = setMode FgPaletteEntrySelect
+beginFgPaletteSelect = pushMode FgPaletteEntrySelect
 
 beginBgPaletteSelect :: AppState -> AppState
-beginBgPaletteSelect = setMode BgPaletteEntrySelect
+beginBgPaletteSelect = pushMode BgPaletteEntrySelect
 
 setTool :: AppState -> Tool -> AppState
 setTool s t = s & tool .~ t
 
 setFgPaletteIndex :: AppState -> Int -> AppState
-setFgPaletteIndex s i = setMode Main $ s & drawFgPaletteIndex .~ i
+setFgPaletteIndex s i = popMode $ s & drawFgPaletteIndex .~ i
 
 setBgPaletteIndex :: AppState -> Int -> AppState
-setBgPaletteIndex s i = setMode Main $ s & drawBgPaletteIndex .~ i
+setBgPaletteIndex s i = popMode $ s & drawBgPaletteIndex .~ i
 
 beginCharacterSelect :: AppState -> AppState
-beginCharacterSelect = setMode CharacterSelect
+beginCharacterSelect = pushMode CharacterSelect
 
 cancelCharacterSelect :: AppState -> AppState
-cancelCharacterSelect = setMode Main
+cancelCharacterSelect = popMode
 
 selectCharacter :: Char -> AppState -> AppState
-selectCharacter c s = setMode Main $ s & drawCharacter .~ c
+selectCharacter c s = popMode $ s & drawCharacter .~ c
 
 checkForMouseSupport :: IO ()
 checkForMouseSupport = do

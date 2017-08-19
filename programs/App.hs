@@ -55,7 +55,7 @@ mkInitialState chan mc = do
 
     return $ AppState { _drawing                 = c
                       , _drawingOverlay          = overlay
-                      , _mode                    = Main
+                      , _modes                   = [Main]
                       , _tool                    = Freehand
                       , _drawCharacter           = '*'
                       , _drawFgPaletteIndex      = 0
@@ -93,7 +93,7 @@ application :: App AppState AppEvent Name
 application =
     App { appDraw = drawUI
         , appChooseCursor = \s locs ->
-            case s^.mode of
+            case currentMode s of
                 CanvasSizePrompt -> do
                     cur <- focusGetCurrent (s^.canvasSizeFocus)
                     showCursorNamed cur locs
