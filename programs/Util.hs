@@ -81,7 +81,6 @@ styleBindings =
     [ ('!', V.bold)
     , ('@', V.underline)
     , ('$', V.blink)
-    , ('%', V.dim)
     , ('^', V.reverseVideo)
     ]
 
