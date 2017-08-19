@@ -21,12 +21,12 @@ module Tart.Canvas
 where
 
 import Control.Monad (forM_, forM, replicateM, when)
+import Control.Monad.State
 import Data.Bits
 import Data.Word (Word64)
 import Data.Monoid ((<>))
 import Data.Maybe (catMaybes)
-import Data.List (reverse)
-import Data.Char (isSpace)
+import Data.List (intercalate)
 import qualified Graphics.Vty as V
 import qualified Data.Array.IArray as I
 import qualified Data.Array.MArray as A
@@ -126,84 +126,118 @@ writeCanvas path c = do
 
     BS.writeFile path $ BSL.toStrict bytes
 
+type RLE a = State RLEState a
+
+data RLEState =
+    RLEState { content       :: [(String, V.Attr)]
+             , currentString :: String
+             , currentAttr   :: V.Attr
+             }
+
+runRLE :: RLE () -> [(String, V.Attr)]
+runRLE act =
+    let s = execState (act >> sealFinalToken) (RLEState [] "" V.defAttr)
+    in content s
+
+rleNext :: (Char, V.Attr) -> RLE ()
+rleNext (ch, attr) = do
+    -- If the attribute matches the current attribute, just append the
+    -- character.
+    cur <- gets currentAttr
+    case cur == attr of
+        True -> appendCharacter ch
+        False -> newToken ch attr
+
+appendCharacter :: Char -> RLE ()
+appendCharacter c =
+    modify $ \s -> s { currentString = currentString s <> [c]
+                     }
+
+sealFinalToken :: RLE ()
+sealFinalToken =
+    modify $ \s -> s { content = if null $ currentString s
+                                 then content s
+                                 else content s <> [(currentString s, currentAttr s)]
+                     }
+
+newToken :: Char -> V.Attr -> RLE ()
+newToken c a =
+    modify $ \s -> s { currentString = [c]
+                     , currentAttr = a
+                     , content = if null $ currentString s
+                                 then content s
+                                 else content s <> [(currentString s, currentAttr s)]
+                     }
+
 ppCanvas :: Bool -> Canvas -> String
 ppCanvas emitSequences c =
-    let maybeStrip = if emitSequences
-                     then id
-                     else strip
-        strip = reverse . dropWhile isSpace . reverse
-        ppLine pairs = concat $ ppPair <$> pairs
-        ppChange _ _ | not emitSequences = ""
-        ppChange _ NoChange              = ""
-        ppChange b (Set color)           = colorCode b color
-        ppChange _ Clear                 = "\ESC[0m"
-        ppPair ((fChange, bChange), str) =
-            -- If both are to be cleared, emit a single clear.
-            let fg = ppChange True  fChange
-                bg = ppChange False bChange
-                ctrlseq = if fChange == bChange && fChange == Clear
-                             then fg
-                             else if fChange == Clear
-                                  then fg <> bg
-                                  else if bChange == Clear
-                                       then bg <> fg
-                                       else fg <> bg
-            in ctrlseq <> str
-    in unlines $ maybeStrip <$> ppLine <$> rleEncode c
+    let pairs = runRLE (mkRLE c)
+        mkOutput (s, attr) =
+            if emitSequences
+            then ctrlSequence attr <> s
+            else s
+        ctrlSequence a =
+            "\ESC[0m" <> attrSequence a
+    in concat $ mkOutput <$> pairs
 
-colorCode :: Bool -> V.Color -> String
-colorCode f (V.Color240 w) =
+mkRLE :: Canvas -> RLE ()
+mkRLE c = do
+    let (w, h) = canvasSize c
+    forM_ [0..h-1] $ \row -> do
+        forM_ [0..w-1] $ \col ->
+            rleNext $ canvasGetPixel c (col, row)
+        rleNext ('\n', V.defAttr)
+
+attrSequence :: V.Attr -> String
+attrSequence a =
+    let fg = colorCode True (V.attrForeColor a)
+        bg = colorCode False (V.attrBackColor a)
+        sty = styleCode (V.attrStyle a)
+    in fg <> bg <> sty
+
+styleCode :: V.MaybeDefault V.Style -> String
+styleCode V.KeepCurrent = ""
+styleCode V.Default = ""
+styleCode (V.SetTo s) = styleCode' s
+
+styles :: [V.Style]
+styles =
+    [ V.bold
+    , V.underline
+    , V.blink
+    , V.reverseVideo
+    ]
+
+styleCode' :: V.Style -> String
+styleCode' s =
+    let present = filter (V.hasStyle s) styles
+    in if null present
+       then ""
+       else "\ESC[" <> intercalate ";" (styleToCode <$> present) <> "m"
+
+styleToCode :: V.Style -> String
+styleToCode s =
+    let mapping = [ (V.bold,         "1")
+                  , (V.underline,    "4")
+                  , (V.blink,        "5")
+                  , (V.reverseVideo, "7")
+                  ]
+    in maybe "" id $ lookup s mapping
+
+colorCode :: Bool -> V.MaybeDefault V.Color -> String
+colorCode _ V.KeepCurrent = ""
+colorCode _ V.Default = ""
+colorCode f (V.SetTo c) = colorCode' f c
+
+colorCode' :: Bool -> V.Color -> String
+colorCode' f (V.Color240 w) =
     "\ESC[" <> if f then "38" else "48" <> ";5;" <> show w <> "m"
-colorCode f (V.ISOColor w) =
+colorCode' f (V.ISOColor w) =
     let c = if f then "38" else "48"
         valid v = v >= 0 && v <= 15
     in if valid w
        then "\ESC[" <> c <> ";5;" <> show w <> "m"
        else ""
-
-decodeCanvas :: Canvas -> [[(Char, V.Attr)]]
-decodeCanvas c =
-    decodeRow <$> [0..height-1]
-    where
-        (width, height) = canvasSize c
-        decodeRow row = canvasGetPixel c <$> (, row) <$> [0..width-1]
-
-rleEncode :: Canvas -> [[((ColorChange, ColorChange), [Char])]]
-rleEncode c =
-    rleEncodeLine <$> decodeCanvas c
-
-rleEncodeLine :: [(Char, V.Attr)] -> [((ColorChange, ColorChange), [Char])]
-rleEncodeLine row =
-    let go (changes, _, s) [] = [(changes, s)]
-        go (changes, prevAttr, prevChunk) ((curChar, curAttr):rest) =
-            let (f, b) = colorChanges prevAttr curAttr
-            in if f == NoChange && b == NoChange
-               then go (changes, prevAttr, prevChunk <> [curChar]) rest
-               else (changes, prevChunk) : go ((f, b), curAttr, [curChar]) rest
-    in go ((NoChange, NoChange), V.defAttr, "") row
-
-data ColorChange =
-    NoChange
-    | Clear
-    | Set V.Color
-    deriving (Show, Eq)
-
-colorChanges :: V.Attr -> V.Attr -> (ColorChange, ColorChange)
-colorChanges a b =
-    let fg = colorChange (V.attrForeColor a) (V.attrForeColor b)
-        bg = colorChange (V.attrBackColor a) (V.attrBackColor b)
-    in (fg, bg)
-
-colorChange ::  V.MaybeDefault V.Color
-            -> V.MaybeDefault V.Color
-            -> ColorChange
-colorChange V.Default V.Default       = NoChange
-colorChange _ V.KeepCurrent           = NoChange
-colorChange V.KeepCurrent V.Default   = Clear
-colorChange (V.SetTo _) V.Default     = Clear
-colorChange (V.SetTo a) (V.SetTo b)   = if a == b then NoChange else Set b
-colorChange V.Default (V.SetTo b)     = Set b
-colorChange V.KeepCurrent (V.SetTo b) = Set b
 
 canvasSize :: Canvas -> (Int, Int)
 canvasSize = size

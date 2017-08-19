@@ -23,7 +23,8 @@ library
                        binary,
                        vty >= 5.17,
                        microlens-platform,
-                       bytestring
+                       bytestring,
+                       mtl
 
 executable tart
   ghc-options:         -threaded -Wall -Werror
