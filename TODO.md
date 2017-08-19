@@ -15,6 +15,8 @@
 
 - Add a keybinding to open the style selector
 
+- Make event handling follow the stack model that drawing now uses
+
 -----------------------------------------------------------------
 Dealing with the larger color space:
 
