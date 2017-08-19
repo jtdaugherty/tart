@@ -7,6 +7,7 @@ module Types
   , AppEvent(..)
   , Action(..)
   , toolName
+  , isSelectionMode
 
   , noStyle
   , setStyle
@@ -83,6 +84,19 @@ data Mode = Main
           | AskToSave
           | TextEntry
           deriving (Eq, Show)
+
+selectionModes :: [Mode]
+selectionModes =
+    [ CharacterSelect
+    , FgPaletteEntrySelect
+    , BgPaletteEntrySelect
+    , ToolSelect
+    , StyleSelect
+    , BoxStyleSelect
+    ]
+
+isSelectionMode :: Mode -> Bool
+isSelectionMode = (`elem` selectionModes)
 
 data Name = Canvas
           | TopHud
