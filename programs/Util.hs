@@ -194,7 +194,7 @@ pushMode m s =
            & dragging .~ Nothing
 
 popMode :: AppState -> AppState
-popMode s = s & modes %~ (\m -> if m == [Main] then m else tail m)
+popMode s = s & modes %~ (\m -> if length m == 1 then m else tail m)
               & dragging .~ Nothing
 
 beginCanvasSizePrompt :: AppState -> AppState
