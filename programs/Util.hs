@@ -188,7 +188,7 @@ decreaseCanvasSize s =
 pushMode :: Mode -> AppState -> AppState
 pushMode m s =
     if isSelectionMode m && isSelectionMode (currentMode s)
-    then s & modes %~ (\ms -> m : tail ms)
+    then s & modes %~ ((m:) . tail)
            & dragging .~ Nothing
     else s & modes %~ (m:)
            & dragging .~ Nothing
