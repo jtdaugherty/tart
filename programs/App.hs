@@ -85,6 +85,7 @@ mkInitialState chan mc = do
                       , _boxStyleIndex           = 0
                       , _eraserSize              = 1
                       , _repaintSize             = 1
+                      , _restyleSize             = 1
                       , _undoStack               = []
                       , _redoStack               = []
                       , _drawStyle               = noStyle

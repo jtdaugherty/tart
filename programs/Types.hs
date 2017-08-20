@@ -45,6 +45,7 @@ module Types
   , boxStyleIndex
   , eraserSize
   , repaintSize
+  , restyleSize
   , undoStack
   , redoStack
   , drawStyle
@@ -121,11 +122,14 @@ data Name = Canvas
           | DecreaseEraserSize
           | IncreaseRepaintSize
           | DecreaseRepaintSize
+          | IncreaseRestyleSize
+          | DecreaseRestyleSize
           deriving (Eq, Show, Ord)
 
 data Tool = Freehand
           | Box
           | Repaint
+          | Restyle
           | Eyedropper
           | FloodFill
           | Eraser
@@ -136,6 +140,7 @@ toolName :: Tool -> String
 toolName Freehand   = "Freehand"
 toolName Box        = "Box"
 toolName Repaint    = "Repaint"
+toolName Restyle    = "Restyle"
 toolName Eraser     = "Eraser"
 toolName Eyedropper = "Eyedropper"
 toolName FloodFill  = "Flood fill"
@@ -193,6 +198,7 @@ data AppState =
              , _boxStyleIndex           :: Int
              , _eraserSize              :: Int
              , _repaintSize             :: Int
+             , _restyleSize             :: Int
              , _undoStack               :: [[Action]]
              , _redoStack               :: [[Action]]
              }

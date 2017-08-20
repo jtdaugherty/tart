@@ -27,6 +27,8 @@ module Util
   , decreaseEraserSize
   , increaseRepaintSize
   , decreaseRepaintSize
+  , increaseRestyleSize
+  , decreaseRestyleSize
   , pushUndo
   , toggleStyleFromKey
   , isStyleKey
@@ -73,7 +75,8 @@ tools =
     , (FloodFill , 3)
     , (TextString, 4)
     , (Repaint   , 5)
-    , (Eyedropper, 6)
+    , (Restyle   , 6)
+    , (Eyedropper, 7)
     , (Eraser    , 0)
     ]
 
@@ -119,6 +122,12 @@ increaseRepaintSize = (& repaintSize %~ succ)
 
 decreaseRepaintSize :: AppState -> AppState
 decreaseRepaintSize = (& repaintSize %~ (max 1 . pred))
+
+increaseRestyleSize :: AppState -> AppState
+increaseRestyleSize = (& restyleSize %~ succ)
+
+decreaseRestyleSize :: AppState -> AppState
+decreaseRestyleSize = (& restyleSize %~ (max 1 . pred))
 
 pushUndo :: [Action] -> AppState -> AppState
 pushUndo [] s = s

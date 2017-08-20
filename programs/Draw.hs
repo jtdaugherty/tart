@@ -71,6 +71,7 @@ drawWithCurrentTool point s =
         Freehand -> drawAtPoint point s
         Eraser   -> eraseAtPoint point (s^.eraserSize) s
         Repaint  -> repaintAtPoint point (s^.repaintSize) s
+        Restyle  -> restyleAtPoint point (s^.restyleSize) s
         FloodFill -> floodFillAtPoint point s
         TextString -> return $ beginTextEntry point s
         Box -> do
@@ -236,6 +237,16 @@ repaintAtPoint point sz s = do
         attr = currentPaletteAttribute s
         getPixel p = let old = canvasGetPixel (s^.drawing) p
                      in (p, old^._1, attr { V.attrStyle = V.attrStyle $ old^._2 })
+        pixels = getPixel <$> points
+    (s', old) <- drawMany pixels drawing s
+    return $ pushUndo old s'
+
+restyleAtPoint :: (Int, Int) -> Int -> AppState -> EventM Name AppState
+restyleAtPoint point sz s = do
+    let points = makeBoxAboutPoint point sz
+        attr = currentPaletteAttribute s
+        getPixel p = let old = canvasGetPixel (s^.drawing) p
+                     in (p, old^._1, (old^._2) { V.attrStyle = V.attrStyle attr })
         pixels = getPixel <$> points
     (s', old) <- drawMany pixels drawing s
     return $ pushUndo old s'

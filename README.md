@@ -24,7 +24,7 @@ Features
   printing to terminals
 - Import existing plaintext files as the basis for new ASCII art files
 - Drawing tools: freehand, box, flood fill, text string
-- Utility tools: repaint, eyedropper, eraser
+- Utility tools: repaint, restyle, eyedropper, eraser
 - Multiple graphical styles for boxes
 - Character selection for freehand and flood fill tools
 - Set foreground color, background color, and text style independently

@@ -56,6 +56,7 @@ toolHud s =
                    , (Box, boxHud)
                    , (Eraser, eraserHud)
                    , (Repaint, repaintHud)
+                   , (Restyle, restyleHud)
                    ]
     in case lookup (s^.tool) toolHuds of
         Nothing -> emptyWidget
@@ -82,6 +83,9 @@ eraserHud = drawEraserSize
 repaintHud :: AppState -> Widget Name
 repaintHud = drawRepaintSize
 
+restyleHud :: AppState -> Widget Name
+restyleHud = drawRestyleSize
+
 drawEraserSize :: AppState -> Widget Name
 drawEraserSize s =
     let inc = clickable IncreaseEraserSize $ withDefAttr keybindingAttr $ str ">>"
@@ -95,6 +99,13 @@ drawRepaintSize s =
         dec = clickable DecreaseRepaintSize $ withDefAttr keybindingAttr $ str "<<"
     in borderWithLabel (str "Size") $
        dec <+> (hLimit 5 $ hCenter $ str $ show $ s^.repaintSize) <+> inc
+
+drawRestyleSize :: AppState -> Widget Name
+drawRestyleSize s =
+    let inc = clickable IncreaseRestyleSize $ withDefAttr keybindingAttr $ str ">>"
+        dec = clickable DecreaseRestyleSize $ withDefAttr keybindingAttr $ str "<<"
+    in borderWithLabel (str "Size") $
+       dec <+> (hLimit 5 $ hCenter $ str $ show $ s^.restyleSize) <+> inc
 
 drawBoxStyleSelector :: AppState -> Widget Name
 drawBoxStyleSelector s =
