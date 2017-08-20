@@ -33,6 +33,7 @@ module Util
   , toggleStyleFromKey
   , isStyleKey
   , styleBindings
+  , recenterCanvas
 
   , canvasMoveDown
   , canvasMoveUp
@@ -293,10 +294,16 @@ resizeCanvas :: AppState -> (Int, Int) -> EventM n AppState
 resizeCanvas s newSz = do
     c <- liftIO $ resizeFrom (s^.drawing) newSz
     o <- liftIO $ resizeFrom (s^.drawingOverlay) newSz
-    return $ s & drawing .~ c
-               & drawingOverlay .~ o
-               & canvasOffset .~ (Location $ newSz & each %~ (`div` 2))
-               & canvasDirty .~ (canvasSize c /= canvasSize (s^.drawing))
+    return $
+        recenterCanvas $
+            s & drawing .~ c
+              & drawingOverlay .~ o
+              & canvasDirty .~ (canvasSize c /= canvasSize (s^.drawing))
+
+recenterCanvas :: AppState -> AppState
+recenterCanvas s =
+    let sz = canvasSize $ s^.drawing
+    in s & canvasOffset .~ (Location $ sz & each %~ (`div` 2))
 
 currentPaletteAttribute :: AppState -> V.Attr
 currentPaletteAttribute s =

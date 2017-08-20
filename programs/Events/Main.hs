@@ -50,6 +50,8 @@ handleEvent s (VtyEvent (V.EvKey (V.KChar 'v') [])) = do
     continue $ beginCanvasSizePrompt s
 handleEvent s (MouseDown ResizeCanvas _ _ _) = do
     continue $ beginCanvasSizePrompt s
+handleEvent s (VtyEvent (V.EvKey (V.KChar 'C') [])) = do
+    continue $ recenterCanvas s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'f') [])) = do
     continue $ beginFgPaletteSelect s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'b') [])) = do
