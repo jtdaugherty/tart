@@ -17,6 +17,7 @@ module Tart.Canvas
   , clearCanvas
   , canvasFromText
   , canvasToImage
+  , normalizeAttr
   )
 where
 

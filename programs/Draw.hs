@@ -152,7 +152,7 @@ findBgPaletteEntry a s =
 
 floodFillAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
 floodFillAtPoint point s = do
-    let fillAttr = currentPaletteAttribute s
+    let fillAttr = normalizeAttr fillCh $ currentPaletteAttribute s
         fillCh = s^.drawCharacter
         fillPix = (fillCh, fillAttr)
         targetPix = canvasGetPixel (s^.drawing) point
