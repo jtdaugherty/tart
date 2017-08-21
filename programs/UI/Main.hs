@@ -57,6 +57,7 @@ toolHud s =
                    , (Eraser, eraserHud)
                    , (Repaint, repaintHud)
                    , (Restyle, restyleHud)
+                   , (Eyedropper, eyedropperHud)
                    ]
     in case lookup (s^.tool) toolHuds of
         Nothing -> emptyWidget
@@ -64,6 +65,9 @@ toolHud s =
 
 freehandHud :: AppState -> Widget Name
 freehandHud s = drawChar s
+
+eyedropperHud :: AppState -> Widget Name
+eyedropperHud s = drawChar s
 
 floodfillHud :: AppState -> Widget Name
 floodfillHud s = drawChar s
