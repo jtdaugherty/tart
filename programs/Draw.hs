@@ -162,7 +162,9 @@ floodFillAtPoint point s = do
         left  = (& _1 %~ (max 0 . pred))
         right = (& _1 %~ (min (w-1) . succ))
 
-        go :: (Int, Int) -> (AppState, [((Int, Int), (Char, V.Attr))]) -> EventM Name (AppState, [((Int, Int), (Char, V.Attr))])
+        go :: (Int, Int)
+           -> (AppState, [((Int, Int), (Char, V.Attr))])
+           -> EventM Name (AppState, [((Int, Int), (Char, V.Attr))])
         go p (st, uBuf) = do
             let pix = canvasGetPixel (st^.drawing) p
             if | pix == fillPix -> return (st, uBuf)
