@@ -1,21 +1,17 @@
 
 - Better quit/save UX ('q' -> 'y/n' instead of 'q' -> 'Esc')
 
-- Smart combining box characters - extra metadata in canvas?
-
 - Let user pick RGB colors
 
 - Extra drawing primitives:
   - circles
-  - lines (click and drag)
+  - lines
 
 - HTML output mode?
 
 - Layers
 
 - Add a keybinding to open the style selector
-
-- Make event handling follow the stack model that drawing now uses
 
 -----------------------------------------------------------------
 Dealing with the larger color space:
