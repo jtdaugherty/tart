@@ -180,9 +180,9 @@ floodFillAtPoint point s = do
     let prevDirty = s^.canvasDirty
         newDirty = s^.canvasDirty
         d = if prevDirty /= newDirty
-            then Just ClearCanvasDirty
-            else Nothing
-    return $ pushUndo (catMaybes [Just $ SetPixels undoBuf, d]) finalSt
+            then [ClearCanvasDirty, SetPixels undoBuf]
+            else []
+    return $ pushUndo d finalSt
 
 drawAtPoint :: (Int, Int) -> AppState -> EventM Name AppState
 drawAtPoint point s =
