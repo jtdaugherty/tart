@@ -168,8 +168,10 @@ canvas s =
                   ]
              else [ s^.drawing
                   ]
+        sz = canvasSize $ s^.drawing
     in centerAbout (s^.canvasOffset & _2 %~ pred) $
        updateAttrMap (applyAttrMappings [(borderAttr, fg V.white)]) $
+       setAvailableSize (sz & each %~ (+ 2)) $
        border $
        clickable Canvas $
        raw $ canvasToImage cs
