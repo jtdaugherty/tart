@@ -46,7 +46,7 @@ topHud s =
         modified = if not $ s^.canvasDirty then "" else "*"
     in clickable TopHud $
        vBox [ (padLeft (Pad 1) $ hBox $ padRight (Pad 1) <$> toolbarEntries)
-            , hBox [borderElem bsHorizontal <+> str ("[" <> filename <> modified <> "]") <+> hBorder]
+            , hBox [hBorder, str ("[" <> filename <> modified <> "]"), borderElem bsHorizontal]
             ]
 
 toolHud :: AppState -> Widget Name
