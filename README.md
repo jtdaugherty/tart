@@ -1,6 +1,8 @@
 tart - terminal art program
 ===========================
 
+**NOTE: This is unreleased software and is under heavy development. Use at your own risk.**
+
 ```
  _____  _    ____ _____  _
 (_   _)/ \  |    (_   _)| |
