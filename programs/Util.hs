@@ -155,7 +155,7 @@ quit ask s = do
 
 writeCanvasFiles :: FilePath -> Canvas -> IO ()
 writeCanvasFiles path c = do
-    let tf = TartFile c
+    let tf = TartFile [c] ["default"] [0]
     writeTartFile FormatBinary    tf path
     writeTartFile FormatPlain     tf (path <> ".plain.txt")
     writeTartFile FormatAnsiColor tf (path <> ".color.txt")

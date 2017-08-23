@@ -98,7 +98,10 @@ main = do
                         Left e -> do
                             putStrLn $ f <> ": could not read file: " <> e
                             exitFailure
-                        Right tf -> return $ Just (configOutput cfg <|> Just f, tartFileCanvas tf)
+                        Right tf ->
+                            return $ Just ( configOutput cfg <|> Just f
+                                          , tartFileCanvasList tf !! 0
+                                          )
                 _ -> return Nothing
 
     chan <- newBChan 10

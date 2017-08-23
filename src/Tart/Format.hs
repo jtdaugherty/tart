@@ -15,11 +15,15 @@ import qualified Data.ByteString.Lazy as BSL
 import Tart.Canvas
 
 data TartFile =
-    TartFile { tartFileCanvas :: Canvas
+    TartFile { tartFileCanvasList  :: [Canvas]
+             , tartFileCanvasNames :: [String]
+             , tartFileCanvasOrder :: [Int]
              }
 
 data TartFileData =
-    TartFileData { tartFileCanvasData :: CanvasData
+    TartFileData { tartFileDataCanvasData  :: [CanvasData]
+                 , tartFileDataCanvasNames :: [String]
+                 , tartFileDataCanvasOrder :: [Int]
                  }
 
 data OutputFormat =
@@ -29,18 +33,39 @@ data OutputFormat =
     deriving (Eq, Show, Read)
 
 instance B.Binary TartFileData where
-    put d = B.put $ tartFileCanvasData d
-    get = TartFileData <$> B.get
+    put d = do
+        B.put $ tartFileDataCanvasData d
+        B.put $ tartFileDataCanvasNames d
+        B.put $ tartFileDataCanvasOrder d
+    get =
+        TartFileData <$> B.get
+                     <*> B.get
+                     <*> B.get
 
 tartFileToData :: TartFile -> TartFileData
-tartFileToData tf = TartFileData $ canvasToData $ tartFileCanvas tf
+tartFileToData tf =
+    TartFileData (canvasToData <$> tartFileCanvasList tf)
+                 (tartFileCanvasNames tf)
+                 (tartFileCanvasOrder tf)
 
 tartFileFromData :: TartFileData -> IO (Either String TartFile)
 tartFileFromData d = do
-    result <- canvasFromData $ tartFileCanvasData d
+    let loadCanvases [] = return $ Right []
+        loadCanvases (cd:cds) = do
+            result <- canvasFromData cd
+            case result of
+                Left e -> return $ Left e
+                Right c -> do
+                    rest <- loadCanvases cds
+                    case rest of
+                        Left e -> return $ Left e
+                        Right cs -> return $ Right $ c : cs
+
+    result <- loadCanvases (tartFileDataCanvasData d)
     case result of
         Left s -> return $ Left s
-        Right c -> return $ Right $ TartFile c
+        Right cs -> return $ Right $ TartFile cs (tartFileDataCanvasNames d)
+                                                 (tartFileDataCanvasOrder d)
 
 readTartFile :: FilePath -> IO (Either String TartFile)
 readTartFile path = do
@@ -63,9 +88,14 @@ writeTartFile format =
           FormatAnsiColor -> writeCanvasPretty True
           FormatBinary    -> writeCanvasBinary
 
+tartFileCanvasesSorted :: TartFile -> [Canvas]
+tartFileCanvasesSorted tf =
+    let cs = tartFileCanvasList tf
+    in [ cs !! i | i <- tartFileCanvasOrder tf ]
+
 writeCanvasPretty :: Bool -> TartFile -> FilePath -> IO ()
 writeCanvasPretty color tf path =
-    writeFile path $ prettyPrintCanvas color [tartFileCanvas tf]
+    writeFile path $ prettyPrintCanvas color $ tartFileCanvasesSorted tf
 
 writeCanvasBinary :: TartFile -> FilePath -> IO ()
 writeCanvasBinary tf path =
