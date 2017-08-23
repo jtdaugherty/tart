@@ -3,16 +3,16 @@
 {-# LANGUAGE BinaryLiterals #-}
 module Tart.Canvas
   ( Canvas
+  , CanvasData
+  , canvasFromData
+  , canvasToData
   , newCanvas
   , canvasSize
   , canvasSetPixel
   , canvasSetMany
   , canvasGetPixel
   , resizeFrom
-  , writeCanvas
-  , writeCanvasForTerminal
-  , writeCanvasPlain
-  , readCanvas
+  , prettyPrintCanvas
   , merge
   , clearCanvas
   , canvasFromText
@@ -32,10 +32,6 @@ import qualified Graphics.Vty as V
 import qualified Data.Array.IArray as I
 import qualified Data.Array.MArray as A
 import qualified Data.Binary as B
-import qualified Data.Binary.Put as B
-import qualified Data.Binary.Get as B
-import qualified Data.ByteString as BS
-import qualified Data.ByteString.Lazy as BSL
 import Data.Array.IO (IOUArray)
 import Data.Array.Unboxed (UArray)
 import Lens.Micro.Platform
@@ -45,6 +41,44 @@ data Canvas =
            , immut :: UArray   (Int, Int) Word64
            , size  :: (Int, Int)
            }
+
+data CanvasData =
+    CanvasData { canvasDataSize :: (Int, Int)
+               , canvasData :: [Word64]
+               }
+
+instance B.Binary CanvasData where
+    put cd = do
+        B.put $ canvasDataSize cd
+        mapM_ B.put $ canvasData cd
+
+    get = do
+        (w, h) <- B.get
+        CanvasData <$> (pure (w, h))
+                   <*> replicateM (w * h) B.get
+
+canvasFromData :: CanvasData -> IO (Either String Canvas)
+canvasFromData cd = do
+    let (w, h) = canvasDataSize cd
+    if w * h /= length (canvasData cd)
+       then return $ Left "Canvas data entries do not match dimensions"
+       else do
+           c <- newCanvas (w, h)
+           let idxs = [(w', h') | w' <- [0..w-1], h' <- [0..h-1]]
+           forM_ (zip idxs (canvasData cd)) $ \(point, word) ->
+               A.writeArray (mut c) point word
+           f <- A.freeze $ mut c
+           return $ Right $ c { immut = f }
+
+canvasToData :: Canvas -> CanvasData
+canvasToData c =
+    CanvasData sz canvasPixels
+    where
+        sz@(w, h) = canvasSize c
+        canvasPixels =
+           [ canvasGetPixelRaw c (w', h')
+           | w' <- [0..w-1], h' <- [0..h-1]
+           ]
 
 newCanvas :: (Int, Int) -> IO Canvas
 newCanvas sz = do
@@ -70,12 +104,6 @@ canvasFromText s = do
     c <- newCanvas (width, height)
     canvasSetMany c pixs
 
-writeCanvasForTerminal :: FilePath -> Canvas -> IO ()
-writeCanvasForTerminal path c = writeFile path $ ppCanvas True c
-
-writeCanvasPlain :: FilePath -> Canvas -> IO ()
-writeCanvasPlain path c = writeFile path $ ppCanvas False c
-
 clearCanvas :: Canvas -> IO Canvas
 clearCanvas c = do
     let (width, height) = canvasSize c
@@ -84,48 +112,6 @@ clearCanvas c = do
             A.writeArray (mut c) (w, h) blankPixel
     f <- A.freeze (mut c)
     return $ c { immut = f }
-
-readCanvas :: FilePath -> IO (Either String Canvas)
-readCanvas path = do
-    bytes <- BS.readFile path
-
-    let parser :: B.Get ((Int, Int), [Word64])
-        parser = do
-            (w, h) <- B.get
-            ps <- replicateM (w * h) B.get
-            return ((w, h), ps)
-    case B.runGetOrFail parser $ BSL.fromStrict bytes of
-        Left (_, _, s) -> return $ Left s
-        Right (remaining, _, val) -> do
-            let (sz, pixels) = val
-
-            if | not $ BSL.null remaining ->
-                   return $ Left $ "File contained " <> show (BSL.length remaining) <>
-                                   " extra bytes"
-               | length pixels /= fst sz * snd sz ->
-                   return $ Left "File did not contain expected amount of data"
-               | otherwise -> do
-                   c <- newCanvas sz
-
-                   let (width, height) = sz
-                       idxs = [(w, h) | w <- [0..width-1], h <- [0..height-1]]
-
-                   forM_ (zip idxs pixels) $ uncurry $ A.writeArray (mut c)
-
-                   f <- A.freeze $ mut c
-                   return $ Right $ c { immut = f }
-
-writeCanvas :: FilePath -> Canvas -> IO ()
-writeCanvas path c = do
-    let bytes = B.runPut $ do
-          B.put $ canvasSize c
-
-          let (width, height) = canvasSize c
-          forM_ [0..width-1] $ \w ->
-              forM_ [0..height-1] $ \h ->
-                  B.put $ (immut c) I.! (w, h)
-
-    BS.writeFile path $ BSL.toStrict bytes
 
 type RLE a = State RLEState a
 
@@ -170,9 +156,9 @@ newToken c a =
                                  else content s <> [(currentString s, currentAttr s)]
                      }
 
-ppCanvas :: Bool -> Canvas -> String
-ppCanvas emitSequences c =
-    let pairs = runRLE (mkRLE c)
+prettyPrintCanvas :: Bool -> [Canvas] -> String
+prettyPrintCanvas emitSequences cs =
+    let pairs = runRLE (mkRLE cs)
         mkOutput (s, attr) =
             if emitSequences
             then ctrlSequence attr <> s
@@ -181,12 +167,13 @@ ppCanvas emitSequences c =
             "\ESC[0m" <> attrSequence a
     in concat $ mkOutput <$> pairs
 
-mkRLE :: Canvas -> RLE ()
-mkRLE c = do
+mkRLE :: [Canvas] -> RLE ()
+mkRLE [] = return ()
+mkRLE cs@(c:_) = do
     let (w, h) = canvasSize c
     forM_ [0..h-1] $ \row -> do
         forM_ [0..w-1] $ \col ->
-            rleNext $ canvasGetPixel c (col, row)
+            rleNext $ findPixel cs (col, row)
         rleNext ('\n', V.defAttr)
 
 attrSequence :: V.Attr -> String
@@ -244,8 +231,10 @@ canvasSize :: Canvas -> (Int, Int)
 canvasSize = size
 
 canvasGetPixel :: Canvas -> (Int, Int) -> (Char, V.Attr)
-canvasGetPixel c point =
-    decodePixel $ (immut c) I.! point
+canvasGetPixel c p = decodePixel $ canvasGetPixelRaw c p
+
+canvasGetPixelRaw :: Canvas -> (Int, Int) -> Word64
+canvasGetPixelRaw c point = (immut c) I.! point
 
 canvasSetMany :: Canvas -> [((Int, Int), Char, V.Attr)] -> IO Canvas
 canvasSetMany c pixels = do
@@ -392,15 +381,17 @@ canvasToImage cs =
                        , minimum $ snd <$> sizes
                        )
         (lastCol, lastRow) = smallestSize & each %~ pred
-        blank = decodePixel blankPixel
         rows = getRow <$> [0..lastRow]
         getRow r = V.horizCat $ (uncurry $ flip V.char) <$> getCol r <$> [0..lastCol]
-        getCol r c = findPixel (c, r) cs
-        findPixel _ [] = error "BUG: canvasToImage got no layers"
-        findPixel point [l] = canvasGetPixel l point
-        findPixel point (l:ls) =
-            let pix = canvasGetPixel l point
-            in if pix == blank
-               then findPixel point ls
-               else pix
+        getCol r c = findPixel cs (c, r)
     in V.vertCat rows
+
+findPixel :: [Canvas] -> (Int, Int) -> (Char, V.Attr)
+findPixel [] _ = error "BUG: canvasToImage got no layers"
+findPixel [l] point = canvasGetPixel l point
+findPixel (l:ls) point =
+    let pix = canvasGetPixel l point
+        blank = decodePixel blankPixel
+    in if pix == blank
+       then findPixel ls point
+       else pix

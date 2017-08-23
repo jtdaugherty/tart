@@ -68,6 +68,7 @@ import Brick.Widgets.Border.Style
 
 import Types
 import Tart.Canvas
+import Tart.Format
 
 tools :: [(Tool, Int)]
 tools =
@@ -153,10 +154,11 @@ quit ask s = do
         False -> halt s
 
 writeCanvasFiles :: FilePath -> Canvas -> IO ()
-writeCanvasFiles f c = do
-    writeCanvas f c
-    writeCanvasPlain (f <> ".plain.txt") c
-    writeCanvasForTerminal (f <> ".color.txt") c
+writeCanvasFiles path c = do
+    let tf = TartFile c
+    writeTartFile Binary tf path
+    writeTartFile Plain  tf (path <> ".plain.txt")
+    writeTartFile Color  tf (path <> ".color.txt")
 
 askToSave :: AppState -> AppState
 askToSave s =

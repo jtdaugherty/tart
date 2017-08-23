@@ -14,6 +14,7 @@ import System.Directory (doesFileExist)
 import App
 import Util
 import Tart.Canvas
+import Tart.Format
 
 data Option = Import FilePath
             | Output FilePath
@@ -92,12 +93,12 @@ main = do
         Nothing ->
             case rest of
                 [f] -> do
-                    r <- readCanvas f
+                    r <- readTartFile f
                     case r of
                         Left e -> do
                             putStrLn $ f <> ": could not read file: " <> e
                             exitFailure
-                        Right c -> return $ Just (configOutput cfg <|> Just f, c)
+                        Right tf -> return $ Just (configOutput cfg <|> Just f, tartFileCanvas tf)
                 _ -> return Nothing
 
     chan <- newBChan 10

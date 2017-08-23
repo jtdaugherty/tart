@@ -18,13 +18,15 @@ library
   default-language:    Haskell2010
   exposed-modules:
                        Tart.Canvas
+                       Tart.Format
   build-depends:       base >=4.9 && < 5,
                        array,
                        binary,
                        vty >= 5.17,
                        microlens-platform,
                        bytestring,
-                       mtl
+                       mtl,
+                       binary
 
 executable tart
   ghc-options:         -threaded -Wall -Werror
