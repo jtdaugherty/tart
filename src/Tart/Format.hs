@@ -3,6 +3,7 @@ module Tart.Format
   , OutputFormat(..)
   , readTartFile
   , writeTartFile
+  , sortedCanvases
   )
 where
 
@@ -88,10 +89,14 @@ writeTartFile format =
           FormatAnsiColor -> writeCanvasPretty True
           FormatBinary    -> writeCanvasBinary
 
+sortedCanvases :: [Int] -> [Canvas] -> [Canvas]
+sortedCanvases order cs =
+    [ cs !! i | i <- order ]
+
 tartFileCanvasesSorted :: TartFile -> [Canvas]
 tartFileCanvasesSorted tf =
-    let cs = tartFileCanvasList tf
-    in [ cs !! i | i <- tartFileCanvasOrder tf ]
+    sortedCanvases (tartFileCanvasOrder tf)
+                   (tartFileCanvasList tf)
 
 writeCanvasPretty :: Bool -> TartFile -> FilePath -> IO ()
 writeCanvasPretty color tf path =
