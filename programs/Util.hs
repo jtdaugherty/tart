@@ -156,9 +156,9 @@ quit ask s = do
 writeCanvasFiles :: FilePath -> Canvas -> IO ()
 writeCanvasFiles path c = do
     let tf = TartFile c
-    writeTartFile Binary tf path
-    writeTartFile Plain  tf (path <> ".plain.txt")
-    writeTartFile Color  tf (path <> ".color.txt")
+    writeTartFile FormatBinary    tf path
+    writeTartFile FormatPlain     tf (path <> ".plain.txt")
+    writeTartFile FormatAnsiColor tf (path <> ".color.txt")
 
 askToSave :: AppState -> AppState
 askToSave s =

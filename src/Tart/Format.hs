@@ -23,9 +23,9 @@ data TartFileData =
                  }
 
 data OutputFormat =
-    Binary
-    | Color
-    | Plain
+    FormatBinary
+    | FormatAnsiColor
+    | FormatPlain
     deriving (Eq, Show, Read)
 
 instance B.Binary TartFileData where
@@ -59,9 +59,9 @@ readTartFile path = do
 writeTartFile :: OutputFormat -> TartFile -> FilePath -> IO ()
 writeTartFile format =
     case format of
-          Plain -> writeCanvasPretty False
-          Color -> writeCanvasPretty True
-          Binary -> writeCanvasBinary
+          FormatPlain     -> writeCanvasPretty False
+          FormatAnsiColor -> writeCanvasPretty True
+          FormatBinary    -> writeCanvasBinary
 
 writeCanvasPretty :: Bool -> TartFile -> FilePath -> IO ()
 writeCanvasPretty color tf path =
