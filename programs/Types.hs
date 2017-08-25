@@ -133,6 +133,7 @@ data Name = Canvas
           | DecreaseRepaintSize
           | IncreaseRestyleSize
           | DecreaseRestyleSize
+          | SelectLayer Int
           deriving (Eq, Show, Ord)
 
 data Tool = Freehand

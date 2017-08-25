@@ -106,6 +106,8 @@ handleEvent s (VtyEvent (V.EvKey (V.KChar '-') [])) = do
     continue =<< decreaseCanvasSize s
 handleEvent s (VtyEvent (V.EvKey V.KEsc [])) = do
     continue $ s & dragging .~ Nothing
+handleEvent s (MouseDown (SelectLayer idx) _ _ _) = do
+    continue $ s & selectedLayerIndex .~ idx
 handleEvent s (VtyEvent (V.EvPaste bytes)) = do
     continue =<< pasteTextAtPoint (0, 0) s (decodeUtf8 bytes)
 handleEvent s (AppEvent (DragFinished n _ _)) = do

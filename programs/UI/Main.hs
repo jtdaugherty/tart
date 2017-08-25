@@ -11,7 +11,8 @@ import Brick.Widgets.Border
 import Brick.Widgets.Border.Style
 import Brick.Widgets.Center
 import Data.Monoid ((<>))
-import Data.Maybe (isJust)
+import qualified Data.Map as M
+import Data.Maybe (isJust, fromJust)
 import qualified Graphics.Vty as V
 import Lens.Micro.Platform
 
@@ -24,6 +25,7 @@ import Tart.Canvas
 drawMainUI :: AppState -> [Widget Name]
 drawMainUI s =
     [ topHud s
+    , layerHud s
     , canvas s
     ]
 
@@ -48,6 +50,21 @@ topHud s =
        vBox [ (padLeft (Pad 1) $ hBox $ padRight (Pad 1) <$> toolbarEntries)
             , hBox [hBorder, str ("[" <> filename <> modified <> "]"), borderElem bsHorizontal]
             ]
+
+layerHud :: AppState -> Widget Name
+layerHud s = translateBy (Location (0, 4)) $
+             (hLimit 20 $ layerList <=> fill ' ') <+> vBorder
+    where
+        layerList = vBox $ (hCenter $ str "Layers") : (mkEntry <$> entries)
+        entries = [ (i, fromJust $ M.lookup i $ s^.layerNames)
+                  | i <- s^.layerOrder
+                  ]
+        mkEntry (idx, name) =
+            let applyAttr = if idx == s^.selectedLayerIndex
+                            then withDefAttr selectedLayerAttr
+                            else id
+            in clickable (SelectLayer idx) $
+               applyAttr $ vLimit 1 $ str name <+> fill ' '
 
 toolHud :: AppState -> Widget Name
 toolHud s =
