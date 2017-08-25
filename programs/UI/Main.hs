@@ -194,7 +194,7 @@ canvas s =
             | i >= length ls = ls <> [val]
             | otherwise = take i ls <> [val] <> drop i ls
         sz = s^.appCanvasSize
-    in centerAbout (s^.canvasOffset & _2 %~ pred) $
+    in centerAbout (s^.canvasOffset & _2 %~ pred & _1 %~ (subtract 10)) $
        updateAttrMap (applyAttrMappings [(borderAttr, fg V.white)]) $
        setAvailableSize (sz & each %~ (+ 2)) $
        border $
