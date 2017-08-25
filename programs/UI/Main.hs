@@ -55,10 +55,14 @@ layerHud :: AppState -> Widget Name
 layerHud s = translateBy (Location (0, 4)) $
              (hLimit 20 $ layerList <=> fill ' ') <+> vBorder
     where
-        layerList = vBox $ (hCenter $ str "Layers") : (mkEntry <$> entries)
+        layerList = vBox $ (hCenter $ str "Layers") :
+                           (mkEntry <$> entries) <>
+                           [addLayerEntry]
         entries = [ (i, fromJust $ M.lookup i $ s^.layerNames)
                   | i <- s^.layerOrder
                   ]
+        addLayerEntry =
+            clickable AddLayer $ hCenter $ str "[Add Layer]"
         mkEntry (idx, name) =
             let applyAttr = if idx == s^.selectedLayerIndex
                             then withDefAttr selectedLayerAttr

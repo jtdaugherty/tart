@@ -35,6 +35,7 @@ module Util
   , isStyleKey
   , styleBindings
   , recenterCanvas
+  , addLayer
 
   , canvasMoveDown
   , canvasMoveUp
@@ -313,6 +314,16 @@ recenterCanvas :: AppState -> AppState
 recenterCanvas s =
     let sz = s^.appCanvasSize
     in s & canvasOffset .~ (Location $ sz & each %~ (`div` 2))
+
+addLayer :: AppState -> EventM Name AppState
+addLayer s = do
+    let layerName = "layer " <> (show idx)
+        idx = 1 + (M.size $ s^.layers)
+    c <- liftIO $ newCanvas (s^.appCanvasSize)
+    return $ s & layers.at idx .~ Just c
+               & layerNames.at idx .~ Just layerName
+               & layerOrder %~ (<> [idx])
+               & canvasDirty .~ True
 
 currentPaletteAttribute :: AppState -> V.Attr
 currentPaletteAttribute s =
