@@ -167,11 +167,11 @@ drawPaletteSelector s isFg =
 canvas :: AppState -> Widget Name
 canvas s =
     let cs = if shouldUseOverlay s
-             then [ s^.drawingOverlay
-                  , s^.currentLayer
-                  ]
-             else [ s^.currentLayer
-                  ]
+             then s^.drawingOverlay : appLayers
+             else appLayers
+        appLayers = [ s^.layerAt idx
+                    | idx <- s^.layerOrder
+                    ]
         sz = s^.appCanvasSize
     in centerAbout (s^.canvasOffset & _2 %~ pred) $
        updateAttrMap (applyAttrMappings [(borderAttr, fg V.white)]) $

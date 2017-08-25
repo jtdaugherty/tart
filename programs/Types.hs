@@ -1,5 +1,6 @@
 {-# LANGUAGE BinaryLiterals #-}
 {-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE RankNTypes #-}
 module Types
   ( Mode(..)
   , Name(..)
@@ -18,6 +19,7 @@ module Types
   , AppState(..)
   , layers
   , currentLayer
+  , layerAt
   , layerOrder
   , layerNames
   , selectedLayerIndex
@@ -220,6 +222,11 @@ currentLayer :: Lens' AppState Canvas
 currentLayer =
     lens (\s   -> fromJust $ s^.layers.at (s^.selectedLayerIndex))
          (\s c -> s & layers.at (s^.selectedLayerIndex) .~ Just c)
+
+layerAt :: Int -> Lens' AppState Canvas
+layerAt i =
+    lens (\s   -> fromJust $ s^.layers.at i)
+         (\s c -> s & layers.at i .~ Just c)
 
 currentMode :: AppState -> Mode
 currentMode s = case _modes s of
