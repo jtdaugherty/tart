@@ -86,7 +86,7 @@ main = do
             s <- readFile f
             c <- canvasFromText s
             case configOutput cfg of
-                Nothing -> return $ Just (Nothing, c)
+                Nothing -> return $ Just (Nothing, [c], [0], ["default"])
                 Just output -> do
                     writeCanvasFiles output [c] [0] ["default"]
                     exitSuccess
@@ -100,7 +100,9 @@ main = do
                             exitFailure
                         Right tf ->
                             return $ Just ( configOutput cfg <|> Just f
-                                          , tartFileCanvasList tf !! 0
+                                          , tartFileCanvasList tf
+                                          , tartFileCanvasOrder tf
+                                          , tartFileCanvasNames tf
                                           )
                 _ -> return Nothing
 

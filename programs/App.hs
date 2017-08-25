@@ -47,17 +47,23 @@ defaultPalette = Vec.fromList
 initialCanvasSize :: (Int, Int)
 initialCanvasSize = (40, 17)
 
-mkInitialState :: BChan AppEvent -> Maybe (Maybe FilePath, Canvas) -> IO AppState
+mkInitialState :: BChan AppEvent
+               -> Maybe (Maybe FilePath, [Canvas], [Int], [String])
+               -> IO AppState
 mkInitialState chan mc = do
-    (c, fp) <- case mc of
-        Nothing -> (, Nothing) <$> newCanvas initialCanvasSize
-        Just (fp, c) -> return (c, fp)
+    (cs, order, names, fp) <- case mc of
+        Nothing -> do
+            c <- newCanvas initialCanvasSize
+            return ([c], [0], ["default"], Nothing)
+        Just (fp, cs, order, names) ->
+            return (cs, order, names, fp)
 
-    overlay <- newCanvas (canvasSize c)
+    let sz = canvasSize $ cs !! 0
+    overlay <- newCanvas sz
 
-    return $ AppState { _layers                  = M.fromList [(0, c)]
-                      , _layerNames              = M.fromList [(0, "default")]
-                      , _layerOrder              = [0]
+    return $ AppState { _layers                  = M.fromList $ zip [0..] cs
+                      , _layerNames              = M.fromList $ zip [0..] names
+                      , _layerOrder              = order
                       , _drawingOverlay          = overlay
                       , _selectedLayerIndex      = 0
                       , _modes                   = [Main]
@@ -79,8 +85,7 @@ mkInitialState chan mc = do
                       , _canvasSizeFocus         = focusRing [ CanvasSizeWidthEdit
                                                              , CanvasSizeHeightEdit
                                                              ]
-                      , _canvasOffset            = Location $
-                                                   canvasSize c & each %~ (`div` 2)
+                      , _canvasOffset            = Location $ sz & each %~ (`div` 2)
                       , _canvasPath              = fp
                       , _canvasDirty             = False
                       , _askToSaveFilenameEdit   = editor AskToSaveFilenameEdit (Just 1) ""
