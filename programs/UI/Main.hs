@@ -184,11 +184,15 @@ drawPaletteSelector s isFg =
 canvas :: AppState -> Widget Name
 canvas s =
     let cs = if shouldUseOverlay s
-             then s^.drawingOverlay : appLayers
+             then insertBefore (s^.drawingOverlay) (s^.selectedLayerIndex) appLayers
              else appLayers
         appLayers = [ s^.layerAt idx
                     | idx <- s^.layerOrder
                     ]
+        insertBefore :: a -> Int -> [a] -> [a]
+        insertBefore val i ls
+            | i >= length ls = ls <> [val]
+            | otherwise = take i ls <> [val] <> drop i ls
         sz = s^.appCanvasSize
     in centerAbout (s^.canvasOffset & _2 %~ pred) $
        updateAttrMap (applyAttrMappings [(borderAttr, fg V.white)]) $
