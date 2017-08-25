@@ -1,5 +1,6 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TupleSections #-}
 module Util
   ( checkForMouseSupport
   , setTool
@@ -49,7 +50,7 @@ module Util
   )
 where
 
-import Control.Monad (when)
+import Control.Monad (when, forM)
 import Control.Monad.Trans (liftIO)
 import Data.Monoid ((<>))
 import qualified Graphics.Vty as V
@@ -298,11 +299,12 @@ checkForMouseSupport = do
 
 resizeCanvas :: AppState -> (Int, Int) -> EventM n AppState
 resizeCanvas s newSz = do
-    c <- liftIO $ resizeFrom (s^.currentLayer) newSz
+    ls <- liftIO $ forM (M.toList $ s^.layers) $ \(idx, l) ->
+        (idx,) <$> resizeFrom l newSz
     o <- liftIO $ resizeFrom (s^.drawingOverlay) newSz
     return $
         recenterCanvas $
-            s & currentLayer .~ c
+            s & layers .~ (M.fromList ls)
               & drawingOverlay .~ o
               & appCanvasSize .~ newSz
               & canvasDirty .~ (s^.appCanvasSize /= newSz)
