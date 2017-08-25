@@ -9,6 +9,7 @@ where
 
 import qualified Graphics.Vty as V
 import qualified Data.Vector as Vec
+import qualified Data.Map as M
 import Lens.Micro.Platform
 
 import Brick
@@ -54,8 +55,11 @@ mkInitialState chan mc = do
 
     overlay <- newCanvas (canvasSize c)
 
-    return $ AppState { _drawing                 = c
+    return $ AppState { _layers                  = M.fromList [(0, c)]
+                      , _layerNames              = M.fromList [(0, "default")]
+                      , _layerOrder              = [0]
                       , _drawingOverlay          = overlay
+                      , _selectedLayerIndex      = 0
                       , _modes                   = [Main]
                       , _tool                    = Freehand
                       , _appCanvasSize           = initialCanvasSize

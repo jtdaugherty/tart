@@ -55,6 +55,8 @@ import Data.Monoid ((<>))
 import qualified Graphics.Vty as V
 import qualified Data.Vector as Vec
 import qualified Data.Text as T
+import qualified Data.Map as M
+import Data.List (sortOn)
 import System.Exit (exitFailure)
 import Lens.Micro.Platform
 import Data.Text.Zipper (gotoEOL)
@@ -149,13 +151,15 @@ quit ask s = do
                     if ask
                     then continue $ askToSave s
                     else do
-                        liftIO $ writeCanvasFiles p (s^.drawing)
+                        let ls = snd <$> (sortOn fst $ M.toList $ s^.layers)
+                        liftIO $ writeCanvasFiles p ls (s^.layerOrder)
+                                    (snd <$> (sortOn fst $ M.toList $ s^.layerNames))
                         halt s
         False -> halt s
 
-writeCanvasFiles :: FilePath -> Canvas -> IO ()
-writeCanvasFiles path c = do
-    let tf = TartFile [c] ["default"] [0]
+writeCanvasFiles :: FilePath -> [Canvas] -> [Int] -> [String] -> IO ()
+writeCanvasFiles path cs order names = do
+    let tf = TartFile cs names order
     writeTartFile FormatBinary    tf path
     writeTartFile FormatPlain     tf (path <> ".plain.txt")
     writeTartFile FormatAnsiColor tf (path <> ".color.txt")
@@ -177,10 +181,10 @@ handleDragFinished s n =
         Canvas ->
             case s^.tool of
                 Box -> do
-                    (c', old) <- liftIO $ merge (s^.drawing) (s^.drawingOverlay)
+                    (c', old) <- liftIO $ merge (s^.currentLayer) (s^.drawingOverlay)
                     o' <- liftIO $ clearCanvas (s^.drawingOverlay)
                     return $ pushUndo [SetPixels old] $
-                             s & drawing .~ c'
+                             s & currentLayer .~ c'
                                & drawingOverlay .~ o'
                 _ -> return s
         _ -> return s
@@ -294,11 +298,11 @@ checkForMouseSupport = do
 
 resizeCanvas :: AppState -> (Int, Int) -> EventM n AppState
 resizeCanvas s newSz = do
-    c <- liftIO $ resizeFrom (s^.drawing) newSz
+    c <- liftIO $ resizeFrom (s^.currentLayer) newSz
     o <- liftIO $ resizeFrom (s^.drawingOverlay) newSz
     return $
         recenterCanvas $
-            s & drawing .~ c
+            s & currentLayer .~ c
               & drawingOverlay .~ o
               & appCanvasSize .~ newSz
               & canvasDirty .~ (s^.appCanvasSize /= newSz)

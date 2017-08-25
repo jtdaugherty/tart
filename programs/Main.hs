@@ -88,7 +88,7 @@ main = do
             case configOutput cfg of
                 Nothing -> return $ Just (Nothing, c)
                 Just output -> do
-                    writeCanvasFiles output c
+                    writeCanvasFiles output [c] [0] ["default"]
                     exitSuccess
         Nothing ->
             case rest of

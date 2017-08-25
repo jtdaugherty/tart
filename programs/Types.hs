@@ -16,7 +16,11 @@ module Types
   , hasStyle
 
   , AppState(..)
-  , drawing
+  , layers
+  , currentLayer
+  , layerOrder
+  , layerNames
+  , selectedLayerIndex
   , drawingOverlay
   , modes
   , currentMode
@@ -55,12 +59,14 @@ where
 
 import Data.Bits ((.&.), (.|.), complement)
 import Data.Word (Word8)
+import Data.Maybe (fromJust)
 import Brick (Extent, Location)
 import Brick.BChan (BChan)
 import Brick.Focus
 import Brick.Widgets.Edit (Editor)
 import qualified Data.Text as T
-import Lens.Micro.TH
+import qualified Data.Map as M
+import Lens.Micro.Platform
 import qualified Data.Vector as Vec
 import qualified Graphics.Vty as V
 
@@ -170,8 +176,11 @@ noStyle :: V.Style
 noStyle = 0
 
 data AppState =
-    AppState { _drawing                 :: Canvas
+    AppState { _layers                  :: M.Map Int Canvas
+             , _layerOrder              :: [Int]
+             , _layerNames              :: M.Map Int String
              , _drawingOverlay          :: Canvas
+             , _selectedLayerIndex      :: Int
              , _appCanvasSize           :: (Int, Int)
              , _modes                   :: [Mode]
              , _drawFgPaletteIndex      :: Int
@@ -206,6 +215,11 @@ data AppState =
              }
 
 makeLenses ''AppState
+
+currentLayer :: Lens' AppState Canvas
+currentLayer =
+    lens (\s   -> fromJust $ s^.layers.at (s^.selectedLayerIndex))
+         (\s c -> s & layers.at (s^.selectedLayerIndex) .~ Just c)
 
 currentMode :: AppState -> Mode
 currentMode s = case _modes s of

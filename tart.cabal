@@ -70,4 +70,5 @@ executable tart
                        text,
                        text-zipper,
                        directory,
+                       containers,
                        tart

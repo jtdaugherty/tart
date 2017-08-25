@@ -62,7 +62,7 @@ applyAction :: AppState -> Action -> EventM Name (AppState, [Action])
 applyAction s ClearCanvasDirty = return (s & canvasDirty .~ False, [])
 applyAction s (SetPixels ps) = do
     let old' = (\(p, (ch, attr)) -> (p, ch, attr)) <$> ps
-    (s', old) <- drawMany old' drawing s
+    (s', old) <- drawMany old' currentLayer s
     return (s', old)
 
 drawWithCurrentTool :: (Int, Int) -> AppState -> EventM Name AppState
@@ -90,7 +90,7 @@ drawWithCurrentTool point s =
             -- Read the pixel at the canvas location. Set the
             -- application state's current drawing character and colors
             -- from it.
-            let (ch, attr) = canvasGetPixel (s^.drawing) point
+            let (ch, attr) = canvasGetPixel (s^.currentLayer) point
             in return $ s & drawCharacter .~ ch
                           & drawFgPaletteIndex .~ findFgPaletteEntry attr s
                           & drawBgPaletteIndex .~ findBgPaletteEntry attr s
@@ -131,7 +131,7 @@ drawTextAtPoint point t s = do
         pixs = zip ([startCol..]) (truncateText point t s)
         many = mkEntry <$> pixs
         mkEntry (col, (ch, attr)) = ((col, row), ch, attr)
-    (s', old) <- drawMany many drawing s
+    (s', old) <- drawMany many currentLayer s
     return $ pushUndo old s'
 
 findFgPaletteEntry :: V.Attr -> AppState -> Int
@@ -155,7 +155,7 @@ floodFillAtPoint point s = do
     let fillAttr = normalizeAttr fillCh $ currentPaletteAttribute s
         fillCh = s^.drawCharacter
         fillPix = (fillCh, fillAttr)
-        targetPix = canvasGetPixel (s^.drawing) point
+        targetPix = canvasGetPixel (s^.currentLayer) point
         (w, h) = s^.appCanvasSize
         up    = (& _2 %~ (max 0 . pred))
         down  = (& _2 %~ (min (h-1) . succ))
@@ -166,13 +166,13 @@ floodFillAtPoint point s = do
            -> (AppState, [((Int, Int), (Char, V.Attr))])
            -> EventM Name (AppState, [((Int, Int), (Char, V.Attr))])
         go p (st, uBuf) = do
-            let pix = canvasGetPixel (st^.drawing) p
+            let pix = canvasGetPixel (st^.currentLayer) p
             if | pix == fillPix -> return (st, uBuf)
                | pix /= targetPix -> return (st, uBuf)
                | otherwise -> do
-                   let old = canvasGetPixel (st^.drawing) p
-                   d' <- liftIO $ canvasSetPixel (st^.drawing) p fillCh fillAttr
-                   let newSt = st & drawing .~ d' & canvasDirty .~ True
+                   let old = canvasGetPixel (st^.currentLayer) p
+                   d' <- liftIO $ canvasSetPixel (st^.currentLayer) p fillCh fillAttr
+                   let newSt = st & currentLayer .~ d' & canvasDirty .~ True
                    go (down p) (newSt, (p, old):uBuf) >>=
                        go (up p) >>=
                        go (left p) >>=
@@ -192,7 +192,7 @@ drawAtPoint point s =
 
 drawAtPoint' :: (Int, Int) -> Char -> V.Attr -> AppState -> EventM Name AppState
 drawAtPoint' point ch attr s = do
-    (s', old) <- drawMany [(point, ch, attr)] drawing s
+    (s', old) <- drawMany [(point, ch, attr)] currentLayer s
     return $ pushUndo old s'
 
 drawMany :: [((Int, Int), Char, V.Attr)]
@@ -230,27 +230,27 @@ eraseAtPoint :: (Int, Int) -> Int -> AppState -> EventM Name AppState
 eraseAtPoint point sz s = do
     let points = makeBoxAboutPoint point sz
         pixels = (, ' ', V.defAttr) <$> points
-    (s', old) <- drawMany pixels drawing s
+    (s', old) <- drawMany pixels currentLayer s
     return $ pushUndo old s'
 
 repaintAtPoint :: (Int, Int) -> Int -> AppState -> EventM Name AppState
 repaintAtPoint point sz s = do
     let points = makeBoxAboutPoint point sz
         attr = currentPaletteAttribute s
-        getPixel p = let old = canvasGetPixel (s^.drawing) p
+        getPixel p = let old = canvasGetPixel (s^.currentLayer) p
                      in (p, old^._1, attr { V.attrStyle = V.attrStyle $ old^._2 })
         pixels = getPixel <$> points
-    (s', old) <- drawMany pixels drawing s
+    (s', old) <- drawMany pixels currentLayer s
     return $ pushUndo old s'
 
 restyleAtPoint :: (Int, Int) -> Int -> AppState -> EventM Name AppState
 restyleAtPoint point sz s = do
     let points = makeBoxAboutPoint point sz
         attr = currentPaletteAttribute s
-        getPixel p = let old = canvasGetPixel (s^.drawing) p
+        getPixel p = let old = canvasGetPixel (s^.currentLayer) p
                      in (p, old^._1, (old^._2) { V.attrStyle = V.attrStyle attr })
         pixels = getPixel <$> points
-    (s', old) <- drawMany pixels drawing s
+    (s', old) <- drawMany pixels currentLayer s
     return $ pushUndo old s'
 
 drawBox :: BorderStyle

@@ -168,9 +168,9 @@ canvas :: AppState -> Widget Name
 canvas s =
     let cs = if shouldUseOverlay s
              then [ s^.drawingOverlay
-                  , s^.drawing
+                  , s^.currentLayer
                   ]
-             else [ s^.drawing
+             else [ s^.currentLayer
                   ]
         sz = s^.appCanvasSize
     in centerAbout (s^.canvasOffset & _2 %~ pred) $
