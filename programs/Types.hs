@@ -23,6 +23,7 @@ module Types
   , tool
   , drawFgPaletteIndex
   , drawBgPaletteIndex
+  , appCanvasSize
   , palette
   , drawCharacter
   , fgPaletteSelectorExtent
@@ -171,6 +172,7 @@ noStyle = 0
 data AppState =
     AppState { _drawing                 :: Canvas
              , _drawingOverlay          :: Canvas
+             , _appCanvasSize           :: (Int, Int)
              , _modes                   :: [Mode]
              , _drawFgPaletteIndex      :: Int
              , _drawBgPaletteIndex      :: Int

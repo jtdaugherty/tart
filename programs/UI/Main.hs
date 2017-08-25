@@ -128,7 +128,7 @@ drawStyleSelector s =
 
 drawCanvasSize :: AppState -> Widget Name
 drawCanvasSize s =
-    let (width, height) = canvasSize $ s^.drawing
+    let (width, height) = s^.appCanvasSize
     in clickable ResizeCanvas $
        borderWithLabel (str "Can" <+> (withDefAttr keybindingAttr (str "v")) <+> str "as") $
        hLimit 8 $ hCenter (str $ show width <> "x" <> show height)
@@ -172,7 +172,7 @@ canvas s =
                   ]
              else [ s^.drawing
                   ]
-        sz = canvasSize $ s^.drawing
+        sz = s^.appCanvasSize
     in centerAbout (s^.canvasOffset & _2 %~ pred) $
        updateAttrMap (applyAttrMappings [(borderAttr, fg V.white)]) $
        setAvailableSize (sz & each %~ (+ 2)) $

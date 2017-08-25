@@ -104,7 +104,7 @@ styleWord (V.SetTo s) = s
 truncateText :: (Int, Int) -> [(Char, V.Attr)] -> AppState -> [(Char, V.Attr)]
 truncateText point t s =
     let startCol = point^._1
-        maxCol = min ((canvasSize (s^.drawing))^._1 - 1)
+        maxCol = min ((s^.appCanvasSize)^._1 - 1)
                      (startCol + length t - 1)
         safe = take (maxCol - startCol + 1) t
     in safe
@@ -115,7 +115,7 @@ pasteTextAtPoint point s t = do
         (startCol, startRow) = point
         pasteWidth = maximum $ T.length <$> ls
         pasteHeight = length ls
-        (oldWidth, oldHeight) = canvasSize (s^.drawing)
+        (oldWidth, oldHeight) = s^.appCanvasSize
         newSize = ( max oldWidth pasteWidth
                   , max oldHeight pasteHeight
                   )
@@ -156,7 +156,7 @@ floodFillAtPoint point s = do
         fillCh = s^.drawCharacter
         fillPix = (fillCh, fillAttr)
         targetPix = canvasGetPixel (s^.drawing) point
-        (w, h) = canvasSize (s^.drawing)
+        (w, h) = s^.appCanvasSize
         up    = (& _2 %~ (max 0 . pred))
         down  = (& _2 %~ (min (h-1) . succ))
         left  = (& _1 %~ (max 0 . pred))

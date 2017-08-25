@@ -187,15 +187,15 @@ handleDragFinished s n =
 
 increaseCanvasSize :: AppState -> EventM Name AppState
 increaseCanvasSize s =
-    resizeCanvas s
-        (canvasSize (s^.drawing) & _1 %~ (\w -> if w == 1 then 4 else w + 4)
-                                 & _2 %~ (\h -> if h == 1 then 2 else h + 2))
+    resizeCanvas s $
+        (s^.appCanvasSize) & _1 %~ (\w -> if w == 1 then 4 else w + 4)
+                           & _2 %~ (\h -> if h == 1 then 2 else h + 2)
 
 decreaseCanvasSize :: AppState -> EventM Name AppState
 decreaseCanvasSize s =
-    resizeCanvas s
-        (canvasSize (s^.drawing) & _1 %~ (max 1 . (subtract 4))
-                                 & _2 %~ (max 1 . (subtract 2)))
+    resizeCanvas s $
+        (s^.appCanvasSize) & _1 %~ (max 1 . (subtract 4))
+                           & _2 %~ (max 1 . (subtract 2))
 
 pushMode :: Mode -> AppState -> AppState
 pushMode m s =
@@ -216,9 +216,9 @@ beginCanvasSizePrompt s =
                                          , CanvasSizeHeightEdit
                                          ]
           & canvasSizeWidthEdit  .~ applyEdit gotoEOL (editor CanvasSizeWidthEdit (Just 1) $
-                                           T.pack $ show $ fst $ canvasSize $ s^.drawing)
+                                           T.pack $ show $ fst $ s^.appCanvasSize)
           & canvasSizeHeightEdit .~ applyEdit gotoEOL (editor CanvasSizeHeightEdit (Just 1) $
-                                           T.pack $ show $ snd $ canvasSize $ s^.drawing)
+                                           T.pack $ show $ snd $ s^.appCanvasSize)
 
 canvasMoveDown :: AppState -> AppState
 canvasMoveDown s =
@@ -300,11 +300,12 @@ resizeCanvas s newSz = do
         recenterCanvas $
             s & drawing .~ c
               & drawingOverlay .~ o
-              & canvasDirty .~ (canvasSize c /= canvasSize (s^.drawing))
+              & appCanvasSize .~ newSz
+              & canvasDirty .~ (s^.appCanvasSize /= newSz)
 
 recenterCanvas :: AppState -> AppState
 recenterCanvas s =
-    let sz = canvasSize $ s^.drawing
+    let sz = s^.appCanvasSize
     in s & canvasOffset .~ (Location $ sz & each %~ (`div` 2))
 
 currentPaletteAttribute :: AppState -> V.Attr

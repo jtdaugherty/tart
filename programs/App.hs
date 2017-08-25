@@ -58,6 +58,7 @@ mkInitialState chan mc = do
                       , _drawingOverlay          = overlay
                       , _modes                   = [Main]
                       , _tool                    = Freehand
+                      , _appCanvasSize           = initialCanvasSize
                       , _drawCharacter           = '*'
                       , _drawFgPaletteIndex      = 0
                       , _drawBgPaletteIndex      = 0
