@@ -79,7 +79,7 @@ data AppEvent =
     deriving (Eq)
 
 data Action =
-    SetPixels [((Int, Int), (Char, V.Attr))]
+    SetPixels Int [((Int, Int), (Char, V.Attr))]
     | ClearCanvasDirty
     deriving (Eq, Show)
 

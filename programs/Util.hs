@@ -183,7 +183,7 @@ handleDragFinished s n =
                 Box -> do
                     (c', old) <- liftIO $ merge (s^.currentLayer) (s^.drawingOverlay)
                     o' <- liftIO $ clearCanvas (s^.drawingOverlay)
-                    return $ pushUndo [SetPixels old] $
+                    return $ pushUndo [SetPixels (s^.selectedLayerIndex) old] $
                              s & currentLayer .~ c'
                                & drawingOverlay .~ o'
                 _ -> return s
