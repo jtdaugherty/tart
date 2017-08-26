@@ -17,6 +17,8 @@ module Util
   , beginTextEntry
   , tryResizeCanvas
   , quit
+  , beginLayerRename
+  , renameCurrentLayer
   , currentPaletteAttribute
   , handleDragFinished
   , getBoxBorderStyle
@@ -61,13 +63,13 @@ import qualified Data.Map as M
 import Data.List (sortOn)
 import System.Exit (exitFailure)
 import Lens.Micro.Platform
-import Data.Text.Zipper (gotoEOL)
+import Data.Text.Zipper (gotoEOL, textZipper)
 import Text.Read (readMaybe)
-import Data.Maybe (isJust)
+import Data.Maybe (isJust, fromJust)
 
 import Brick
 import Brick.Focus
-import Brick.Widgets.Edit (editor, applyEdit, getEditContents)
+import Brick.Widgets.Edit (editor, applyEdit, getEditContents, editContentsL)
 import Brick.Widgets.Border.Style
 
 import Types
@@ -139,6 +141,25 @@ pushUndo :: [Action] -> AppState -> AppState
 pushUndo [] s = s
 pushUndo l s = s & undoStack %~ (l:)
                  & redoStack .~ []
+
+beginLayerRename :: AppState -> AppState
+beginLayerRename s =
+    let z = textZipper [line] (Just 1)
+        line = T.pack $ fromJust $ s^.layerNames.at (s^.selectedLayerIndex)
+    in pushMode RenameLayer $
+        s & layerNameEditor.editContentsL .~ gotoEOL z
+
+renameCurrentLayer :: T.Text -> AppState -> AppState
+renameCurrentLayer name s =
+    let newName = T.unpack name
+        Just oldName = s^.layerNames.at (s^.selectedLayerIndex)
+    in if null newName
+       then s
+       else if newName == oldName
+            then popMode s
+            else popMode $
+                   s & layerNames.at (s^.selectedLayerIndex) .~ Just (T.unpack name)
+                     & canvasDirty .~ True
 
 quit :: Bool -> AppState -> EventM Name (Next AppState)
 quit ask s = do

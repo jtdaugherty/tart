@@ -22,6 +22,7 @@ module Types
   , layerAt
   , layerOrder
   , layerNames
+  , layerNameEditor
   , selectedLayerIndex
   , drawingOverlay
   , modes
@@ -93,6 +94,7 @@ data Mode = Main
           | CanvasSizePrompt
           | AskToSave
           | TextEntry
+          | RenameLayer
           deriving (Eq, Show)
 
 selectionModes :: [Mode]
@@ -134,6 +136,8 @@ data Name = Canvas
           | IncreaseRestyleSize
           | DecreaseRestyleSize
           | SelectLayer Int
+          | LayerName
+          | LayerNameEditor
           | AddLayer
           deriving (Eq, Show, Ord)
 
@@ -200,6 +204,7 @@ data AppState =
              , _styleSelectorExtent     :: Maybe (Extent Name)
              , _canvasExtent            :: Maybe (Extent Name)
              , _dragging                :: Maybe (Name, Location, Location)
+             , _layerNameEditor         :: Editor T.Text Name
              , _canvasSizeWidthEdit     :: Editor T.Text Name
              , _canvasSizeHeightEdit    :: Editor T.Text Name
              , _canvasSizeFocus         :: FocusRing Name

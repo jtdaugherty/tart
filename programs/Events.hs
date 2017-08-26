@@ -19,6 +19,7 @@ import Events.AskToSave
 import Events.TextEntry
 import Events.BoxStyleSelect
 import Events.StyleSelect
+import Events.RenameLayer
 
 handleEvent :: AppState -> BrickEvent Name AppEvent -> EventM Name (Next AppState)
 handleEvent s (VtyEvent (V.EvResize _ _)) = do
@@ -59,6 +60,7 @@ handleEvent s e = do
                 TextEntry            -> handleTextEntryEvent st ev
                 BoxStyleSelect       -> handleBoxStyleSelectEvent st ev
                 StyleSelect          -> handleStyleSelectEvent st ev
+                RenameLayer          -> handleRenameLayerEvent st ev
 
 updateExtents :: AppState -> EventM Name AppState
 updateExtents s = do

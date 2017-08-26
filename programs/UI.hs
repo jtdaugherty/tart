@@ -25,6 +25,7 @@ drawMode :: AppState -> Mode -> [Widget Name]
 drawMode s m =
     case m of
         Main                 -> drawMainUI s
+        RenameLayer          -> []
         FgPaletteEntrySelect -> drawPaletteEntrySelectUI s
         BgPaletteEntrySelect -> drawPaletteEntrySelectUI s
         ToolSelect           -> drawToolSelectUI s

@@ -42,6 +42,7 @@ executable tart
                        Events.AskToSave
                        Events.TextEntry
                        Events.BoxStyleSelect
+                       Events.RenameLayer
                        Events.StyleSelect
                        UI
                        UI.Main
@@ -71,4 +72,5 @@ executable tart
                        text-zipper,
                        directory,
                        containers,
-                       tart
+                       tart,
+                       text-zipper

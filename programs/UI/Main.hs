@@ -7,10 +7,12 @@ module UI.Main
 where
 
 import Brick
+import Brick.Widgets.Edit
 import Brick.Widgets.Border
 import Brick.Widgets.Border.Style
 import Brick.Widgets.Center
 import Data.Monoid ((<>))
+import qualified Data.Text as T
 import qualified Data.Map as M
 import Data.Maybe (isJust, fromJust)
 import qualified Graphics.Vty as V
@@ -64,11 +66,17 @@ layerHud s = translateBy (Location (0, 4)) $
         addLayerEntry =
             clickable AddLayer $ hCenter $ str "[Add Layer]"
         mkEntry (idx, name) =
-            let applyAttr = if idx == s^.selectedLayerIndex
-                            then withDefAttr selectedLayerAttr
-                            else id
-            in clickable (SelectLayer idx) $
-               applyAttr $ vLimit 1 $ str name <+> fill ' '
+            if RenameLayer `elem` s^.modes && s^.selectedLayerIndex == idx
+               then
+                   renderEditor (txt . T.concat) True (s^.layerNameEditor)
+               else
+                   let applyAttr = if idx == s^.selectedLayerIndex
+                                   then withDefAttr selectedLayerAttr
+                                   else id
+                   in clickable (if idx == s^.selectedLayerIndex
+                                 then LayerName
+                                 else SelectLayer idx) $
+                      applyAttr $ vLimit 1 $ str name <+> fill ' '
 
 toolHud :: AppState -> Widget Name
 toolHud s =

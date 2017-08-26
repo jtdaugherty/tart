@@ -80,6 +80,7 @@ mkInitialState chan mc = do
                       , _styleSelectorExtent     = Nothing
                       , _canvasExtent            = Nothing
                       , _dragging                = Nothing
+                      , _layerNameEditor         = editor LayerNameEditor (Just 1) ""
                       , _canvasSizeWidthEdit     = editor CanvasSizeWidthEdit (Just 1) ""
                       , _canvasSizeHeightEdit    = editor CanvasSizeHeightEdit (Just 1) ""
                       , _canvasSizeFocus         = focusRing [ CanvasSizeWidthEdit
@@ -112,6 +113,8 @@ application =
                    showCursorNamed AskToSaveFilenameEdit locs
                | TextEntry `elem` s^.modes ->
                    showCursorNamed TextEntryCursor locs
+               | RenameLayer `elem` s^.modes ->
+                   showCursorNamed LayerNameEditor locs
                | otherwise -> Nothing
         , appHandleEvent = handleEvent
         , appStartEvent = \s -> do
