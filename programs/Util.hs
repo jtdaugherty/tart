@@ -199,7 +199,7 @@ moveLayer idx up s =
                              [idx] <>
                              drop newIndex dropped
                   act = MoveLayerBy idx (not up)
-              in (s & layerOrder .~ newOrder, [act])
+              in (s & canvasDirty .~ True & layerOrder .~ newOrder, [act])
 
 deleteSelectedLayer :: AppState -> AppState
 deleteSelectedLayer s =
