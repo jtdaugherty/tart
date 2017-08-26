@@ -12,7 +12,7 @@
 - Layers
   - UI for reordering, hiding layers
   - Keybinding to toggle layer list?
-  - Make layer actions undoable (add/remove layer, rename, etc.)
+  - Make layer actions undoable
 
 - Add a keybinding to open the style selector
 

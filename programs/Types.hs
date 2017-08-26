@@ -82,7 +82,9 @@ data AppEvent =
 data Action =
     SetPixels Int [((Int, Int), (Char, V.Attr))]
     | ClearCanvasDirty
-    deriving (Eq, Show)
+    | InsertLayer Canvas Int Int String
+    | RemoveLayer Int
+    | ChangeLayerName Int T.Text
 
 data Mode = Main
           | CharacterSelect

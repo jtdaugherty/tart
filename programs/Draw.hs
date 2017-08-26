@@ -64,6 +64,12 @@ applyAction s (SetPixels idx ps) = do
     let old' = (\(p, (ch, attr)) -> (p, ch, attr)) <$> ps
     (s', old) <- drawMany old' (layerAt idx) (Just idx) s
     return (s', old)
+applyAction s (InsertLayer c idx ordIdx name) =
+    return $ insertLayer c idx ordIdx name s
+applyAction s (RemoveLayer idx) =
+    return $ deleteLayer idx s
+applyAction s (ChangeLayerName idx newName) =
+    return $ renameLayer idx newName s
 
 drawWithCurrentTool :: (Int, Int) -> AppState -> EventM Name AppState
 drawWithCurrentTool point s =

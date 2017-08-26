@@ -19,7 +19,10 @@ module Util
   , quit
   , beginLayerRename
   , renameCurrentLayer
+  , renameLayer
+  , deleteLayer
   , deleteSelectedLayer
+  , insertLayer
   , currentPaletteAttribute
   , handleDragFinished
   , getBoxBorderStyle
@@ -152,22 +155,33 @@ beginLayerRename s =
 
 renameCurrentLayer :: T.Text -> AppState -> AppState
 renameCurrentLayer name s =
+    let (s', as) = renameLayer (s^.selectedLayerIndex) name s
+    in pushUndo as s'
+
+renameLayer :: Int -> T.Text -> AppState -> (AppState, [Action])
+renameLayer idx name s =
     let newName = T.unpack name
-        Just oldName = s^.layerNames.at (s^.selectedLayerIndex)
+        Just oldName = s^.layerNames.at idx
+        act = ChangeLayerName idx (T.pack oldName)
     in if null newName
-       then s
+       then (s, [])
        else if newName == oldName
-            then popMode s
-            else popMode $
-                   s & layerNames.at (s^.selectedLayerIndex) .~ Just (T.unpack name)
+            then (popMode s, [])
+            else (popMode $
+                   s & layerNames.at idx .~ Just (T.unpack name)
                      & canvasDirty .~ True
+                 , [act])
 
 deleteSelectedLayer :: AppState -> AppState
-deleteSelectedLayer s
-    | M.size (s^.layers) == 1 = s
+deleteSelectedLayer s =
+    let (s', as) = deleteLayer (s^.selectedLayerIndex) s
+    in pushUndo as s'
+
+deleteLayer :: Int -> AppState -> (AppState, [Action])
+deleteLayer idx s
+    | M.size (s^.layers) == 1 = (s, [])
     | otherwise =
-        let idx = s^.selectedLayerIndex
-            Just orderIndex = elemIndex idx (s^.layerOrder)
+        let Just orderIndex = elemIndex idx (s^.layerOrder)
             newSelIndex = if orderIndex == 0
                           then 0
                           else orderIndex - 1
@@ -183,8 +197,13 @@ deleteSelectedLayer s
                              then Nothing
                              else (, n) <$> fixOrder i
 
-             -- Change the selected index
-        in s & selectedLayerIndex .~ newSelIndex
+            act = InsertLayer (s^.layerAt idx)
+                              idx
+                              orderIndex
+                              (fromJust $ s^.layerNames.at idx)
+
+        in (-- Change the selected index
+           s & selectedLayerIndex .~ newSelIndex
              -- Remove the layer from the layer map, fix indices
              & layers %~ fixNameKeys
              -- Reassign all higher indices in name map, ordering list,
@@ -192,6 +211,32 @@ deleteSelectedLayer s
              & layerOrder .~ newOrder
              -- Remove the name, fix indices
              & layerNames %~ fixNameKeys
+           , [act])
+
+insertLayer :: Canvas -> Int -> Int -> String -> AppState -> (AppState, [Action])
+insertLayer c newIdx orderIndex name s =
+    let selIdx = s^.selectedLayerIndex
+        newSelIndex = if selIdx >= newIdx
+                      then selIdx + 1
+                      else selIdx
+        newOrderNoInsert = (\i -> if i >= newIdx then i + 1 else i) <$> s^.layerOrder
+        newOrder = take orderIndex newOrderNoInsert <>
+                   [newIdx] <>
+                   drop orderIndex newOrderNoInsert
+
+        fixNameKeys m = M.fromList $ fixPair <$> M.toList m
+        fixPair (i, n) = if i >= newIdx
+                         then (i + 1, n)
+                         else (i, n)
+
+        act = RemoveLayer newIdx
+
+    in (
+       s & selectedLayerIndex .~ newSelIndex
+         & layers %~ (M.insert newIdx c . fixNameKeys)
+         & layerOrder .~ newOrder
+         & layerNames %~ (M.insert newIdx name . fixNameKeys)
+       , [act])
 
 quit :: Bool -> AppState -> EventM Name (Next AppState)
 quit ask s = do
@@ -373,7 +418,9 @@ addLayer s = do
     let layerName = "layer " <> (show $ idx + 1)
         idx = M.size $ s^.layers
     c <- liftIO $ newCanvas (s^.appCanvasSize)
-    return $ s & layers.at idx .~ Just c
+    let act = RemoveLayer idx
+    return $ pushUndo [act] $
+             s & layers.at idx .~ Just c
                & layerNames.at idx .~ Just layerName
                & layerOrder %~ (<> [idx])
                & canvasDirty .~ True
