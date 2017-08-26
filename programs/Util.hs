@@ -19,6 +19,7 @@ module Util
   , quit
   , beginLayerRename
   , renameCurrentLayer
+  , deleteSelectedLayer
   , currentPaletteAttribute
   , handleDragFinished
   , getBoxBorderStyle
@@ -60,12 +61,12 @@ import qualified Graphics.Vty as V
 import qualified Data.Vector as Vec
 import qualified Data.Text as T
 import qualified Data.Map as M
-import Data.List (sortOn)
+import Data.List (sortOn, elemIndex)
 import System.Exit (exitFailure)
 import Lens.Micro.Platform
 import Data.Text.Zipper (gotoEOL, textZipper)
 import Text.Read (readMaybe)
-import Data.Maybe (isJust, fromJust)
+import Data.Maybe (isJust, fromJust, catMaybes)
 
 import Brick
 import Brick.Focus
@@ -160,6 +161,37 @@ renameCurrentLayer name s =
             else popMode $
                    s & layerNames.at (s^.selectedLayerIndex) .~ Just (T.unpack name)
                      & canvasDirty .~ True
+
+deleteSelectedLayer :: AppState -> AppState
+deleteSelectedLayer s
+    | M.size (s^.layers) == 1 = s
+    | otherwise =
+        let idx = s^.selectedLayerIndex
+            Just orderIndex = elemIndex idx (s^.layerOrder)
+            newSelIndex = if orderIndex == 0
+                          then 0
+                          else orderIndex - 1
+            newOrder = catMaybes $ fixOrder <$> s^.layerOrder
+            fixOrder i = if idx == i
+                         then Nothing
+                         else Just $ if i > idx
+                                     then i - 1
+                                     else i
+
+            fixNameKeys m = M.fromList $ catMaybes $ fixPair <$> M.toList m
+            fixPair (i, n) = if idx == i
+                             then Nothing
+                             else (, n) <$> fixOrder i
+
+             -- Change the selected index
+        in s & selectedLayerIndex .~ newSelIndex
+             -- Remove the layer from the layer map, fix indices
+             & layers %~ fixNameKeys
+             -- Reassign all higher indices in name map, ordering list,
+             -- layer map
+             & layerOrder .~ newOrder
+             -- Remove the name, fix indices
+             & layerNames %~ fixNameKeys
 
 quit :: Bool -> AppState -> EventM Name (Next AppState)
 quit ask s = do

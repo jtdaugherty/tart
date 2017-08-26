@@ -139,6 +139,7 @@ data Name = Canvas
           | LayerName
           | LayerNameEditor
           | AddLayer
+          | DeleteLayer
           deriving (Eq, Show, Ord)
 
 data Tool = Freehand

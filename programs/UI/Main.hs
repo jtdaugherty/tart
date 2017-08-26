@@ -55,7 +55,8 @@ topHud s =
 
 layerHud :: AppState -> Widget Name
 layerHud s = translateBy (Location (0, 4)) $
-             (hLimit 20 $ layerList <=> fill ' ') <+> vBorder
+             padBottom (Pad 4) $
+             (hLimit 20 $ layerList <=> fill ' ' <=> layerOptions) <+> vBorder
     where
         layerList = vBox $ (hCenter $ str "Layers") :
                            (mkEntry <$> entries) <>
@@ -78,6 +79,10 @@ layerHud s = translateBy (Location (0, 4)) $
                                  then LayerName
                                  else SelectLayer idx) $
                       applyAttr $ vLimit 1 $ str name <+> fill ' '
+        layerOptions =
+            vBox [ hBorderWithLabel (str "Layer Options")
+                 , clickable DeleteLayer $ vLimit 1 $ str "Delete" <+> fill ' '
+                 ]
 
 toolHud :: AppState -> Widget Name
 toolHud s =
