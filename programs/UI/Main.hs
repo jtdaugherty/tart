@@ -14,7 +14,7 @@ import Brick.Widgets.Center
 import Data.Monoid ((<>))
 import qualified Data.Text as T
 import qualified Data.Map as M
-import Data.Maybe (isJust, fromJust)
+import Data.Maybe (isJust, fromJust, catMaybes)
 import qualified Graphics.Vty as V
 import Lens.Micro.Platform
 
@@ -80,8 +80,18 @@ layerHud s = translateBy (Location (0, 4)) $
                                  else SelectLayer idx) $
                       applyAttr $ vLimit 1 $ str name <+> fill ' '
         layerOptions =
-            vBox [ hBorderWithLabel (str "Layer Options")
-                 , clickable DeleteLayer $ vLimit 1 $ str "Delete" <+> fill ' '
+            let i = s^.selectedLayerIndex
+                entry n label =
+                    clickable n $ vLimit 1 $ str label <+> fill ' '
+            in vBox $ catMaybes
+                 [ Just $ hBorderWithLabel (str "Layer Options")
+                 , if i /= head (s^.layerOrder)
+                      then Just $ entry MoveLayerUp "Move up"
+                      else Nothing
+                 , if i /= last (s^.layerOrder)
+                      then Just $ entry MoveLayerDown "Move down"
+                      else Nothing
+                 , Just $ entry DeleteLayer "Delete"
                  ]
 
 toolHud :: AppState -> Widget Name

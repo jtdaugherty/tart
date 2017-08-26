@@ -10,7 +10,7 @@
 - HTML output mode?
 
 - Layers
-  - UI for reordering, hiding layers
+  - UI for hiding/showing layers
   - Keybinding to toggle layer list?
   - Make layer actions undoable
 

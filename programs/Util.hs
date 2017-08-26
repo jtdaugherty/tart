@@ -42,6 +42,9 @@ module Util
   , styleBindings
   , recenterCanvas
   , addLayer
+  , moveLayer
+  , moveCurrentLayerDown
+  , moveCurrentLayerUp
 
   , canvasMoveDown
   , canvasMoveUp
@@ -171,6 +174,32 @@ renameLayer idx name s =
                    s & layerNames.at idx .~ Just (T.unpack name)
                      & canvasDirty .~ True
                  , [act])
+
+moveCurrentLayerDown :: AppState -> AppState
+moveCurrentLayerDown s =
+    let (s', as) = moveLayer (s^.selectedLayerIndex) False s
+    in pushUndo as s'
+
+moveCurrentLayerUp :: AppState -> AppState
+moveCurrentLayerUp s =
+    let (s', as) = moveLayer (s^.selectedLayerIndex) True s
+    in pushUndo as s'
+
+moveLayer :: Int -> Bool -> AppState -> (AppState, [Action])
+moveLayer idx up s =
+    if up && idx == (head $ s^.layerOrder)
+    then (s, [])
+    else if (not up) && idx == (last $ s^.layerOrder)
+         then (s, [])
+         else let Just orderIndex = elemIndex idx $ s^.layerOrder
+                  newIndex = if up then orderIndex - 1
+                                   else orderIndex + 1
+                  dropped = filter (/= idx) $ s^.layerOrder
+                  newOrder = take newIndex dropped <>
+                             [idx] <>
+                             drop newIndex dropped
+                  act = MoveLayerBy idx (not up)
+              in (s & layerOrder .~ newOrder, [act])
 
 deleteSelectedLayer :: AppState -> AppState
 deleteSelectedLayer s =

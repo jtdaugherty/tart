@@ -85,6 +85,7 @@ data Action =
     | InsertLayer Canvas Int Int String
     | RemoveLayer Int
     | ChangeLayerName Int T.Text
+    | MoveLayerBy Int Bool
 
 data Mode = Main
           | CharacterSelect
@@ -142,6 +143,8 @@ data Name = Canvas
           | LayerNameEditor
           | AddLayer
           | DeleteLayer
+          | MoveLayerUp
+          | MoveLayerDown
           deriving (Eq, Show, Ord)
 
 data Tool = Freehand
