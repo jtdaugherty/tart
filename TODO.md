@@ -10,6 +10,9 @@
 - HTML output mode?
 
 - Layers
+  - UI for reordering, hiding, removing layers
+  - Keybinding to toggle layer list?
+  - Make layer actions undoable (add/remove layer, rename, etc.)
 
 - Add a keybinding to open the style selector
 
