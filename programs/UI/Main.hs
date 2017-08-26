@@ -64,7 +64,8 @@ layerHud s = translateBy (Location (0, 4)) $
                   | i <- s^.layerOrder
                   ]
         addLayerEntry =
-            clickable AddLayer $ hCenter $ str "[Add Layer]"
+            clickable AddLayer $ hCenter $
+              withDefAttr clickableAttr $ str "[Add Layer]"
         mkEntry (idx, name) =
             if RenameLayer `elem` s^.modes && s^.selectedLayerIndex == idx
                then
