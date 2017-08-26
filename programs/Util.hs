@@ -338,8 +338,8 @@ recenterCanvas s =
 
 addLayer :: AppState -> EventM Name AppState
 addLayer s = do
-    let layerName = "layer " <> (show idx)
-        idx = 1 + (M.size $ s^.layers)
+    let layerName = "layer " <> (show $ idx + 1)
+        idx = M.size $ s^.layers
     c <- liftIO $ newCanvas (s^.appCanvasSize)
     return $ s & layers.at idx .~ Just c
                & layerNames.at idx .~ Just layerName
