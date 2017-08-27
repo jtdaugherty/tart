@@ -50,14 +50,22 @@ handleEvent s (VtyEvent (V.EvKey (V.KChar 'v') [])) = do
     continue $ beginCanvasSizePrompt s
 handleEvent s (MouseDown LayerName _ _ _) = do
     continue $ beginLayerRename s
+handleEvent s (VtyEvent (V.EvKey (V.KChar 'x') [V.MCtrl])) = do
+    continue $ deleteSelectedLayer s
 handleEvent s (MouseDown DeleteLayer _ _ _) = do
     continue $ deleteSelectedLayer s
+handleEvent s (VtyEvent (V.EvKey (V.KChar 'u') [V.MCtrl])) = do
+    continue $ moveCurrentLayerUp s
 handleEvent s (MouseDown MoveLayerUp _ _ _) = do
     continue $ moveCurrentLayerUp s
 handleEvent s (MouseDown MoveLayerDown _ _ _) = do
     continue $ moveCurrentLayerDown s
+handleEvent s (VtyEvent (V.EvKey (V.KChar 'd') [V.MCtrl])) = do
+    continue $ moveCurrentLayerDown s
 handleEvent s (MouseDown ResizeCanvas _ _ _) = do
     continue $ beginCanvasSizePrompt s
+handleEvent s (VtyEvent (V.EvKey (V.KChar 'v') [V.MCtrl])) = do
+    continue $ toggleCurrentLayer s
 handleEvent s (MouseDown ToggleLayerVisible _ _ _) = do
     continue $ toggleCurrentLayer s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'C') [])) = do
@@ -118,6 +126,8 @@ handleEvent s (VtyEvent (V.EvKey V.KEsc [])) = do
     continue $ s & dragging .~ Nothing
 handleEvent s (MouseDown (SelectLayer idx) _ _ _) = do
     continue $ s & selectedLayerIndex .~ idx
+handleEvent s (VtyEvent (V.EvKey (V.KChar 'a') [V.MCtrl])) = do
+    continue =<< addLayer s
 handleEvent s (MouseDown AddLayer _ _ _) = do
     continue =<< addLayer s
 handleEvent s (VtyEvent (V.EvPaste bytes)) = do
