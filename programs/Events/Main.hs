@@ -50,6 +50,8 @@ handleEvent s (VtyEvent (V.EvKey (V.KChar 'v') [])) = do
     continue $ beginCanvasSizePrompt s
 handleEvent s (MouseDown LayerName _ _ _) = do
     continue $ beginLayerRename s
+handleEvent s (VtyEvent (V.EvKey (V.KChar 'r') [V.MCtrl])) = do
+    continue $ beginLayerRename s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'x') [V.MCtrl])) = do
     continue $ deleteSelectedLayer s
 handleEvent s (MouseDown DeleteLayer _ _ _) = do
