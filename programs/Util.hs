@@ -14,6 +14,8 @@ module Util
   , increaseCanvasSize
   , decreaseCanvasSize
   , beginCanvasSizePrompt
+  , toggleCurrentLayer
+  , toggleLayer
   , beginTextEntry
   , tryResizeCanvas
   , quit
@@ -156,6 +158,17 @@ beginLayerRename s =
     in pushMode RenameLayer $
         s & layerNameEditor.editContentsL .~ gotoEOL z
 
+toggleCurrentLayer :: AppState -> AppState
+toggleCurrentLayer s =
+    let (s', as) = toggleLayer (s^.selectedLayerIndex) s
+    in pushUndo as s'
+
+toggleLayer :: Int -> AppState -> (AppState, [Action])
+toggleLayer idx s =
+    ( s & layerVisible.ix idx %~ not
+    , [ToggleLayer idx]
+    )
+
 renameCurrentLayer :: T.Text -> AppState -> AppState
 renameCurrentLayer name s =
     let (s', as) = renameLayer (s^.selectedLayerIndex) name s
@@ -236,6 +249,9 @@ deleteLayer idx s
            s & selectedLayerIndex .~ newSelIndex
              -- Remove the layer from the layer map, fix indices
              & layers %~ fixNameKeys
+             -- Remove the layer from the layer visibility map, fix
+             -- indices
+             & layerVisible %~ fixNameKeys
              -- Reassign all higher indices in name map, ordering list,
              -- layer map
              & layerOrder .~ newOrder
@@ -264,6 +280,7 @@ insertLayer c newIdx orderIndex name s =
     in (
        s & selectedLayerIndex .~ newSelIndex
          & layers %~ (M.insert newIdx c . fixNameKeys)
+         & layerVisible %~ (M.insert newIdx True . fixNameKeys)
          & layerOrder .~ newOrder
          & layerNames %~ (M.insert newIdx name . fixNameKeys)
        , [act])
@@ -451,6 +468,7 @@ addLayer s = do
     let act = RemoveLayer idx
     return $ pushUndo [act] $
              s & layers.at idx .~ Just c
+               & layerVisible.at idx .~ Just True
                & layerNames.at idx .~ Just layerName
                & layerOrder %~ (<> [idx])
                & canvasDirty .~ True

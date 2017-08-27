@@ -11,7 +11,6 @@ import Brick.Widgets.Edit
 import Brick.Widgets.Border
 import Brick.Widgets.Border.Style
 import Brick.Widgets.Center
-import Data.List (elemIndex)
 import Data.Monoid ((<>))
 import qualified Data.Text as T
 import qualified Data.Map as M
@@ -86,6 +85,10 @@ layerHud s = translateBy (Location (0, 4)) $
                     clickable n $ vLimit 1 $ str label <+> fill ' '
             in vBox $ catMaybes
                  [ Just $ hBorderWithLabel (str "Layer Options")
+                 , Just $ entry ToggleLayerVisible
+                            (if (s^.layerVisible.at i) == Just True
+                             then "Hide"
+                             else "Show")
                  , if i /= head (s^.layerOrder)
                       then Just $ entry MoveLayerUp "Move up"
                       else Nothing
@@ -212,24 +215,23 @@ drawPaletteSelector s isFg =
 
 canvas :: AppState -> Widget Name
 canvas s =
-    let Just orderIndex = elemIndex (s^.selectedLayerIndex) (s^.layerOrder)
-        cs = if shouldUseOverlay s
-             then insertBefore (s^.drawingOverlay) orderIndex appLayers
-             else appLayers
-        appLayers = [ s^.layerAt idx
-                    | idx <- s^.layerOrder
-                    ]
-        insertBefore :: a -> Int -> [a] -> [a]
-        insertBefore val i ls
-            | i >= length ls = ls <> [val]
-            | otherwise = take i ls <> [val] <> drop i ls
+    let appLayers = concat
+            [ if s^.layerVisible.at idx == Just True
+              then if shouldUseOverlay s && idx == s^.selectedLayerIndex
+                   then [s^.drawingOverlay, s^.layerAt idx]
+                   else [s^.layerAt idx]
+              else []
+            | idx <- s^.layerOrder
+            ]
         sz = s^.appCanvasSize
     in centerAbout (s^.canvasOffset & _2 %~ pred & _1 %~ (subtract 10)) $
        updateAttrMap (applyAttrMappings [(borderAttr, fg V.white)]) $
        setAvailableSize (sz & each %~ (+ 2)) $
        border $
-       clickable Canvas $
-       raw $ canvasToImage cs
+       if null appLayers
+          then raw $ V.charFill V.defAttr ' ' (sz^._1) (sz^._2)
+          else clickable Canvas $
+               raw $ canvasToImage appLayers
 
 shouldUseOverlay :: AppState -> Bool
 shouldUseOverlay s =

@@ -10,7 +10,6 @@
 - HTML output mode?
 
 - Layers
-  - UI for hiding/showing layers
   - Keybinding to toggle layer list?
 
 - Add a keybinding to open the style selector

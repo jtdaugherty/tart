@@ -58,6 +58,8 @@ handleEvent s (MouseDown MoveLayerDown _ _ _) = do
     continue $ moveCurrentLayerDown s
 handleEvent s (MouseDown ResizeCanvas _ _ _) = do
     continue $ beginCanvasSizePrompt s
+handleEvent s (MouseDown ToggleLayerVisible _ _ _) = do
+    continue $ toggleCurrentLayer s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'C') [])) = do
     continue $ recenterCanvas s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'f') [])) = do

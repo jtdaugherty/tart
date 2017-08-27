@@ -21,6 +21,7 @@ module Types
   , currentLayer
   , layerAt
   , layerOrder
+  , layerVisible
   , layerNames
   , layerNameEditor
   , selectedLayerIndex
@@ -86,6 +87,7 @@ data Action =
     | RemoveLayer Int
     | ChangeLayerName Int T.Text
     | MoveLayerBy Int Bool
+    | ToggleLayer Int
 
 data Mode = Main
           | CharacterSelect
@@ -145,6 +147,7 @@ data Name = Canvas
           | DeleteLayer
           | MoveLayerUp
           | MoveLayerDown
+          | ToggleLayerVisible
           deriving (Eq, Show, Ord)
 
 data Tool = Freehand
@@ -192,6 +195,7 @@ noStyle = 0
 data AppState =
     AppState { _layers                  :: M.Map Int Canvas
              , _layerOrder              :: [Int]
+             , _layerVisible            :: M.Map Int Bool
              , _layerNames              :: M.Map Int String
              , _drawingOverlay          :: Canvas
              , _selectedLayerIndex      :: Int

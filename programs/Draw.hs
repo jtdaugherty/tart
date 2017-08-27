@@ -72,6 +72,8 @@ applyAction s (ChangeLayerName idx newName) =
     return $ renameLayer idx newName s
 applyAction s (MoveLayerBy idx up) =
     return $ moveLayer idx up s
+applyAction s (ToggleLayer idx) =
+    return $ toggleLayer idx s
 
 drawWithCurrentTool :: (Int, Int) -> AppState -> EventM Name AppState
 drawWithCurrentTool point s =

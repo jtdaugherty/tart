@@ -63,6 +63,8 @@ mkInitialState chan mc = do
 
     return $ AppState { _layers                  = M.fromList $ zip [0..] cs
                       , _layerNames              = M.fromList $ zip [0..] names
+                      , _layerVisible            = M.fromList $ zip [0..length cs-1]
+                                                                    (repeat True)
                       , _layerOrder              = order
                       , _drawingOverlay          = overlay
                       , _selectedLayerIndex      = head order
