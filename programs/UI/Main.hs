@@ -69,7 +69,7 @@ layerHud s = translateBy (Location (0, 4)) $
                   ]
         addLayerEntry =
             clickable AddLayer $ hCenter $
-              withDefAttr clickableAttr $ str "[Add Layer]"
+              withDefAttr clickableAttr $ str "Add Layer (C-a)"
         mkEntry (idx, name, vis) =
             if RenameLayer `elem` s^.modes && s^.selectedLayerIndex == idx
                then
@@ -94,17 +94,17 @@ layerHud s = translateBy (Location (0, 4)) $
                  [ Just $ hBorderWithLabel (str "Layer Options")
                  , Just $ entry ToggleLayerVisible
                             (if (s^.layerVisible.at i) == Just True
-                             then "Hide"
-                             else "Show")
+                             then "Hide (C-v)"
+                             else "Show (C-v)")
                  , if i /= head (s^.layerOrder)
-                      then Just $ entry MoveLayerUp "Move up"
+                      then Just $ entry MoveLayerUp "Move up (C-u)"
                       else Nothing
                  , if i /= last (s^.layerOrder)
-                      then Just $ entry MoveLayerDown "Move down"
+                      then Just $ entry MoveLayerDown "Move down (C-d)"
                       else Nothing
                  , if length (s^.layerOrder) == 1
                       then Nothing
-                      else Just $ entry DeleteLayer "Delete"
+                      else Just $ entry DeleteLayer "Delete (C-x)"
                  ]
 
 toolHud :: AppState -> Widget Name
