@@ -15,6 +15,8 @@ module State
   , popMode
   , increaseCanvasSize
   , decreaseCanvasSize
+  , increaseToolSize
+  , decreaseToolSize
   , beginCanvasSizePrompt
   , toggleCurrentLayer
   , toggleLayer
@@ -130,6 +132,24 @@ boxStyles =
 
 getBoxBorderStyle :: AppState -> (String, BorderStyle)
 getBoxBorderStyle s = boxStyles !! (s^.boxStyleIndex)
+
+increaseToolSize :: AppState -> AppState
+increaseToolSize s =
+    let f = case s^.tool of
+              Repaint -> increaseRepaintSize
+              Restyle -> increaseRestyleSize
+              Eraser  -> increaseEraserSize
+              _ -> id
+    in f s
+
+decreaseToolSize :: AppState -> AppState
+decreaseToolSize s =
+    let f = case s^.tool of
+              Repaint -> decreaseRepaintSize
+              Restyle -> decreaseRestyleSize
+              Eraser  -> decreaseEraserSize
+              _ -> id
+    in f s
 
 increaseEraserSize :: AppState -> AppState
 increaseEraserSize = (& eraserSize %~ succ)

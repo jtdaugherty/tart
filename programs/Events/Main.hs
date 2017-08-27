@@ -95,31 +95,13 @@ handleEvent s (MouseDown IncreaseRestyleSize _ _ _) = do
 handleEvent s (MouseDown DecreaseRestyleSize _ _ _) = do
     continue $ decreaseRestyleSize s
 handleEvent s (MouseDown _ V.BScrollUp _ _) = do
-    let f = case s^.tool of
-              Repaint -> increaseRepaintSize
-              Restyle -> increaseRestyleSize
-              Eraser -> increaseEraserSize
-              _ -> id
-    continue $ f s
+    continue $ increaseToolSize s
 handleEvent s (MouseDown _ V.BScrollDown _ _) = do
-    let f = case s^.tool of
-              Repaint -> decreaseRepaintSize
-              Restyle -> decreaseRestyleSize
-              Eraser -> decreaseEraserSize
-              _ -> id
-    continue $ f s
+    continue $ decreaseToolSize s
 handleEvent s (VtyEvent (V.EvKey (V.KChar '>') [])) = do
-    continue $ case s^.tool of
-        Eraser -> increaseEraserSize s
-        Repaint -> increaseRepaintSize s
-        Restyle -> increaseRestyleSize s
-        _ -> s
+    continue $ increaseToolSize s
 handleEvent s (VtyEvent (V.EvKey (V.KChar '<') [])) = do
-    continue $ case s^.tool of
-        Eraser -> decreaseEraserSize s
-        Repaint -> decreaseRepaintSize s
-        Restyle -> decreaseRestyleSize s
-        _ -> s
+    continue $ decreaseToolSize s
 handleEvent s (MouseDown BoxStyleSelector _ _ _) = do
     continue $ beginBoxStyleSelect s
 handleEvent s (MouseDown Canvas _ _ (Location l)) = do
