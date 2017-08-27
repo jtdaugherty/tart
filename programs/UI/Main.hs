@@ -95,7 +95,9 @@ layerHud s = translateBy (Location (0, 4)) $
                  , if i /= last (s^.layerOrder)
                       then Just $ entry MoveLayerDown "Move down"
                       else Nothing
-                 , Just $ entry DeleteLayer "Delete"
+                 , if length (s^.layerOrder) == 1
+                      then Nothing
+                      else Just $ entry DeleteLayer "Delete"
                  ]
 
 toolHud :: AppState -> Widget Name
