@@ -61,7 +61,10 @@ layerHud s = translateBy (Location (0, 4)) $
         layerList = vBox $ (hCenter $ str "Layers") :
                            (mkEntry <$> entries) <>
                            [addLayerEntry]
-        entries = [ (i, fromJust $ M.lookup i $ s^.layerNames, fromJust $ s^.layerVisible.at i)
+        entries = [ ( i
+                    , fromJust $ M.lookup i $ s^.layerNames
+                    , fromJust $ s^.layerVisible.at i
+                    )
                   | i <- s^.layerOrder
                   ]
         addLayerEntry =
