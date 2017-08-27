@@ -11,6 +11,7 @@ import Brick.Widgets.Edit
 import Brick.Widgets.Border
 import Brick.Widgets.Border.Style
 import Brick.Widgets.Center
+import Data.List (elemIndex)
 import Data.Monoid ((<>))
 import qualified Data.Text as T
 import qualified Data.Map as M
@@ -211,8 +212,9 @@ drawPaletteSelector s isFg =
 
 canvas :: AppState -> Widget Name
 canvas s =
-    let cs = if shouldUseOverlay s
-             then insertBefore (s^.drawingOverlay) (s^.selectedLayerIndex) appLayers
+    let Just orderIndex = elemIndex (s^.selectedLayerIndex) (s^.layerOrder)
+        cs = if shouldUseOverlay s
+             then insertBefore (s^.drawingOverlay) orderIndex appLayers
              else appLayers
         appLayers = [ s^.layerAt idx
                     | idx <- s^.layerOrder
