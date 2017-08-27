@@ -135,6 +135,3 @@ handleEvent s (VtyEvent (V.EvKey (V.KChar 'c') [])) =
 handleEvent s (MouseDown CharSelector _ _ _) =
     continue $ whenTool s [Freehand, FloodFill] beginCharacterSelect
 handleEvent s _ = continue s
-
-whenTool :: AppState -> [Tool] -> (AppState -> AppState) -> AppState
-whenTool s ts f = if s^.tool `elem` ts then f s else s

@@ -5,6 +5,7 @@ module State
   ( checkForMouseSupport
   , setTool
   , setToolByChar
+  , whenTool
   , setFgPaletteIndex
   , setBgPaletteIndex
   , beginFgPaletteSelect
@@ -466,6 +467,9 @@ setToolByChar c s =
     in case filter ((== idx) . snd) tools of
         [(t, _)] -> popMode $ setTool s t
         _ -> s
+
+whenTool :: AppState -> [Tool] -> (AppState -> AppState) -> AppState
+whenTool s ts f = if s^.tool `elem` ts then f s else s
 
 setFgPaletteIndex :: AppState -> Int -> AppState
 setFgPaletteIndex s i = popMode $ s & drawFgPaletteIndex .~ i
