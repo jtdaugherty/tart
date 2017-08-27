@@ -61,13 +61,13 @@ layerHud s = translateBy (Location (0, 4)) $
         layerList = vBox $ (hCenter $ str "Layers") :
                            (mkEntry <$> entries) <>
                            [addLayerEntry]
-        entries = [ (i, fromJust $ M.lookup i $ s^.layerNames)
+        entries = [ (i, fromJust $ M.lookup i $ s^.layerNames, fromJust $ s^.layerVisible.at i)
                   | i <- s^.layerOrder
                   ]
         addLayerEntry =
             clickable AddLayer $ hCenter $
               withDefAttr clickableAttr $ str "[Add Layer]"
-        mkEntry (idx, name) =
+        mkEntry (idx, name, vis) =
             if RenameLayer `elem` s^.modes && s^.selectedLayerIndex == idx
                then
                    renderEditor (txt . T.concat) True (s^.layerNameEditor)
@@ -75,10 +75,13 @@ layerHud s = translateBy (Location (0, 4)) $
                    let applyAttr = if idx == s^.selectedLayerIndex
                                    then withDefAttr selectedLayerAttr
                                    else id
+                       showHiddenStatus = if vis then id else (<+> str "H")
                    in clickable (if idx == s^.selectedLayerIndex
                                  then LayerName
                                  else SelectLayer idx) $
-                      applyAttr $ vLimit 1 $ str name <+> fill ' '
+                      applyAttr $ vLimit 1 $
+                      showHiddenStatus $
+                      str name <+> fill ' '
         layerOptions =
             let i = s^.selectedLayerIndex
                 entry n label =
