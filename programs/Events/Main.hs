@@ -41,46 +41,32 @@ handleEvent s (VtyEvent (V.EvPaste bytes)) =
     continue =<< pasteTextAtPoint (0, 0) s (decodeUtf8 bytes)
 handleEvent s (AppEvent (DragFinished n _ _)) =
     continue =<< handleDragFinished s n
-handleEvent s (MouseDown LayerName _ _ _) =
-    continue $ beginLayerRename s
-handleEvent s (MouseDown DeleteLayer _ _ _) =
-    continue $ deleteSelectedLayer s
-handleEvent s (MouseDown MoveLayerUp _ _ _) =
-    continue $ moveCurrentLayerUp s
-handleEvent s (MouseDown MoveLayerDown _ _ _) =
-    continue $ moveCurrentLayerDown s
-handleEvent s (MouseDown ResizeCanvas _ _ _) =
-    continue $ beginCanvasSizePrompt s
-handleEvent s (MouseDown ToggleLayerVisible _ _ _) =
-    continue $ toggleCurrentLayer s
-handleEvent s (MouseDown ToolSelector _ _ _) =
-    continue $ beginToolSelect s
-handleEvent s (MouseDown IncreaseEraserSize _ _ _) =
-    continue $ increaseEraserSize s
-handleEvent s (MouseDown DecreaseEraserSize _ _ _) =
-    continue $ decreaseEraserSize s
-handleEvent s (MouseDown IncreaseRepaintSize _ _ _) =
-    continue $ increaseRepaintSize s
-handleEvent s (MouseDown DecreaseRepaintSize _ _ _) =
-    continue $ decreaseRepaintSize s
-handleEvent s (MouseDown IncreaseRestyleSize _ _ _) =
-    continue $ increaseRestyleSize s
-handleEvent s (MouseDown DecreaseRestyleSize _ _ _) =
-    continue $ decreaseRestyleSize s
+handleEvent s (MouseDown Canvas _ _ (Location l)) =
+    continue =<< drawWithCurrentTool l s
 handleEvent s (MouseDown _ V.BScrollUp _ _) =
     continue $ increaseToolSize s
 handleEvent s (MouseDown _ V.BScrollDown _ _) =
     continue $ decreaseToolSize s
-handleEvent s (MouseDown BoxStyleSelector _ _ _) =
-    continue $ beginBoxStyleSelect s
-handleEvent s (MouseDown Canvas _ _ (Location l)) =
-    continue =<< drawWithCurrentTool l s
-handleEvent s (MouseDown (SelectLayer idx) _ _ _) =
-    continue $ selectLayer idx s
-handleEvent s (MouseDown AddLayer _ _ _) =
-    continue =<< addLayer s
-handleEvent s (MouseDown CharSelector _ _ _) =
-    continue $ whenTool s [Freehand, FloodFill] beginCharacterSelect
+handleEvent s (MouseDown n _ _ _) =
+    continue =<< case n of
+        LayerName           -> return $ beginLayerRename s
+        DeleteLayer         -> return $ deleteSelectedLayer s
+        MoveLayerUp         -> return $ moveCurrentLayerUp s
+        MoveLayerDown       -> return $ moveCurrentLayerDown s
+        ResizeCanvas        -> return $ beginCanvasSizePrompt s
+        ToggleLayerVisible  -> return $ toggleCurrentLayer s
+        ToolSelector        -> return $ beginToolSelect s
+        IncreaseEraserSize  -> return $ increaseEraserSize s
+        DecreaseEraserSize  -> return $ decreaseEraserSize s
+        IncreaseRepaintSize -> return $ increaseRepaintSize s
+        DecreaseRepaintSize -> return $ decreaseRepaintSize s
+        IncreaseRestyleSize -> return $ increaseRestyleSize s
+        DecreaseRestyleSize -> return $ decreaseRestyleSize s
+        BoxStyleSelector    -> return $ beginBoxStyleSelect s
+        SelectLayer idx     -> return $ selectLayer idx s
+        AddLayer            -> addLayer s
+        CharSelector        -> return $ whenTool s [Freehand, FloodFill] beginCharacterSelect
+        _                   -> return s
 handleEvent s (VtyEvent e) | isStyleKey e =
     continue $ toggleStyleFromKey e s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'w') [])) =
