@@ -464,14 +464,11 @@ addLayer :: AppState -> EventM Name AppState
 addLayer s = do
     let layerName = "layer " <> (show $ idx + 1)
         idx = M.size $ s^.layers
+        orderIndex = length (s^.layerOrder)
+
     c <- liftIO $ newCanvas (s^.appCanvasSize)
-    let act = RemoveLayer idx
-    return $ pushUndo [act] $
-             s & layers.at idx .~ Just c
-               & layerVisible.at idx .~ Just True
-               & layerNames.at idx .~ Just layerName
-               & layerOrder %~ (<> [idx])
-               & canvasDirty .~ True
+    let (s', as) = insertLayer c idx orderIndex layerName s
+    return $ pushUndo as s'
 
 currentPaletteAttribute :: AppState -> V.Attr
 currentPaletteAttribute s =
