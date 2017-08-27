@@ -211,9 +211,10 @@ deleteLayer idx s
     | M.size (s^.layers) == 1 = (s, [])
     | otherwise =
         let Just orderIndex = elemIndex idx (s^.layerOrder)
-            newSelIndex = if orderIndex == 0
-                          then 0
-                          else orderIndex - 1
+            Just selOrderIndex = elemIndex (s^.selectedLayerIndex) (s^.layerOrder)
+            newSelIndex = if selOrderIndex == orderIndex
+                          then newOrder !! (min (length newOrder - 1) selOrderIndex)
+                          else s^.selectedLayerIndex
             newOrder = catMaybes $ fixOrder <$> s^.layerOrder
             fixOrder i = if idx == i
                          then Nothing
