@@ -85,7 +85,8 @@ layerHud s = translateBy (Location (0, 4)) $
         layerOptions =
             let i = s^.selectedLayerIndex
                 entry n label =
-                    clickable n $ vLimit 1 $ str label <+> fill ' '
+                    clickable n $ vLimit 1 $ withDefAttr clickableAttr $
+                                             str label <+> fill ' '
             in vBox $ catMaybes
                  [ Just $ hBorderWithLabel (str "Layer Options")
                  , Just $ entry ToggleLayerVisible
