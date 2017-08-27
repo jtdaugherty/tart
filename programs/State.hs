@@ -4,6 +4,7 @@
 module State
   ( checkForMouseSupport
   , setTool
+  , setToolByChar
   , setFgPaletteIndex
   , setBgPaletteIndex
   , beginFgPaletteSelect
@@ -458,6 +459,13 @@ beginBgPaletteSelect = pushMode BgPaletteEntrySelect
 
 setTool :: AppState -> Tool -> AppState
 setTool s t = s & tool .~ t
+
+setToolByChar :: Char -> AppState -> AppState
+setToolByChar c s =
+    let idx = read [c]
+    in case filter ((== idx) . snd) tools of
+        [(t, _)] -> popMode $ setTool s t
+        _ -> s
 
 setFgPaletteIndex :: AppState -> Int -> AppState
 setFgPaletteIndex s i = popMode $ s & drawFgPaletteIndex .~ i
