@@ -35,7 +35,38 @@ Features
 - Set arbitrary canvas size
 - Full mouse interaction and keyboard shortcuts
 - Paste text from clipboard into canvas
-- Undo (`u` key) / redo (`r` key)
+- Undo and redo
+
+Keybindings
+===========
+
+Tools / styles:
+- `0`..`9`: select tool
+- `!`/`@`/`#`/`$`: select attribute style
+- `f`/`b`: open foreground / background palette selectors
+- `c`: set tool drawing character (where applicable)
+- `<`/`>`: decrease / increase tool size (where applicable)
+- `Esc`: cancel tool drag (e.g. box)
+
+Canvas:
+- `w`/`a`/`s`/`d`: move canvas
+- `C`: re-center canvas
+- `v`: set canvas size
+- `-`/`+`: decrease / increase canvas size
+
+Layers:
+- `C-a`: add new layer
+- `C-r`: rename current layer
+- `C-n`/`C-p`: select next/previous layer
+- `C-x`: delete selected layer
+- `C-u`/`C-d`: move current layer up / down
+- `C-v`: toggle selected layer's visibility
+
+General:
+- `q`: quit
+- `u`: undo
+- `r`: redo
+- OS paste: paste text into canvas
 
 How It Works
 ============
