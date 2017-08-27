@@ -13,6 +13,7 @@ module State
   , beginToolSelect
   , selectNextLayer
   , selectPrevLayer
+  , selectLayer
   , pushMode
   , popMode
   , increaseCanvasSize
@@ -54,6 +55,7 @@ module State
   , moveLayer
   , moveCurrentLayerDown
   , moveCurrentLayerUp
+  , cancelDragging
 
   , canvasMoveDown
   , canvasMoveUp
@@ -257,6 +259,14 @@ selectPrevLayer s =
                  then s^.selectedLayerIndex
                  else (s^.layerOrder) !! (selIndex - 1)
     in s & selectedLayerIndex .~ newSel
+
+selectLayer :: Int -> AppState -> AppState
+selectLayer idx s =
+    s & selectedLayerIndex .~ idx
+
+cancelDragging :: AppState -> AppState
+cancelDragging s =
+    s & dragging .~ Nothing
 
 deleteSelectedLayer :: AppState -> AppState
 deleteSelectedLayer s =

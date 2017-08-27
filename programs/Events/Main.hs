@@ -76,7 +76,7 @@ handleEvent s (MouseDown BoxStyleSelector _ _ _) = do
 handleEvent s (MouseDown Canvas _ _ (Location l)) = do
     continue =<< drawWithCurrentTool l s
 handleEvent s (MouseDown (SelectLayer idx) _ _ _) = do
-    continue $ s & selectedLayerIndex .~ idx
+    continue $ selectLayer idx s
 handleEvent s (MouseDown AddLayer _ _ _) = do
     continue =<< addLayer s
 handleEvent s (MouseDown CharSelector _ _ _) =
@@ -122,7 +122,7 @@ handleEvent s (VtyEvent (V.EvKey (V.KChar '+') [])) = do
 handleEvent s (VtyEvent (V.EvKey (V.KChar '-') [])) = do
     continue =<< decreaseCanvasSize s
 handleEvent s (VtyEvent (V.EvKey V.KEsc [])) | isJust (s^.dragging) = do
-    continue $ s & dragging .~ Nothing
+    continue $ cancelDragging s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'a') [V.MCtrl])) = do
     continue =<< addLayer s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'q') [])) = do
