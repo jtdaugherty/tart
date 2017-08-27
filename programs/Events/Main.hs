@@ -6,6 +6,7 @@ where
 
 import Brick
 import Data.Char (isDigit)
+import Data.Maybe (isJust)
 import qualified Graphics.Vty as V
 import Lens.Micro.Platform
 import Data.Text.Encoding (decodeUtf8)
@@ -120,7 +121,7 @@ handleEvent s (VtyEvent (V.EvKey (V.KChar '+') [])) = do
     continue =<< increaseCanvasSize s
 handleEvent s (VtyEvent (V.EvKey (V.KChar '-') [])) = do
     continue =<< decreaseCanvasSize s
-handleEvent s (VtyEvent (V.EvKey V.KEsc [])) = do
+handleEvent s (VtyEvent (V.EvKey V.KEsc [])) | isJust (s^.dragging) = do
     continue $ s & dragging .~ Nothing
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'a') [V.MCtrl])) = do
     continue =<< addLayer s
