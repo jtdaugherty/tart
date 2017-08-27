@@ -6,7 +6,7 @@ where
 import Brick
 
 import Types
-import Util
+import State
 
 import Events.Common
 

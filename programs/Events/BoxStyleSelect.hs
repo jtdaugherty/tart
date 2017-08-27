@@ -9,7 +9,7 @@ import qualified Graphics.Vty as V
 import Lens.Micro.Platform
 
 import Types
-import Util
+import State
 import Events.Common
 
 handleBoxStyleSelectEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)

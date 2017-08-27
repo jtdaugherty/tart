@@ -9,7 +9,7 @@ import Data.Monoid ((<>))
 import Lens.Micro.Platform
 
 import Types
-import Util
+import State
 import Draw
 import Events.Main
 

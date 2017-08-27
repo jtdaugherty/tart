@@ -11,7 +11,7 @@ import Brick.Focus
 import Brick.Widgets.Edit
 
 import Types
-import Util
+import State
 
 handleCanvasSizePromptEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
 handleCanvasSizePromptEvent s (VtyEvent (V.EvKey (V.KChar '\t') [])) =

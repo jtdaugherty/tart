@@ -10,7 +10,7 @@ import qualified Data.Text as T
 import Lens.Micro.Platform
 
 import Types
-import Util
+import State
 
 handleRenameLayerEvent :: AppState
                        -> BrickEvent Name AppEvent

@@ -21,7 +21,7 @@ import Lens.Micro.Platform
 import Types
 import UI.Common
 import Theme
-import Util
+import State
 import Tart.Canvas
 
 drawMainUI :: AppState -> [Widget Name]

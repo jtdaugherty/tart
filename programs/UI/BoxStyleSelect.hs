@@ -10,7 +10,7 @@ import Lens.Micro.Platform
 
 import Types
 import UI.Main
-import Util
+import State
 
 drawBoxStyleSelectUI :: AppState -> [Widget Name]
 drawBoxStyleSelectUI s =

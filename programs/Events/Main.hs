@@ -12,7 +12,7 @@ import Data.Text.Encoding (decodeUtf8)
 
 import Types
 import Draw
-import Util
+import State
 import Events.Common
 
 handleMainEvent :: AppState -> BrickEvent Name AppEvent -> EventM Name (Next AppState)

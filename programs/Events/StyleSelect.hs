@@ -7,7 +7,7 @@ import Brick
 import Lens.Micro.Platform
 
 import Types
-import Util
+import State
 import Events.Common
 
 handleStyleSelectEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)

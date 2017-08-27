@@ -11,7 +11,7 @@ import qualified Graphics.Vty as V
 
 import Types
 import UI.Main
-import Util
+import State
 import Theme
 
 drawStyleSelectUI :: AppState -> [Widget Name]

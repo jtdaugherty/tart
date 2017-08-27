@@ -1,7 +1,7 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TupleSections #-}
-module Util
+module State
   ( checkForMouseSupport
   , setTool
   , setFgPaletteIndex

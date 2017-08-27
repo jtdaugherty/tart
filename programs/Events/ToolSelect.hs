@@ -8,7 +8,7 @@ import Data.Char (isDigit)
 import qualified Graphics.Vty as V
 
 import Types
-import Util
+import State
 import Events.Common
 
 handleToolSelectEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)

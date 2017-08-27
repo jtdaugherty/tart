@@ -11,7 +11,7 @@ import Lens.Micro.Platform
 
 import Types
 import UI.Main
-import Util
+import State
 import Theme
 
 drawToolSelectUI :: AppState -> [Widget Name]

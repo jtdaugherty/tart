@@ -11,7 +11,7 @@ import Brick
 import Brick.Widgets.Edit
 
 import Types
-import Util
+import State
 
 handleAskToSaveEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
 handleAskToSaveEvent s (VtyEvent (V.EvKey V.KEsc [])) =

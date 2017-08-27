@@ -28,7 +28,7 @@ import Data.Maybe (catMaybes)
 
 import Types
 import Tart.Canvas
-import Util
+import State
 
 undo :: AppState -> EventM Name AppState
 undo s =

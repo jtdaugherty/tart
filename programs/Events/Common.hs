@@ -7,7 +7,7 @@ import Brick
 import qualified Graphics.Vty as V
 
 import Types
-import Util
+import State
 
 handleCommonEvent :: AppState -> BrickEvent Name e -> EventM Name (Maybe AppState)
 handleCommonEvent s (VtyEvent (V.EvKey (V.KChar 't') [])) = do

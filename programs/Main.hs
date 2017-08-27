@@ -12,7 +12,7 @@ import Data.Monoid ((<>))
 import System.Directory (doesFileExist)
 
 import App
-import Util
+import State
 import Tart.Canvas
 import Tart.Format
 
