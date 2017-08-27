@@ -67,58 +67,36 @@ handleEvent s (MouseDown n _ _ _) =
         AddLayer            -> addLayer s
         CharSelector        -> return $ whenTool s [Freehand, FloodFill] beginCharacterSelect
         _                   -> return s
-handleEvent s (VtyEvent e) | isStyleKey e =
-    continue $ toggleStyleFromKey e s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 'w') [])) =
-    continue $ canvasMoveDown s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 's') [])) =
-    continue $ canvasMoveUp s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 'a') [])) =
-    continue $ canvasMoveLeft s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 'd') [])) =
-    continue $ canvasMoveRight s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 'v') [])) =
-    continue $ beginCanvasSizePrompt s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 'r') [V.MCtrl])) =
-    continue $ beginLayerRename s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 'x') [V.MCtrl])) =
-    continue $ deleteSelectedLayer s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 'n') [V.MCtrl])) =
-    continue $ selectNextLayer s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 'p') [V.MCtrl])) =
-    continue $ selectPrevLayer s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 'u') [V.MCtrl])) =
-    continue $ moveCurrentLayerUp s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 'd') [V.MCtrl])) =
-    continue $ moveCurrentLayerDown s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 'v') [V.MCtrl])) =
-    continue $ toggleCurrentLayer s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 'C') [])) =
-    continue $ recenterCanvas s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 'f') [])) =
-    continue $ beginFgPaletteSelect s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 'b') [])) =
-    continue $ beginBgPaletteSelect s
-handleEvent s (VtyEvent (V.EvKey (V.KChar '>') [])) =
-    continue $ increaseToolSize s
-handleEvent s (VtyEvent (V.EvKey (V.KChar '<') [])) =
-    continue $ decreaseToolSize s
-handleEvent s (VtyEvent (V.EvKey (V.KChar '+') [])) =
-    continue =<< increaseCanvasSize s
-handleEvent s (VtyEvent (V.EvKey (V.KChar '-') [])) =
-    continue =<< decreaseCanvasSize s
-handleEvent s (VtyEvent (V.EvKey V.KEsc [])) | isJust (s^.dragging) =
-    continue $ cancelDragging s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 'a') [V.MCtrl])) =
-    continue =<< addLayer s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'q') [])) =
     quit True s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 'u') [])) =
-    continue =<< undo s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 'r') [])) =
-    continue =<< redo s
-handleEvent s (VtyEvent (V.EvKey (V.KChar c) [])) | isDigit c =
-    continue $ setToolByChar c s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 'c') [])) =
-    continue $ whenTool s [Freehand, FloodFill] beginCharacterSelect
+handleEvent s (VtyEvent e) =
+    continue =<< case e of
+        _ | isStyleKey e -> return $ toggleStyleFromKey e s
+        (V.EvKey (V.KChar 'w') []) -> return $ canvasMoveDown s
+        (V.EvKey (V.KChar 's') []) -> return $ canvasMoveUp s
+        (V.EvKey (V.KChar 'a') []) -> return $ canvasMoveLeft s
+        (V.EvKey (V.KChar 'd') []) -> return $ canvasMoveRight s
+        (V.EvKey (V.KChar 'v') []) -> return $ beginCanvasSizePrompt s
+        (V.EvKey (V.KChar 'r') [V.MCtrl]) -> return $ beginLayerRename s
+        (V.EvKey (V.KChar 'x') [V.MCtrl]) -> return $ deleteSelectedLayer s
+        (V.EvKey (V.KChar 'n') [V.MCtrl]) -> return $ selectNextLayer s
+        (V.EvKey (V.KChar 'p') [V.MCtrl]) -> return $ selectPrevLayer s
+        (V.EvKey (V.KChar 'u') [V.MCtrl]) -> return $ moveCurrentLayerUp s
+        (V.EvKey (V.KChar 'd') [V.MCtrl]) -> return $ moveCurrentLayerDown s
+        (V.EvKey (V.KChar 'v') [V.MCtrl]) -> return $ toggleCurrentLayer s
+        (V.EvKey (V.KChar 'C') []) -> return $ recenterCanvas s
+        (V.EvKey (V.KChar 'f') []) -> return $ beginFgPaletteSelect s
+        (V.EvKey (V.KChar 'b') []) -> return $ beginBgPaletteSelect s
+        (V.EvKey (V.KChar '>') []) -> return $ increaseToolSize s
+        (V.EvKey (V.KChar '<') []) -> return $ decreaseToolSize s
+        (V.EvKey V.KEsc []) | isJust (s^.dragging) -> return $ cancelDragging s
+        (V.EvKey (V.KChar c) []) | isDigit c -> return $ setToolByChar c s
+        (V.EvKey (V.KChar 'c') []) -> return $ whenTool s [Freehand, FloodFill]
+                                               beginCharacterSelect
+        (V.EvKey (V.KChar '+') []) -> increaseCanvasSize s
+        (V.EvKey (V.KChar '-') []) -> decreaseCanvasSize s
+        (V.EvKey (V.KChar 'a') [V.MCtrl]) -> addLayer s
+        (V.EvKey (V.KChar 'u') []) -> undo s
+        (V.EvKey (V.KChar 'r') []) -> redo s
+        _ -> return s
 handleEvent s _ = continue s
