@@ -41,6 +41,7 @@ module State
   , increaseRestyleSize
   , decreaseRestyleSize
   , pushUndo
+  , withUndo
   , toggleStyleFromKey
   , isStyleKey
   , styleBindings
@@ -148,6 +149,9 @@ increaseRestyleSize = (& restyleSize %~ succ)
 decreaseRestyleSize :: AppState -> AppState
 decreaseRestyleSize = (& restyleSize %~ (max 1 . pred))
 
+withUndo :: (AppState, [Action]) -> AppState
+withUndo (s, as) = pushUndo as s
+
 pushUndo :: [Action] -> AppState -> AppState
 pushUndo [] s = s
 pushUndo l s = s & undoStack %~ (l:)
@@ -162,8 +166,7 @@ beginLayerRename s =
 
 toggleCurrentLayer :: AppState -> AppState
 toggleCurrentLayer s =
-    let (s', as) = toggleLayer (s^.selectedLayerIndex) s
-    in pushUndo as s'
+    withUndo $ toggleLayer (s^.selectedLayerIndex) s
 
 toggleLayer :: Int -> AppState -> (AppState, [Action])
 toggleLayer idx s =
@@ -173,8 +176,7 @@ toggleLayer idx s =
 
 renameCurrentLayer :: T.Text -> AppState -> AppState
 renameCurrentLayer name s =
-    let (s', as) = renameLayer (s^.selectedLayerIndex) name s
-    in pushUndo as s'
+    withUndo $ renameLayer (s^.selectedLayerIndex) name s
 
 renameLayer :: Int -> T.Text -> AppState -> (AppState, [Action])
 renameLayer idx name s =
@@ -192,13 +194,11 @@ renameLayer idx name s =
 
 moveCurrentLayerDown :: AppState -> AppState
 moveCurrentLayerDown s =
-    let (s', as) = moveLayer (s^.selectedLayerIndex) False s
-    in pushUndo as s'
+    withUndo $ moveLayer (s^.selectedLayerIndex) False s
 
 moveCurrentLayerUp :: AppState -> AppState
 moveCurrentLayerUp s =
-    let (s', as) = moveLayer (s^.selectedLayerIndex) True s
-    in pushUndo as s'
+    withUndo $ moveLayer (s^.selectedLayerIndex) True s
 
 moveLayer :: Int -> Bool -> AppState -> (AppState, [Action])
 moveLayer idx up s =
@@ -238,8 +238,7 @@ selectPrevLayer s =
 
 deleteSelectedLayer :: AppState -> AppState
 deleteSelectedLayer s =
-    let (s', as) = deleteLayer (s^.selectedLayerIndex) s
-    in pushUndo as s'
+    withUndo $ deleteLayer (s^.selectedLayerIndex) s
 
 deleteLayer :: Int -> AppState -> (AppState, [Action])
 deleteLayer idx s
@@ -489,8 +488,7 @@ addLayer s = do
         orderIndex = length (s^.layerOrder)
 
     c <- liftIO $ newCanvas (s^.appCanvasSize)
-    let (s', as) = insertLayer c idx orderIndex layerName s
-    return $ pushUndo as s'
+    return $ withUndo $ insertLayer c idx orderIndex layerName s
 
 currentPaletteAttribute :: AppState -> V.Attr
 currentPaletteAttribute s =

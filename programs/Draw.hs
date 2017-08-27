@@ -141,8 +141,7 @@ drawTextAtPoint point t s = do
         pixs = zip ([startCol..]) (truncateText point t s)
         many = mkEntry <$> pixs
         mkEntry (col, (ch, attr)) = ((col, row), ch, attr)
-    (s', old) <- drawMany many currentLayer (Just $ s^.selectedLayerIndex) s
-    return $ pushUndo old s'
+    withUndo <$> drawMany many currentLayer (Just $ s^.selectedLayerIndex) s
 
 findFgPaletteEntry :: V.Attr -> AppState -> Int
 findFgPaletteEntry a s =
@@ -202,8 +201,7 @@ drawAtPoint point s =
 
 drawAtPoint' :: (Int, Int) -> Char -> V.Attr -> AppState -> EventM Name AppState
 drawAtPoint' point ch attr s = do
-    (s', old) <- drawMany [(point, ch, attr)] currentLayer (Just $ s^.selectedLayerIndex) s
-    return $ pushUndo old s'
+    withUndo <$> drawMany [(point, ch, attr)] currentLayer (Just $ s^.selectedLayerIndex) s
 
 drawMany :: [((Int, Int), Char, V.Attr)]
          -> Lens' AppState Canvas
@@ -242,8 +240,7 @@ eraseAtPoint :: (Int, Int) -> Int -> AppState -> EventM Name AppState
 eraseAtPoint point sz s = do
     let points = makeBoxAboutPoint point sz
         pixels = (, ' ', V.defAttr) <$> points
-    (s', old) <- drawMany pixels currentLayer (Just $ s^.selectedLayerIndex) s
-    return $ pushUndo old s'
+    withUndo <$> drawMany pixels currentLayer (Just $ s^.selectedLayerIndex) s
 
 repaintAtPoint :: (Int, Int) -> Int -> AppState -> EventM Name AppState
 repaintAtPoint point sz s = do
@@ -252,8 +249,7 @@ repaintAtPoint point sz s = do
         getPixel p = let old = canvasGetPixel (s^.currentLayer) p
                      in (p, old^._1, attr { V.attrStyle = V.attrStyle $ old^._2 })
         pixels = getPixel <$> points
-    (s', old) <- drawMany pixels currentLayer (Just $ s^.selectedLayerIndex) s
-    return $ pushUndo old s'
+    withUndo <$> drawMany pixels currentLayer (Just $ s^.selectedLayerIndex) s
 
 restyleAtPoint :: (Int, Int) -> Int -> AppState -> EventM Name AppState
 restyleAtPoint point sz s = do
@@ -262,8 +258,7 @@ restyleAtPoint point sz s = do
         getPixel p = let old = canvasGetPixel (s^.currentLayer) p
                      in (p, old^._1, (old^._2) { V.attrStyle = V.attrStyle attr })
         pixels = getPixel <$> points
-    (s', old) <- drawMany pixels currentLayer (Just $ s^.selectedLayerIndex) s
-    return $ pushUndo old s'
+    withUndo <$> drawMany pixels currentLayer (Just $ s^.selectedLayerIndex) s
 
 drawBox :: BorderStyle
         -> Location
