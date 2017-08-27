@@ -14,7 +14,7 @@ tart - terminal art program
 Tart is a program that provides an image-editor-like interface to
 creating ASCII art - in the terminal, with your mouse!
 
-![](screenshots/1.png)
+![](screenshots/2.png)
 
 Features
 ========
