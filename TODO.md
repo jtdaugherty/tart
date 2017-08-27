@@ -12,7 +12,6 @@
 - Layers
   - UI for hiding/showing layers
   - Keybinding to toggle layer list?
-  - Make layer actions undoable
 
 - Add a keybinding to open the style selector
 
