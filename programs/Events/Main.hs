@@ -54,6 +54,10 @@ handleEvent s (VtyEvent (V.EvKey (V.KChar 'x') [V.MCtrl])) = do
     continue $ deleteSelectedLayer s
 handleEvent s (MouseDown DeleteLayer _ _ _) = do
     continue $ deleteSelectedLayer s
+handleEvent s (VtyEvent (V.EvKey (V.KChar 'n') [V.MCtrl])) = do
+    continue $ selectNextLayer s
+handleEvent s (VtyEvent (V.EvKey (V.KChar 'p') [V.MCtrl])) = do
+    continue $ selectPrevLayer s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'u') [V.MCtrl])) = do
     continue $ moveCurrentLayerUp s
 handleEvent s (MouseDown MoveLayerUp _ _ _) = do

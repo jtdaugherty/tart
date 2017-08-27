@@ -9,6 +9,8 @@ module State
   , beginFgPaletteSelect
   , beginBgPaletteSelect
   , beginToolSelect
+  , selectNextLayer
+  , selectPrevLayer
   , pushMode
   , popMode
   , increaseCanvasSize
@@ -213,6 +215,26 @@ moveLayer idx up s =
                              drop newIndex dropped
                   act = MoveLayerBy idx (not up)
               in (s & canvasDirty .~ True & layerOrder .~ newOrder, [act])
+
+selectNextLayer :: AppState -> AppState
+selectNextLayer s =
+    -- Find the selected layer in the layer ordering.
+    let Just selIndex = elemIndex (s^.selectedLayerIndex) (s^.layerOrder)
+    -- Then select the next layer, if any.
+        newSel = if selIndex == length (s^.layerOrder) - 1
+                 then s^.selectedLayerIndex
+                 else (s^.layerOrder) !! (selIndex + 1)
+    in s & selectedLayerIndex .~ newSel
+
+selectPrevLayer :: AppState -> AppState
+selectPrevLayer s =
+    -- Find the selected layer in the layer ordering.
+    let Just selIndex = elemIndex (s^.selectedLayerIndex) (s^.layerOrder)
+    -- Then select the previous layer, if any.
+        newSel = if selIndex == 0
+                 then s^.selectedLayerIndex
+                 else (s^.layerOrder) !! (selIndex - 1)
+    in s & selectedLayerIndex .~ newSel
 
 deleteSelectedLayer :: AppState -> AppState
 deleteSelectedLayer s =
