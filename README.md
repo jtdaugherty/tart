@@ -28,6 +28,7 @@ Features
 - Drawing tools: freehand, box, flood fill, text string
 - Utility tools: repaint, restyle, eyedropper, eraser
 - Multiple graphical styles for boxes
+- Named image layers with reordering, visibility toggling
 - Character selection for freehand and flood fill tools
 - Set foreground color, background color, and text style independently
 - Text styles: bold, blink, underline, reverse video
