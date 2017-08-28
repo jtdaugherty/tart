@@ -9,9 +9,6 @@
 
 - HTML output mode?
 
-- Layers
-  - Keybinding to toggle layer list?
-
 -----------------------------------------------------------------
 Dealing with the larger color space:
 
