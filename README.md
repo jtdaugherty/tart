@@ -37,6 +37,18 @@ Features
 - Paste text from clipboard into canvas
 - Undo and redo
 
+Terminal Emulator Support
+=========================
+
+`tart` has been tested extensively with the following terminal emulators
+and is known to work well with them:
+
+ * OS X: `iTerm2`
+ * OS X: `Terminal.app`
+
+Please let me know if you use `tart` with another emulator and let me
+know how well it works!
+
 Keybindings
 ===========
 
