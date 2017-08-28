@@ -76,6 +76,7 @@ handleEvent s (VtyEvent e) =
         (V.EvKey (V.KChar 's') []) -> return $ canvasMoveUp s
         (V.EvKey (V.KChar 'a') []) -> return $ canvasMoveLeft s
         (V.EvKey (V.KChar 'd') []) -> return $ canvasMoveRight s
+        (V.EvKey (V.KChar 'y') []) -> return $ beginStyleSelect s
         (V.EvKey (V.KChar 'v') []) -> return $ beginCanvasSizePrompt s
         (V.EvKey (V.KChar 'r') [V.MCtrl]) -> return $ beginLayerRename s
         (V.EvKey (V.KChar 'x') [V.MCtrl]) -> return $ deleteSelectedLayer s

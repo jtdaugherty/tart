@@ -12,8 +12,6 @@
 - Layers
   - Keybinding to toggle layer list?
 
-- Add a keybinding to open the style selector
-
 -----------------------------------------------------------------
 Dealing with the larger color space:
 

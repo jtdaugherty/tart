@@ -165,7 +165,7 @@ drawBoxStyleSelector s =
 drawStyleSelector :: AppState -> Widget Name
 drawStyleSelector s =
     clickable StyleSelector $
-    borderWithLabel (str "Style") $
+    borderWithLabel (str "St" <+> (withDefAttr keybindingAttr $ str "y") <+> str "le") $
     hLimit styleSelectorEntryWidth $
     hCenter $ raw $ V.string (V.defAttr `V.withStyle` (s^.drawStyle)) "demo"
 

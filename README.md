@@ -42,6 +42,7 @@ Keybindings
 
 Tools / styles:
 - `0`..`9`: select tool
+- `y`: open the attribute style selector
 - `!`/`@`/`#`/`$`: select attribute style
 - `f`/`b`: open foreground / background palette selectors
 - `c`: set tool drawing character (where applicable)
