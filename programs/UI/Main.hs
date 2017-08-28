@@ -240,7 +240,7 @@ canvas s =
        if null appLayers
           then raw $ V.charFill V.defAttr ' ' (sz^._1) (sz^._2)
           else clickable Canvas $
-               raw $ canvasToImage appLayers
+               raw $ canvasLayersToImage appLayers
 
 shouldUseOverlay :: AppState -> Bool
 shouldUseOverlay s =

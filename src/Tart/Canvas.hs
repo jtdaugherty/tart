@@ -16,7 +16,7 @@ module Tart.Canvas
   , merge
   , clearCanvas
   , canvasFromText
-  , canvasToImage
+  , canvasLayersToImage
   , normalizeAttr
   )
 where
@@ -373,9 +373,9 @@ merge dest src = do
 --
 -- The result will be as high as the least tall input canvas, and as
 -- wide as the least wide input canvas.
-canvasToImage :: [Canvas] -> V.Image
-canvasToImage [] = V.emptyImage
-canvasToImage cs =
+canvasLayersToImage :: [Canvas] -> V.Image
+canvasLayersToImage [] = V.emptyImage
+canvasLayersToImage cs =
     let sizes = canvasSize <$> cs
         smallestSize = ( minimum $ fst <$> sizes
                        , minimum $ snd <$> sizes
@@ -387,7 +387,7 @@ canvasToImage cs =
     in V.vertCat rows
 
 findPixel :: [Canvas] -> (Int, Int) -> (Char, V.Attr)
-findPixel [] _ = error "BUG: canvasToImage got no layers"
+findPixel [] _ = error "BUG: canvasLayersToImage got no layers"
 findPixel [l] point = canvasGetPixel l point
 findPixel (l:ls) point =
     let pix = canvasGetPixel l point
