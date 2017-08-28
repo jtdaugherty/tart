@@ -13,8 +13,7 @@ import Brick.Widgets.Border.Style
 import Brick.Widgets.Center
 import Data.Monoid ((<>))
 import qualified Data.Text as T
-import qualified Data.Map as M
-import Data.Maybe (isJust, fromJust, catMaybes, fromMaybe)
+import Data.Maybe (isJust, catMaybes, fromMaybe)
 import qualified Graphics.Vty as V
 import Lens.Micro.Platform
 
@@ -62,15 +61,14 @@ layerHud s = translateBy (Location (0, 4)) $
                            (mkEntry <$> entries) <>
                            [addLayerEntry]
         entries = [ ( i
-                    , fromJust $ M.lookup i $ s^.layerNames
-                    , fromJust $ s^.layerVisible.at i
+                    , s^.layerInfoFor(i)
                     )
                   | i <- s^.layerOrder
                   ]
         addLayerEntry =
             clickable AddLayer $ hCenter $
               withDefAttr clickableAttr $ str "Add Layer (C-a)"
-        mkEntry (idx, name, vis) =
+        mkEntry (idx, LayerInfo name vis) =
             if RenameLayer `elem` s^.modes && s^.selectedLayerIndex == idx
                then
                    renderEditor (txt . T.concat) True (s^.layerNameEditor)
@@ -93,7 +91,7 @@ layerHud s = translateBy (Location (0, 4)) $
             in vBox $ catMaybes
                  [ Just $ hBorderWithLabel (str "Layer Options")
                  , Just $ entry ToggleLayerVisible
-                            (if (s^.layerVisible.at i) == Just True
+                            (if s^.layerInfoFor(i).layerVisible
                              then "Hide (C-v)"
                              else "Show (C-v)")
                  , if i /= head (s^.layerOrder)
@@ -212,7 +210,7 @@ drawPaletteSelector s isFg =
 canvas :: AppState -> Widget Name
 canvas s =
     let appLayers = concat
-            [ if s^.layerVisible.at idx == Just True
+            [ if s^.layerInfoFor(idx).layerVisible
               then if shouldUseOverlay s && idx == s^.selectedLayerIndex
                    then [s^.drawingOverlay, s^.layerAt idx]
                    else [s^.layerAt idx]

@@ -10,6 +10,10 @@ module Types
   , toolName
   , isSelectionMode
 
+  , LayerInfo(..)
+  , layerName
+  , layerVisible
+
   , noStyle
   , setStyle
   , clearStyle
@@ -20,9 +24,9 @@ module Types
   , layers
   , currentLayer
   , layerAt
+  , layerInfoFor
   , layerOrder
-  , layerVisible
-  , layerNames
+  , layerInfo
   , layerNameEditor
   , selectedLayerIndex
   , drawingOverlay
@@ -188,11 +192,17 @@ clearStyle old dest = dest .&. complement old
 noStyle :: V.Style
 noStyle = 0
 
+data LayerInfo =
+    LayerInfo { _layerName :: String
+              , _layerVisible :: Bool
+              }
+
+makeLenses ''LayerInfo
+
 data AppState =
     AppState { _layers                  :: M.Map Int Canvas
              , _layerOrder              :: [Int]
-             , _layerVisible            :: M.Map Int Bool
-             , _layerNames              :: M.Map Int String
+             , _layerInfo               :: M.Map Int LayerInfo
              , _drawingOverlay          :: Canvas
              , _selectedLayerIndex      :: Int
              , _appCanvasSize           :: (Int, Int)
@@ -240,6 +250,11 @@ layerAt :: Int -> Lens' AppState Canvas
 layerAt i =
     lens (\s   -> fromJust $ s^.layers.at i)
          (\s c -> s & layers.at i .~ Just c)
+
+layerInfoFor :: Int -> Lens' AppState LayerInfo
+layerInfoFor i =
+    lens (\s   -> fromJust $ s^.layerInfo.at i)
+         (\s v -> s & layerInfo.at i .~ Just v)
 
 currentMode :: AppState -> Mode
 currentMode s = case _modes s of

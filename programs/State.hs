@@ -193,7 +193,7 @@ pushUndo l s = s & undoStack %~ (l:)
 beginLayerRename :: AppState -> AppState
 beginLayerRename s =
     let z = textZipper [line] (Just 1)
-        line = T.pack $ fromJust $ s^.layerNames.at (s^.selectedLayerIndex)
+        line = T.pack $ s^.layerInfoFor(s^.selectedLayerIndex).layerName
     in pushMode RenameLayer $
         s & layerNameEditor.editContentsL .~ gotoEOL z
 
@@ -203,7 +203,7 @@ toggleCurrentLayer s =
 
 toggleLayer :: Int -> AppState -> (AppState, [Action])
 toggleLayer idx s =
-    ( s & layerVisible.ix idx %~ not
+    ( s & layerInfoFor(idx).layerVisible %~ not
     , [ToggleLayer idx]
     )
 
@@ -214,14 +214,14 @@ renameCurrentLayer name s =
 renameLayer :: Int -> T.Text -> AppState -> (AppState, [Action])
 renameLayer idx name s =
     let newName = T.unpack name
-        Just oldName = s^.layerNames.at idx
+        oldName = s^.layerInfoFor(idx).layerName
         act = ChangeLayerName idx (T.pack oldName)
     in if null newName
        then (s, [])
        else if newName == oldName
             then (popMode s, [])
             else (popMode $
-                   s & layerNames.at idx .~ Just (T.unpack name)
+                   s & layerInfoFor(idx).layerName .~ T.unpack name
                      & canvasDirty .~ True
                  , [act])
 
@@ -305,20 +305,18 @@ deleteLayer idx s
             act = InsertLayer (s^.layerAt idx)
                               idx
                               orderIndex
-                              (fromJust $ s^.layerNames.at idx)
+                              (_layerName $ fromJust $ s^.layerInfo.at idx)
 
         in (-- Change the selected index
            s & selectedLayerIndex .~ newSelIndex
              -- Remove the layer from the layer map, fix indices
              & layers %~ fixNameKeys
-             -- Remove the layer from the layer visibility map, fix
-             -- indices
-             & layerVisible %~ fixNameKeys
              -- Reassign all higher indices in name map, ordering list,
              -- layer map
              & layerOrder .~ newOrder
-             -- Remove the name, fix indices
-             & layerNames %~ fixNameKeys
+             -- Remove the layer from the layer visibility map, fix
+             -- indices
+             & layerInfo %~ fixNameKeys
            , [act])
 
 insertLayer :: Canvas -> Int -> Int -> String -> AppState -> (AppState, [Action])
@@ -342,9 +340,8 @@ insertLayer c newIdx orderIndex name s =
     in (
        s & selectedLayerIndex .~ newSelIndex
          & layers %~ (M.insert newIdx c . fixNameKeys)
-         & layerVisible %~ (M.insert newIdx True . fixNameKeys)
          & layerOrder .~ newOrder
-         & layerNames %~ (M.insert newIdx name . fixNameKeys)
+         & layerInfo %~ (M.insert newIdx (LayerInfo name True) . fixNameKeys)
        , [act])
 
 quit :: Bool -> AppState -> EventM Name (Next AppState)
@@ -362,7 +359,7 @@ quit ask s = do
                     else do
                         let ls = snd <$> (sortOn fst $ M.toList $ s^.layers)
                         liftIO $ writeCanvasFiles p ls (s^.layerOrder)
-                                    (snd <$> (sortOn fst $ M.toList $ s^.layerNames))
+                                    (_layerName <$> snd <$> (sortOn fst $ M.toList $ s^.layerInfo))
                         halt s
         False -> halt s
 
@@ -534,12 +531,12 @@ recenterCanvas s =
 
 addLayer :: AppState -> EventM Name AppState
 addLayer s = do
-    let layerName = "layer " <> (show $ idx + 1)
+    let newLayerName = "layer " <> (show $ idx + 1)
         idx = M.size $ s^.layers
         orderIndex = length (s^.layerOrder)
 
     c <- liftIO $ newCanvas (s^.appCanvasSize)
-    return $ withUndo $ insertLayer c idx orderIndex layerName s
+    return $ withUndo $ insertLayer c idx orderIndex newLayerName s
 
 currentPaletteAttribute :: AppState -> V.Attr
 currentPaletteAttribute s =

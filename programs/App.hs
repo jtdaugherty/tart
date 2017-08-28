@@ -62,9 +62,7 @@ mkInitialState chan mc = do
     overlay <- newCanvas sz
 
     return $ AppState { _layers                  = M.fromList $ zip [0..] cs
-                      , _layerNames              = M.fromList $ zip [0..] names
-                      , _layerVisible            = M.fromList $ zip [0..length cs-1]
-                                                                    (repeat True)
+                      , _layerInfo               = M.fromList $ zip [0..] (LayerInfo <$> names <*> pure True)
                       , _layerOrder              = order
                       , _drawingOverlay          = overlay
                       , _selectedLayerIndex      = head order
