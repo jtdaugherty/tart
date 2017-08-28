@@ -85,9 +85,9 @@ readTartFile path = do
 writeTartFile :: OutputFormat -> TartFile -> FilePath -> IO ()
 writeTartFile format =
     case format of
-          FormatPlain     -> writeCanvasPretty False
-          FormatAnsiColor -> writeCanvasPretty True
-          FormatBinary    -> writeCanvasBinary
+          FormatPlain     -> writeTartFilePretty False
+          FormatAnsiColor -> writeTartFilePretty True
+          FormatBinary    -> writeTartFileBinary
 
 sortedCanvases :: [Int] -> [Canvas] -> [Canvas]
 sortedCanvases order cs =
@@ -98,10 +98,10 @@ tartFileCanvasesSorted tf =
     sortedCanvases (tartFileCanvasOrder tf)
                    (tartFileCanvasList tf)
 
-writeCanvasPretty :: Bool -> TartFile -> FilePath -> IO ()
-writeCanvasPretty color tf path =
+writeTartFilePretty :: Bool -> TartFile -> FilePath -> IO ()
+writeTartFilePretty color tf path =
     writeFile path $ prettyPrintCanvas color $ tartFileCanvasesSorted tf
 
-writeCanvasBinary :: TartFile -> FilePath -> IO ()
-writeCanvasBinary tf path =
+writeTartFileBinary :: TartFile -> FilePath -> IO ()
+writeTartFileBinary tf path =
     BS.writeFile path $ BSL.toStrict $ B.runPut $ B.put (tartFileToData tf)
