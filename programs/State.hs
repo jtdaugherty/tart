@@ -57,6 +57,7 @@ module State
   , moveCurrentLayerDown
   , moveCurrentLayerUp
   , cancelDragging
+  , toggleLayerList
 
   , canvasMoveDown
   , canvasMoveUp
@@ -528,6 +529,10 @@ recenterCanvas :: AppState -> AppState
 recenterCanvas s =
     let sz = s^.appCanvasSize
     in s & canvasOffset .~ (Location $ sz & each %~ (`div` 2))
+
+toggleLayerList :: AppState -> AppState
+toggleLayerList s =
+    s & layerListVisible %~ not
 
 addLayer :: AppState -> EventM Name AppState
 addLayer s = do

@@ -35,6 +35,7 @@ module Types
   , tool
   , drawFgPaletteIndex
   , drawBgPaletteIndex
+  , layerListVisible
   , appCanvasSize
   , palette
   , drawCharacter
@@ -203,6 +204,7 @@ data AppState =
     AppState { _layers                  :: M.Map Int Canvas
              , _layerOrder              :: [Int]
              , _layerInfo               :: M.Map Int LayerInfo
+             , _layerListVisible        :: Bool
              , _drawingOverlay          :: Canvas
              , _selectedLayerIndex      :: Int
              , _appCanvasSize           :: (Int, Int)

@@ -72,6 +72,7 @@ handleEvent s (VtyEvent (V.EvKey (V.KChar 'q') [])) =
 handleEvent s (VtyEvent e) =
     continue =<< case e of
         _ | isStyleKey e -> return $ toggleStyleFromKey e s
+        (V.EvKey (V.KChar 'l') [V.MCtrl]) -> return $ toggleLayerList s
         (V.EvKey (V.KChar 'w') []) -> return $ canvasMoveDown s
         (V.EvKey (V.KChar 's') []) -> return $ canvasMoveUp s
         (V.EvKey (V.KChar 'a') []) -> return $ canvasMoveLeft s

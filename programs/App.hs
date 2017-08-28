@@ -65,6 +65,7 @@ mkInitialState chan mc = do
                       , _layerInfo               = M.fromList $ zip [0..] (LayerInfo <$> names <*> pure True)
                       , _layerOrder              = order
                       , _drawingOverlay          = overlay
+                      , _layerListVisible        = True
                       , _selectedLayerIndex      = head order
                       , _modes                   = [Main]
                       , _tool                    = Freehand

@@ -25,10 +25,10 @@ import Tart.Canvas
 
 drawMainUI :: AppState -> [Widget Name]
 drawMainUI s =
-    [ topHud s
-    , layerHud s
-    , canvas s
-    ]
+    catMaybes [ Just $ topHud s
+              , if s^.layerListVisible then Just $ layerHud s else Nothing
+              , Just $ canvas s
+              ]
 
 topHud :: AppState -> Widget Name
 topHud s =
@@ -218,7 +218,11 @@ canvas s =
             | idx <- s^.layerOrder
             ]
         sz = s^.appCanvasSize
-    in centerAbout (s^.canvasOffset & _2 %~ pred & _1 %~ (subtract 10)) $
+        widthAdjust = if s^.layerListVisible
+                      then 10
+                      else 0
+    in centerAbout (s^.canvasOffset & _2 %~ pred
+                                    & _1 %~ (subtract widthAdjust)) $
        updateAttrMap (applyAttrMappings [(borderAttr, fg V.white)]) $
        setAvailableSize (sz & each %~ (+ 2)) $
        border $

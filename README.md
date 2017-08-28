@@ -62,6 +62,7 @@ Layers:
 - `C-x`: delete selected layer
 - `C-u`/`C-d`: move current layer up / down
 - `C-v`: toggle selected layer's visibility
+- `C-l`: toggle visibility of layer list
 
 General:
 - `q`: quit
