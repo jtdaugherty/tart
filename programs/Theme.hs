@@ -26,6 +26,6 @@ theme = attrMap defAttr
   [ (keybindingAttr,        fg white `withStyle` underline)
   , (editAttr,              black `on` yellow)
   , (editFocusedAttr,       black `on` yellow)
-  , (selectedLayerAttr,     black `on` magenta)
+  , (selectedLayerAttr,     white `on` magenta)
   , (clickableAttr,         fg white `withStyle` bold)
   ]
