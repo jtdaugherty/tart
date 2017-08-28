@@ -7,25 +7,17 @@ module Tart.Format
   )
 where
 
-import qualified Data.Binary as B
+import Data.Monoid ((<>))
 import qualified Data.Binary.Put as B
 import qualified Data.Binary.Get as B
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as BSL
 
 import Tart.Canvas
-
-data TartFile =
-    TartFile { tartFileCanvasList  :: [Canvas]
-             , tartFileCanvasNames :: [String]
-             , tartFileCanvasOrder :: [Int]
-             }
-
-data TartFileData =
-    TartFileData { tartFileDataCanvasData  :: [CanvasData]
-                 , tartFileDataCanvasNames :: [String]
-                 , tartFileDataCanvasOrder :: [Int]
-                 }
+import Tart.Format.Types
+import Tart.Format.V0
+import Tart.Format.V1
+import Tart.Format.V2
 
 data OutputFormat =
     FormatBinary
@@ -33,53 +25,31 @@ data OutputFormat =
     | FormatPlain
     deriving (Eq, Show, Read)
 
-instance B.Binary TartFileData where
-    put d = do
-        B.put $ tartFileDataCanvasData d
-        B.put $ tartFileDataCanvasNames d
-        B.put $ tartFileDataCanvasOrder d
-    get =
-        TartFileData <$> B.get
-                     <*> B.get
-                     <*> B.get
-
-tartFileToData :: TartFile -> TartFileData
-tartFileToData tf =
-    TartFileData (canvasToData <$> tartFileCanvasList tf)
-                 (tartFileCanvasNames tf)
-                 (tartFileCanvasOrder tf)
-
-tartFileFromData :: TartFileData -> IO (Either String TartFile)
-tartFileFromData d = do
-    let loadCanvases [] = return $ Right []
-        loadCanvases (cd:cds) = do
-            result <- canvasFromData cd
-            case result of
-                Left e -> return $ Left e
-                Right c -> do
-                    rest <- loadCanvases cds
-                    case rest of
-                        Left e -> return $ Left e
-                        Right cs -> return $ Right $ c : cs
-
-    result <- loadCanvases (tartFileDataCanvasData d)
-    case result of
-        Left s -> return $ Left s
-        Right cs -> return $ Right $ TartFile cs (tartFileDataCanvasNames d)
-                                                 (tartFileDataCanvasOrder d)
+formats :: [TartFileFormat]
+formats =
+    [ version2Format
+    , version1Format
+    , version0Format
+    ]
 
 readTartFile :: FilePath -> IO (Either String TartFile)
 readTartFile path = do
     bs <- BS.readFile path
-    case B.runGetOrFail B.get (BSL.fromStrict bs) of
-        Left (_, _, s) -> return $ Left s
+    readTartFile' (BSL.fromStrict bs) path formats
+
+readTartFile' :: BSL.ByteString -> FilePath -> [TartFileFormat] -> IO (Either String TartFile)
+readTartFile' _ path [] = return $ Left $ path <> ": could not load file"
+readTartFile' bs path ((BinaryFormatVersion parser converter):fmts) = do
+    let tryNextFormat = readTartFile' bs path fmts
+    case B.runGetOrFail parser bs of
+        Left _ -> tryNextFormat
         Right (remaining, _, d) ->
             case BSL.null remaining of
-                False -> return $ Left "File contained unused bytes"
+                False -> tryNextFormat
                 True -> do
-                    result <- tartFileFromData d
+                    result <- converter d
                     case result of
-                        Left msg -> return $ Left msg
+                        Left _ -> tryNextFormat
                         Right tf -> return $ Right tf
 
 writeTartFile :: OutputFormat -> TartFile -> FilePath -> IO ()
@@ -104,4 +74,7 @@ writeTartFilePretty color tf path =
 
 writeTartFileBinary :: TartFile -> FilePath -> IO ()
 writeTartFileBinary tf path =
-    BS.writeFile path $ BSL.toStrict $ B.runPut $ B.put (tartFileToData tf)
+    BS.writeFile path $ BSL.toStrict $ B.runPut $ latestVersionEncoder tf
+
+latestVersionEncoder :: TartFile -> B.Put
+latestVersionEncoder = encodeVersion2

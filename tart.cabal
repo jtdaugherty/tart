@@ -19,6 +19,10 @@ library
   exposed-modules:
                        Tart.Canvas
                        Tart.Format
+                       Tart.Format.Types
+                       Tart.Format.V0
+                       Tart.Format.V1
+                       Tart.Format.V2
   build-depends:       base >=4.9 && < 5,
                        array,
                        binary,
