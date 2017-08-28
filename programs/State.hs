@@ -16,6 +16,7 @@ module State
   , selectLayer
   , pushMode
   , popMode
+  , toolSize
   , increaseCanvasSize
   , decreaseCanvasSize
   , increaseToolSize
@@ -154,6 +155,14 @@ decreaseToolSize s =
               Eraser  -> decreaseEraserSize
               _ -> id
     in f s
+
+toolSize :: AppState -> Maybe Int
+toolSize s =
+    case s^.tool of
+        Repaint -> Just $ s^.repaintSize
+        Restyle -> Just $ s^.restyleSize
+        Eraser  -> Just $ s^.eraserSize
+        _ -> Nothing
 
 increaseEraserSize :: AppState -> AppState
 increaseEraserSize = (& eraserSize %~ succ)

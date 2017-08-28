@@ -14,7 +14,7 @@ import Brick.Widgets.Center
 import Data.Monoid ((<>))
 import qualified Data.Text as T
 import qualified Data.Map as M
-import Data.Maybe (isJust, fromJust, catMaybes)
+import Data.Maybe (isJust, fromJust, catMaybes, fromMaybe)
 import qualified Graphics.Vty as V
 import Lens.Micro.Platform
 
@@ -140,34 +140,21 @@ boxHud :: AppState -> Widget Name
 boxHud = drawBoxStyleSelector
 
 eraserHud :: AppState -> Widget Name
-eraserHud = drawEraserSize
+eraserHud = drawToolSize
 
 repaintHud :: AppState -> Widget Name
-repaintHud = drawRepaintSize
+repaintHud = drawToolSize
 
 restyleHud :: AppState -> Widget Name
-restyleHud = drawRestyleSize
+restyleHud = drawToolSize
 
-drawEraserSize :: AppState -> Widget Name
-drawEraserSize s =
-    let inc = clickable IncreaseEraserSize $ withDefAttr keybindingAttr $ str ">>"
-        dec = clickable DecreaseEraserSize $ withDefAttr keybindingAttr $ str "<<"
+drawToolSize :: AppState -> Widget Name
+drawToolSize s =
+    let inc = clickable IncreaseToolSize $ withDefAttr keybindingAttr $ str ">>"
+        dec = clickable DecreaseToolSize $ withDefAttr keybindingAttr $ str "<<"
+        sz = fromMaybe (error "BUG: current tool has no size") $ toolSize s
     in borderWithLabel (str "Size") $
-       dec <+> (hLimit 5 $ hCenter $ str $ show $ s^.eraserSize) <+> inc
-
-drawRepaintSize :: AppState -> Widget Name
-drawRepaintSize s =
-    let inc = clickable IncreaseRepaintSize $ withDefAttr keybindingAttr $ str ">>"
-        dec = clickable DecreaseRepaintSize $ withDefAttr keybindingAttr $ str "<<"
-    in borderWithLabel (str "Size") $
-       dec <+> (hLimit 5 $ hCenter $ str $ show $ s^.repaintSize) <+> inc
-
-drawRestyleSize :: AppState -> Widget Name
-drawRestyleSize s =
-    let inc = clickable IncreaseRestyleSize $ withDefAttr keybindingAttr $ str ">>"
-        dec = clickable DecreaseRestyleSize $ withDefAttr keybindingAttr $ str "<<"
-    in borderWithLabel (str "Size") $
-       dec <+> (hLimit 5 $ hCenter $ str $ show $ s^.restyleSize) <+> inc
+       dec <+> (hLimit 5 $ hCenter $ str $ show sz) <+> inc
 
 drawBoxStyleSelector :: AppState -> Widget Name
 drawBoxStyleSelector s =

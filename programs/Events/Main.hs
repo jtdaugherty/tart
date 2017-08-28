@@ -41,12 +41,16 @@ handleEvent s (VtyEvent (V.EvPaste bytes)) =
     continue =<< pasteTextAtPoint (0, 0) s (decodeUtf8 bytes)
 handleEvent s (AppEvent (DragFinished n _ _)) =
     continue =<< handleDragFinished s n
-handleEvent s (MouseDown Canvas _ _ (Location l)) =
-    continue =<< drawWithCurrentTool l s
+handleEvent s (VtyEvent (V.EvMouseDown _ _ V.BScrollUp _)) =
+    continue $ increaseToolSize s
+handleEvent s (VtyEvent (V.EvMouseDown _ _ V.BScrollDown _)) =
+    continue $ decreaseToolSize s
 handleEvent s (MouseDown _ V.BScrollUp _ _) =
     continue $ increaseToolSize s
 handleEvent s (MouseDown _ V.BScrollDown _ _) =
     continue $ decreaseToolSize s
+handleEvent s (MouseDown Canvas _ _ (Location l)) =
+    continue =<< drawWithCurrentTool l s
 handleEvent s (MouseDown n _ _ _) =
     continue =<< case n of
         LayerName           -> return $ beginLayerRename s
@@ -56,12 +60,8 @@ handleEvent s (MouseDown n _ _ _) =
         ResizeCanvas        -> return $ beginCanvasSizePrompt s
         ToggleLayerVisible  -> return $ toggleCurrentLayer s
         ToolSelector        -> return $ beginToolSelect s
-        IncreaseEraserSize  -> return $ increaseEraserSize s
-        DecreaseEraserSize  -> return $ decreaseEraserSize s
-        IncreaseRepaintSize -> return $ increaseRepaintSize s
-        DecreaseRepaintSize -> return $ decreaseRepaintSize s
-        IncreaseRestyleSize -> return $ increaseRestyleSize s
-        DecreaseRestyleSize -> return $ decreaseRestyleSize s
+        IncreaseToolSize    -> return $ increaseToolSize s
+        DecreaseToolSize    -> return $ decreaseToolSize s
         BoxStyleSelector    -> return $ beginBoxStyleSelect s
         SelectLayer idx     -> return $ selectLayer idx s
         AddLayer            -> addLayer s

@@ -134,12 +134,8 @@ data Name = Canvas
           | AskToSaveFilenameEdit
           | TextEntryCursor
           | BoxStyleSelector
-          | IncreaseEraserSize
-          | DecreaseEraserSize
-          | IncreaseRepaintSize
-          | DecreaseRepaintSize
-          | IncreaseRestyleSize
-          | DecreaseRestyleSize
+          | IncreaseToolSize
+          | DecreaseToolSize
           | SelectLayer Int
           | LayerName
           | LayerNameEditor
