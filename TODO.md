@@ -5,7 +5,6 @@
 
 - Extra drawing primitives:
   - circles
-  - lines
 
 - HTML output mode?
 

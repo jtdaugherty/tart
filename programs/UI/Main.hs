@@ -110,6 +110,7 @@ toolHud s =
     let toolHuds = [ (Freehand, freehandHud)
                    , (FloodFill, floodfillHud)
                    , (Box, boxHud)
+                   , (Line, lineHud)
                    , (Eraser, eraserHud)
                    , (Repaint, repaintHud)
                    , (Restyle, restyleHud)
@@ -121,6 +122,9 @@ toolHud s =
 
 freehandHud :: AppState -> Widget Name
 freehandHud s = drawChar s
+
+lineHud :: AppState -> Widget Name
+lineHud s = drawChar s
 
 eyedropperHud :: AppState -> Widget Name
 eyedropperHud s = drawChar s

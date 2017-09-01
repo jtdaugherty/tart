@@ -65,7 +65,7 @@ handleEvent s (MouseDown n _ _ _) =
         BoxStyleSelector    -> return $ beginBoxStyleSelect s
         SelectLayer idx     -> return $ selectLayer idx s
         AddLayer            -> addLayer s
-        CharSelector        -> return $ whenTool s [Freehand, FloodFill] beginCharacterSelect
+        CharSelector        -> return $ whenTool s charTools beginCharacterSelect
         _                   -> return s
 handleEvent s (VtyEvent (V.EvKey (V.KChar 'q') [])) =
     quit True s
@@ -93,7 +93,7 @@ handleEvent s (VtyEvent e) =
         (V.EvKey (V.KChar '<') []) -> return $ decreaseToolSize s
         (V.EvKey V.KEsc []) | isJust (s^.dragging) -> return $ cancelDragging s
         (V.EvKey (V.KChar c) []) | isDigit c -> return $ setToolByChar c s
-        (V.EvKey (V.KChar 'c') []) -> return $ whenTool s [Freehand, FloodFill]
+        (V.EvKey (V.KChar 'c') []) -> return $ whenTool s charTools
                                                beginCharacterSelect
         (V.EvKey (V.KChar '+') []) -> increaseCanvasSize s
         (V.EvKey (V.KChar '-') []) -> decreaseCanvasSize s

@@ -153,6 +153,7 @@ data Name = Canvas
 
 data Tool = Freehand
           | Box
+          | Line
           | Repaint
           | Restyle
           | Eyedropper
@@ -164,6 +165,7 @@ data Tool = Freehand
 toolName :: Tool -> String
 toolName Freehand   = "Freehand"
 toolName Box        = "Box"
+toolName Line       = "Line"
 toolName Repaint    = "Repaint"
 toolName Restyle    = "Restyle"
 toolName Eraser     = "Eraser"

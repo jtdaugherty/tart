@@ -65,6 +65,7 @@ module State
   , canvasMoveRight
 
   , tools
+  , charTools
   , boxStyles
 
   , beginCharacterSelect
@@ -100,12 +101,20 @@ tools :: [(Tool, Int)]
 tools =
     [ (Freehand  , 1)
     , (Box       , 2)
-    , (FloodFill , 3)
-    , (TextString, 4)
-    , (Repaint   , 5)
-    , (Restyle   , 6)
-    , (Eyedropper, 7)
+    , (Line      , 3)
+    , (FloodFill , 4)
+    , (TextString, 5)
+    , (Repaint   , 6)
+    , (Restyle   , 7)
+    , (Eyedropper, 8)
     , (Eraser    , 0)
+    ]
+
+charTools :: [Tool]
+charTools =
+    [ Freehand
+    , Line
+    , FloodFill
     ]
 
 styleBindings :: [(Char, V.Style)]
@@ -386,14 +395,14 @@ handleDragFinished :: AppState -> Name -> EventM Name AppState
 handleDragFinished s n =
     case n of
         Canvas ->
-            case s^.tool of
-                Box -> do
+            case s^.tool `elem` [Box, Line] of
+                True -> do
                     (c', old) <- liftIO $ merge (s^.currentLayer) (s^.drawingOverlay)
                     o' <- liftIO $ clearCanvas (s^.drawingOverlay)
                     return $ pushUndo [SetPixels (s^.selectedLayerIndex) old] $
                              s & currentLayer .~ c'
                                & drawingOverlay .~ o'
-                _ -> return s
+                False -> return s
         _ -> return s
 
 increaseCanvasSize :: AppState -> EventM Name AppState
