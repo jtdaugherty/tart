@@ -282,7 +282,8 @@ floodFillAtPoint point s = do
            -> (AppState, [((Int, Int), (Char, V.Attr))])
            -> EventM Name (AppState, [((Int, Int), (Char, V.Attr))])
         go p (st, uBuf) = do
-            let pix = canvasGetPixel (st^.currentLayer) p
+            let rawPix = canvasGetPixel (st^.currentLayer) p
+                pix = rawPix & _2 %~ normalizeAttr (rawPix^._1)
             if | pix == fillPix -> return (st, uBuf)
                | pix /= targetPix -> return (st, uBuf)
                | otherwise -> do

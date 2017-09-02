@@ -26,7 +26,7 @@ library
   build-depends:       base >=4.9 && < 5,
                        array,
                        binary,
-                       vty >= 5.17,
+                       vty >= 5.17.1,
                        microlens-platform,
                        bytestring,
                        mtl,
