@@ -16,26 +16,41 @@ creating ASCII art - in the terminal, with your mouse!
 
 ![](screenshots/2.png)
 
+Building
+========
+
+`tart` is a Haskell project. You'll need
+[GHC](https://www.haskell.org/ghc/) (preferably at least 8.2) and
+[cabal-install](http://hackage.haskell.org/package/cabal-install)
+(preferably at least 2.0). Then:
+
+```
+$ cabal update
+$ git clone https://github.com/jtdaugherty/tart.git
+$ cd tart
+$ cabal new-build
+$ $(find . -name tart -type f)
+```
+
 Features
 ========
 
-- Image-editor-like interface
-- Load and save ASCII art files (binary)
-- Save plain versions of ASCII art for embedding in documents
-- Save color versions of ASCII art with terminal escape sequences for
-  printing to terminals
-- Import existing plaintext files as the basis for new ASCII art files
 - Drawing tools: freehand, line, box, flood fill, text string
 - Utility tools: repaint, restyle, eyedropper, eraser
 - Multiple graphical styles for boxes
 - Named image layers with reordering, visibility toggling
 - Character selection for freehand and flood fill tools
 - Set foreground color, background color, and text style independently
-- Text styles: bold, blink, underline, reverse video
-- Set arbitrary canvas size
 - Full mouse interaction and keyboard shortcuts
 - Paste text from clipboard into canvas
 - Undo and redo
+- Text styles: bold, blink, underline, reverse video
+- Load and save ASCII art files (binary)
+- Save plain versions of ASCII art for embedding in documents
+- Save color versions of ASCII art with terminal escape sequences for
+  printing to terminals
+- Import existing plaintext files as the basis for new ASCII art files
+- Set arbitrary canvas size
 
 Terminal Emulator Support
 =========================
@@ -97,3 +112,17 @@ save to disk, at which point Tart creates three files:
    color escape sequences, suitable for emitting to terminals
  * A text file `foo.plain.txt` containing the ASCII art without terminal
    color escape sequences, suitable for embedding in documentation
+
+Contributing
+============
+
+If you decide to contribute, that's great! Here are some guidelines you
+should consider to make submitting patches easier for all concerned:
+
+ - If you want to take on big things, talk to me first; let's have a
+   design/vision discussion before you start coding. Create a GitHub
+   issue and we can use that as the place to hash things out.
+ - Please make changes consistent with the conventions I've used in the
+   codebase.
+ - Please adjust or provide Haddock and/or user guide documentation
+   relevant to any changes you make.
