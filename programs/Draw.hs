@@ -383,8 +383,8 @@ drawBox bs a b which whichIdx s = do
                    )
         top =    (, bsHorizontal bs, attr) <$> (, ul^._2) <$> [ul^._1 + 1..ur^._1 - 1]
         bottom = (, bsHorizontal bs, attr) <$> (, ll^._2) <$> [ll^._1 + 1..lr^._1 - 1]
-        left =   (, bsVertical bs, attr)  <$> (ul^._1, ) <$> [ul^._2 + 1..ll^._2 - 1]
-        right =  (, bsVertical bs, attr)  <$> (ur^._1, ) <$> [ur^._2 + 1..lr^._2 - 1]
+        left =   (, bsVertical bs, attr)   <$> (ul^._1, ) <$> [ul^._2 + 1..ll^._2 - 1]
+        right =  (, bsVertical bs, attr)   <$> (ur^._1, ) <$> [ur^._2 + 1..lr^._2 - 1]
 
         width = lr^._1 - ul^._1
         height = lr^._2 - ul^._2
