@@ -4,9 +4,6 @@
 module Draw
   ( drawWithCurrentTool
   , drawAtPoint
-  , eraseAtPoint
-  , boxCorners
-  , drawBox
   , drawTextAtPoint
   , truncateText
   , pasteTextAtPoint
