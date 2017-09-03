@@ -1,13 +1,16 @@
 module Tart.Format
   ( TartFile(..)
   , OutputFormat(..)
+  , TartFilePath
   , readTartFile
   , writeTartFile
   , sortedCanvases
+  , toTartFilepath
   )
 where
 
 import Data.Monoid ((<>))
+import Data.List (isSuffixOf)
 import qualified Data.Binary.Put as B
 import qualified Data.Binary.Get as B
 import qualified Data.ByteString as BS
@@ -32,9 +35,20 @@ formats =
     , version0Format
     ]
 
-readTartFile :: FilePath -> IO (Either String TartFile)
-readTartFile path = do
-    bs <- BS.readFile path
+newtype TartFilePath = TartFilePath FilePath
+
+tartFilenameExtension :: String
+tartFilenameExtension = ".tart"
+
+toTartFilepath :: FilePath -> TartFilePath
+toTartFilepath p =
+    if tartFilenameExtension `isSuffixOf` p
+    then TartFilePath $ take (length p - length tartFilenameExtension) p
+    else TartFilePath p
+
+readTartFile :: TartFilePath -> IO (Either String TartFile)
+readTartFile (TartFilePath path) = do
+    bs <- BS.readFile $ path <> tartFilenameExtension
     readTartFile' (BSL.fromStrict bs) path formats
 
 readTartFile' :: BSL.ByteString -> FilePath -> [TartFileFormat] -> IO (Either String TartFile)
@@ -52,7 +66,7 @@ readTartFile' bs path ((BinaryFormatVersion parser converter):fmts) = do
                         Left _ -> tryNextFormat
                         Right tf -> return $ Right tf
 
-writeTartFile :: OutputFormat -> TartFile -> FilePath -> IO ()
+writeTartFile :: OutputFormat -> TartFile -> TartFilePath -> IO ()
 writeTartFile format =
     case format of
           FormatPlain     -> writeTartFilePretty False
@@ -68,13 +82,18 @@ tartFileCanvasesSorted tf =
     sortedCanvases (tartFileCanvasOrder tf)
                    (tartFileCanvasList tf)
 
-writeTartFilePretty :: Bool -> TartFile -> FilePath -> IO ()
-writeTartFilePretty color tf path =
-    writeFile path $ prettyPrintCanvas color $ tartFileCanvasesSorted tf
+writeTartFilePretty :: Bool -> TartFile -> TartFilePath -> IO ()
+writeTartFilePretty color tf (TartFilePath path) =
+    let ext = if color then ".color.txt"
+                       else ".plain.txt"
+        fn = path <> ext
+    in writeFile fn $
+       prettyPrintCanvas color $ tartFileCanvasesSorted tf
 
-writeTartFileBinary :: TartFile -> FilePath -> IO ()
-writeTartFileBinary tf path =
-    BS.writeFile path $ BSL.toStrict $ B.runPut $ latestVersionEncoder tf
+writeTartFileBinary :: TartFile -> TartFilePath -> IO ()
+writeTartFileBinary tf (TartFilePath path) =
+    let fn = path <> tartFilenameExtension
+    in BS.writeFile fn $ BSL.toStrict $ B.runPut $ latestVersionEncoder tf
 
 latestVersionEncoder :: TartFile -> B.Put
 latestVersionEncoder = encodeVersion2

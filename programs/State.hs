@@ -75,7 +75,7 @@ module State
   )
 where
 
-import Control.Monad (when, forM)
+import Control.Monad (when, forM, forM_)
 import Control.Monad.Trans (liftIO)
 import Data.Monoid ((<>))
 import qualified Graphics.Vty as V
@@ -377,9 +377,9 @@ quit ask s = do
 writeCanvasFiles :: FilePath -> [Canvas] -> [Int] -> [String] -> IO ()
 writeCanvasFiles path cs order names = do
     let tf = TartFile cs names order
-    writeTartFile FormatBinary    tf path
-    writeTartFile FormatPlain     tf (path <> ".plain.txt")
-    writeTartFile FormatAnsiColor tf (path <> ".color.txt")
+        tfp = toTartFilepath path
+        formats = [FormatBinary, FormatPlain, FormatAnsiColor]
+    forM_ formats $ \f -> writeTartFile f tf tfp
 
 askToSave :: AppState -> AppState
 askToSave s =

@@ -93,7 +93,7 @@ main = do
         Nothing ->
             case rest of
                 [f] -> do
-                    r <- readTartFile f
+                    r <- readTartFile $ toTartFilepath f
                     case r of
                         Left e -> do
                             putStrLn $ f <> ": could not read file: " <> e

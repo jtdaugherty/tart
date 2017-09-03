@@ -106,7 +106,7 @@ current foreground and background color. You can also resize the drawing
 canvas to get the desired output size. When you're finished, you can
 save to disk, at which point Tart creates three files:
 
- * A binary file (say `foo`) suitable for reloading with Tart for
+ * A binary file (say `foo.tart`) suitable for reloading with Tart for
    further editing later
  * A text file `foo.color.txt` containing the ASCII art with terminal
    color escape sequences, suitable for emitting to terminals
