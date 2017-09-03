@@ -27,6 +27,7 @@ import Types
 import Tart.Canvas
 import State
 import Draw.Line
+import Draw.Box
 
 undo :: AppState -> EventM Name AppState
 undo s =
@@ -288,46 +289,9 @@ drawBox :: BorderStyle
         -> Maybe Int
         -> AppState
         -> EventM Name (AppState, [Action])
-drawBox bs a b which whichIdx s = do
+drawBox bs (Location a) (Location b) which whichIdx s = do
     let attr = currentPaletteAttribute s
-        (ul, lr) = boxCorners a b
-        (ll, ur) = ( (ul^._1, lr^._2)
-                   , (lr^._1, ul^._2)
-                   )
-        top =    (, bsHorizontal bs, attr) <$> (, ul^._2) <$> [ul^._1 + 1..ur^._1 - 1]
-        bottom = (, bsHorizontal bs, attr) <$> (, ll^._2) <$> [ll^._1 + 1..lr^._1 - 1]
-        left =   (, bsVertical bs, attr)   <$> (ul^._1, ) <$> [ul^._2 + 1..ll^._2 - 1]
-        right =  (, bsVertical bs, attr)   <$> (ur^._1, ) <$> [ur^._2 + 1..lr^._2 - 1]
-
-        width = lr^._1 - ul^._1
-        height = lr^._2 - ul^._2
-        corners = if width == 0
-                  then [ (ul, bsVertical bs, attr)
-                       , (lr, bsVertical bs, attr)
-                       ]
-                  else if height == 0
-                       then [ (ul, bsHorizontal bs, attr)
-                            , (lr, bsHorizontal bs, attr)
-                            ]
-                       else [ (ul, bsCornerTL bs, attr)
-                            , (lr, bsCornerBR bs, attr)
-                            , (ll, bsCornerBL bs, attr)
-                            , (ur, bsCornerTR bs, attr)
-                            ]
-
-        -- Draw the corners
-        pixels = corners <>
-                 -- Draw the top and bottom
-                 top <>
-                 bottom <>
-                 -- Draw the sides
-                 left <>
-                 right
-
+        points = plotBox bs a b
+        pixels = mkPixel <$> points
+        mkPixel (p, ch) = (p, ch, attr)
     drawMany pixels which whichIdx s
-
-boxCorners :: Location -> Location -> ((Int, Int), (Int, Int))
-boxCorners (Location (a0, a1)) (Location (b0, b1)) =
-    let ul = (min a0 b0, min a1 b1)
-        lr = (max a0 b0, max a1 b1)
-    in (ul, lr)
