@@ -22,9 +22,7 @@ drawPromptWindow =
     where
         help = hBox [ str "("
                     , withDefAttr keybindingAttr $ str "Esc"
-                    , str " to quit without saving, "
-                    , withDefAttr keybindingAttr $ str "Enter"
-                    , str " to save and quit)"
+                    , str " to quit without saving)"
                     ]
         body = (hCenter $ str "You have unsaved changes. Save them? (y/n)") <=>
                (hCenter help)
