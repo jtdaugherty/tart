@@ -16,6 +16,7 @@ import Events.PaletteEntrySelect
 import Events.ToolSelect
 import Events.CanvasSizePrompt
 import Events.AskToSave
+import Events.AskForSaveFilename
 import Events.TextEntry
 import Events.BoxStyleSelect
 import Events.StyleSelect
@@ -57,6 +58,7 @@ handleEvent s e = do
                 CharacterSelect      -> handleCharacterSelectEvent st ev
                 CanvasSizePrompt     -> handleCanvasSizePromptEvent st ev
                 AskToSave            -> handleAskToSaveEvent st ev
+                AskForSaveFilename   -> handleAskForSaveFilenameEvent st ev
                 TextEntry            -> handleTextEntryEvent st ev
                 BoxStyleSelect       -> handleBoxStyleSelectEvent st ev
                 StyleSelect          -> handleStyleSelectEvent st ev

@@ -13,6 +13,7 @@ import UI.PaletteEntrySelect
 import UI.ToolSelect
 import UI.CanvasSizePrompt
 import UI.AskToSave
+import UI.AskForSaveFilename
 import UI.TextEntry
 import UI.BoxStyleSelect
 import UI.StyleSelect
@@ -32,6 +33,7 @@ drawMode s m =
         CharacterSelect      -> drawCharacterSelectUI s
         CanvasSizePrompt     -> drawCanvasSizePromptUI s
         AskToSave            -> drawAskToSaveUI s
+        AskForSaveFilename   -> drawAskForSaveFilenameUI s
         TextEntry            -> drawTextEntryUI s
         BoxStyleSelect       -> drawBoxStyleSelectUI s
         StyleSelect          -> drawStyleSelectUI s

@@ -3,22 +3,18 @@ module UI.AskToSave
   )
 where
 
-import qualified Data.Text as T
-import Lens.Micro.Platform
-
 import Brick
 import Brick.Widgets.Border
 import Brick.Widgets.Center
-import Brick.Widgets.Edit
 
 import Types
 import Theme
 
 drawAskToSaveUI :: AppState -> [Widget Name]
-drawAskToSaveUI s = [drawPromptWindow s]
+drawAskToSaveUI _ = [drawPromptWindow]
 
-drawPromptWindow :: AppState -> Widget Name
-drawPromptWindow s =
+drawPromptWindow :: Widget Name
+drawPromptWindow =
     centerLayer $
     borderWithLabel (str "Save") $
         hLimit 60 $
@@ -30,8 +26,5 @@ drawPromptWindow s =
                     , withDefAttr keybindingAttr $ str "Enter"
                     , str " to save and quit)"
                     ]
-        body = (hCenter $ str "You have unsaved changes. Save them?") <=>
-               (hCenter help) <=>
-               padTopBottom 1 fn
-        renderString = txt . T.unlines
-        fn = str "Path: " <+> renderEditor renderString True (s^.askToSaveFilenameEdit)
+        body = (hCenter $ str "You have unsaved changes. Save them? (y/n)") <=>
+               (hCenter help)

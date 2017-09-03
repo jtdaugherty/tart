@@ -17,6 +17,7 @@ module State
   , pushMode
   , popMode
   , toolSize
+  , askForSaveFilename
   , increaseCanvasSize
   , decreaseCanvasSize
   , increaseToolSize
@@ -382,9 +383,13 @@ writeCanvasFiles path cs order names = do
 
 askToSave :: AppState -> AppState
 askToSave s =
-    pushMode AskToSave $
+    pushMode AskToSave s
+
+askForSaveFilename :: AppState -> AppState
+askForSaveFilename s =
+    pushMode AskForSaveFilename $
         s & askToSaveFilenameEdit .~ applyEdit gotoEOL (editor AskToSaveFilenameEdit (Just 1) $
-                                           T.pack $ maybe "" id $ s^.canvasPath)
+                                     T.pack $ maybe "" id $ s^.canvasPath)
 
 beginTextEntry :: (Int, Int) -> AppState -> AppState
 beginTextEntry start s =

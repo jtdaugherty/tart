@@ -44,6 +44,7 @@ executable tart
                        Events.Common
                        Events.CanvasSizePrompt
                        Events.AskToSave
+                       Events.AskForSaveFilename
                        Events.TextEntry
                        Events.BoxStyleSelect
                        Events.RenameLayer
@@ -56,6 +57,7 @@ executable tart
                        UI.ToolSelect
                        UI.CanvasSizePrompt
                        UI.AskToSave
+                       UI.AskForSaveFilename
                        UI.TextEntry
                        UI.BoxStyleSelect
                        UI.StyleSelect
