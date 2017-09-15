@@ -11,6 +11,12 @@ category:            Graphics
 build-type:          Simple
 extra-source-files:  CHANGELOG.md
 cabal-version:       >=1.10
+Homepage:            https://github.com/jtdaugherty/tart/
+Bug-reports:         https://github.com/jtdaugherty/tart/issues
+
+Source-Repository head
+  type:     git
+  location: git://github.com/jtdaugherty/tart.git
 
 library
   ghc-options:         -Wall -Werror
