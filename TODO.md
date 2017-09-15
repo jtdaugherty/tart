@@ -6,6 +6,8 @@
 
 - HTML output mode?
 
+- Better encapsulation of layers and their metadata within app state
+
 -----------------------------------------------------------------
 Dealing with the larger color space:
 
