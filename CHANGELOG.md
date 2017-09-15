@@ -1,5 +1,5 @@
-# Revision history for tart
 
-## 0.1  -- YYYY-mm-dd
+0.1
+---
 
-* First version. Released on an unsuspecting world.
+* First version.
