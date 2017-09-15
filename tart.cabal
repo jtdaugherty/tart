@@ -10,6 +10,7 @@ copyright:           2017 Jonathan Daugherty
 category:            Graphics
 build-type:          Simple
 extra-source-files:  CHANGELOG.md
+                     README.md
 cabal-version:       >=1.10
 Homepage:            https://github.com/jtdaugherty/tart/
 Bug-reports:         https://github.com/jtdaugherty/tart/issues
