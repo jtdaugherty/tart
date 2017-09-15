@@ -20,7 +20,7 @@ Source-Repository head
   location: git://github.com/jtdaugherty/tart.git
 
 library
-  ghc-options:         -Wall -Werror
+  ghc-options:         -Wall
   hs-source-dirs:      src
   default-language:    Haskell2010
   exposed-modules:
@@ -40,7 +40,7 @@ library
                        binary
 
 executable tart
-  ghc-options:         -threaded -Wall -Werror
+  ghc-options:         -threaded -Wall
   hs-source-dirs:      programs
   main-is:             Main.hs
   other-modules:       Events
