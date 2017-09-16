@@ -382,9 +382,10 @@ saveToDisk s p = do
 saveAndContinue :: AppState -> EventM Name AppState
 saveAndContinue s = do
     case s^.canvasPath of
-        Nothing -> return ()
-        Just p -> liftIO $ saveToDisk s p
-    return $ s & canvasDirty .~ False
+        Nothing -> return s
+        Just p -> do
+            liftIO $ saveToDisk s p
+            return $ s & canvasDirty .~ False
 
 writeCanvasFiles :: FilePath -> [Canvas] -> [Int] -> [String] -> IO ()
 writeCanvasFiles path cs order names = do
