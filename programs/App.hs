@@ -107,16 +107,19 @@ application :: App AppState AppEvent Name
 application =
     App { appDraw = drawUI
         , appChooseCursor = \s locs ->
-            if | CanvasSizePrompt `elem` s^.modes -> do
-                   cur <- focusGetCurrent (s^.canvasSizeFocus)
-                   showCursorNamed cur locs
-               | AskToSave `elem` s^.modes ->
-                   showCursorNamed AskToSaveFilenameEdit locs
-               | TextEntry `elem` s^.modes ->
-                   showCursorNamed TextEntryCursor locs
-               | RenameLayer `elem` s^.modes ->
-                   showCursorNamed LayerNameEditor locs
-               | otherwise -> Nothing
+            let isSaving = any isSavingMode
+                isSavingMode (AskForSaveFilename _) = True
+                isSavingMode _ = False
+            in if | CanvasSizePrompt `elem` s^.modes -> do
+                      cur <- focusGetCurrent (s^.canvasSizeFocus)
+                      showCursorNamed cur locs
+                  | isSaving (s^.modes) ->
+                      showCursorNamed AskToSaveFilenameEdit locs
+                  | TextEntry `elem` s^.modes ->
+                      showCursorNamed TextEntryCursor locs
+                  | RenameLayer `elem` s^.modes ->
+                      showCursorNamed LayerNameEditor locs
+                  | otherwise -> Nothing
         , appHandleEvent = handleEvent
         , appStartEvent = \s -> do
             vty <- getVtyHandle

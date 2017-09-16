@@ -90,7 +90,8 @@ Layers:
 - `C-l`: toggle visibility of layer list
 
 General:
-- `q`: quit
+- `q`: quit (and optionally save)
+- `C-s`: save
 - `u`: undo
 - `r`: redo
 - OS paste: paste text into canvas

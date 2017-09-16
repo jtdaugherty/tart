@@ -59,6 +59,7 @@ module State
   , moveCurrentLayerUp
   , cancelDragging
   , toggleLayerList
+  , saveAndContinue
 
   , canvasMoveDown
   , canvasMoveUp
@@ -368,11 +369,22 @@ quit ask s = do
                     if ask
                     then continue $ askToSave s
                     else do
-                        let ls = snd <$> (sortOn fst $ M.toList $ s^.layers)
-                        liftIO $ writeCanvasFiles p ls (s^.layerOrder)
-                                    (_layerName <$> snd <$> (sortOn fst $ M.toList $ s^.layerInfo))
+                        liftIO $ saveToDisk s p
                         halt s
         False -> halt s
+
+saveToDisk :: AppState -> FilePath -> IO ()
+saveToDisk s p = do
+    let ls = snd <$> (sortOn fst $ M.toList $ s^.layers)
+    writeCanvasFiles p ls (s^.layerOrder)
+        (_layerName <$> snd <$> (sortOn fst $ M.toList $ s^.layerInfo))
+
+saveAndContinue :: AppState -> EventM Name AppState
+saveAndContinue s = do
+    case s^.canvasPath of
+        Nothing -> return ()
+        Just p -> liftIO $ saveToDisk s p
+    return $ s & canvasDirty .~ False
 
 writeCanvasFiles :: FilePath -> [Canvas] -> [Int] -> [String] -> IO ()
 writeCanvasFiles path cs order names = do
@@ -385,9 +397,9 @@ askToSave :: AppState -> AppState
 askToSave s =
     pushMode AskToSave s
 
-askForSaveFilename :: AppState -> AppState
-askForSaveFilename s =
-    pushMode AskForSaveFilename $
+askForSaveFilename :: Bool -> AppState -> AppState
+askForSaveFilename shouldQuit s =
+    pushMode (AskForSaveFilename shouldQuit) $
         s & askToSaveFilenameEdit .~ applyEdit gotoEOL (editor AskToSaveFilenameEdit (Just 1) $
                                      T.pack $ maybe "" id $ s^.canvasPath)
 

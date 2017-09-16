@@ -103,7 +103,7 @@ data Mode = Main
           | BoxStyleSelect
           | CanvasSizePrompt
           | AskToSave
-          | AskForSaveFilename
+          | AskForSaveFilename Bool
           | TextEntry
           | RenameLayer
           deriving (Eq, Show)

@@ -16,6 +16,6 @@ handleAskToSaveEvent s (VtyEvent (V.EvKey V.KEsc [])) =
 handleAskToSaveEvent s (VtyEvent (V.EvKey (V.KChar 'n') [])) =
     halt s
 handleAskToSaveEvent s (VtyEvent (V.EvKey (V.KChar 'y') [])) =
-    continue $ askForSaveFilename s
+    continue $ askForSaveFilename True s
 handleAskToSaveEvent s _ =
     continue s

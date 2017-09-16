@@ -14,22 +14,29 @@ import Brick.Widgets.Edit
 import Types
 import Theme
 
-drawAskForSaveFilenameUI :: AppState -> [Widget Name]
-drawAskForSaveFilenameUI s = [drawPromptWindow s]
+drawAskForSaveFilenameUI :: Bool -> AppState -> [Widget Name]
+drawAskForSaveFilenameUI isQuitting s = [drawPromptWindow isQuitting s]
 
-drawPromptWindow :: AppState -> Widget Name
-drawPromptWindow s =
+drawPromptWindow :: Bool -> AppState -> Widget Name
+drawPromptWindow isQuitting s =
     centerLayer $
     borderWithLabel (str "Save") $
         hLimit 60 $
         padLeftRight 2 $ padTopBottom 1 body
     where
-        help = hBox [ str "("
-                    , withDefAttr keybindingAttr $ str "Enter"
-                    , str " to save and quit, "
-                    , withDefAttr keybindingAttr $ str "Esc"
-                    , str " to quit without saving)"
-                    ]
+        help = if isQuitting
+                  then hBox [ str "("
+                            , withDefAttr keybindingAttr $ str "Enter"
+                            , str " to save and quit, "
+                            , withDefAttr keybindingAttr $ str "Esc"
+                            , str " to quit without saving)"
+                            ]
+                  else hBox [ str "("
+                            , withDefAttr keybindingAttr $ str "Enter"
+                            , str " to save, "
+                            , withDefAttr keybindingAttr $ str "Esc"
+                            , str " to cancel)"
+                            ]
         body = (hCenter $ str "Save changes to:") <=>
                (hCenter help) <=>
                padTopBottom 1 fn

@@ -58,7 +58,7 @@ handleEvent s e = do
                 CharacterSelect      -> handleCharacterSelectEvent st ev
                 CanvasSizePrompt     -> handleCanvasSizePromptEvent st ev
                 AskToSave            -> handleAskToSaveEvent st ev
-                AskForSaveFilename   -> handleAskForSaveFilenameEvent st ev
+                AskForSaveFilename q -> handleAskForSaveFilenameEvent q st ev
                 TextEntry            -> handleTextEntryEvent st ev
                 BoxStyleSelect       -> handleBoxStyleSelectEvent st ev
                 StyleSelect          -> handleStyleSelectEvent st ev

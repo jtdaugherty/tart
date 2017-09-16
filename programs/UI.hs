@@ -33,7 +33,7 @@ drawMode s m =
         CharacterSelect      -> drawCharacterSelectUI s
         CanvasSizePrompt     -> drawCanvasSizePromptUI s
         AskToSave            -> drawAskToSaveUI s
-        AskForSaveFilename   -> drawAskForSaveFilenameUI s
+        AskForSaveFilename q -> drawAskForSaveFilenameUI q s
         TextEntry            -> drawTextEntryUI s
         BoxStyleSelect       -> drawBoxStyleSelectUI s
         StyleSelect          -> drawStyleSelectUI s
