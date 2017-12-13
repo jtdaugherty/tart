@@ -14,6 +14,16 @@ import Types
 import State
 
 handleCanvasSizePromptEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
+handleCanvasSizePromptEvent s (MouseDown CanvasSizeWidthEdit _ _ _) =
+    case focusGetCurrent (s^.canvasSizeFocus) of
+        Just CanvasSizeWidthEdit -> continue s
+        _ -> continue $ s & canvasSizeFocus %~ focusNext
+handleCanvasSizePromptEvent s (MouseDown CanvasSizeHeightEdit _ _ _) =
+    case focusGetCurrent (s^.canvasSizeFocus) of
+        Just CanvasSizeHeightEdit -> continue s
+        _ -> continue $ s & canvasSizeFocus %~ focusNext
+handleCanvasSizePromptEvent s (MouseDown _ _ _ _) =
+    continue $ popMode s
 handleCanvasSizePromptEvent s (VtyEvent (V.EvKey (V.KChar '\t') [])) =
     continue $ s & canvasSizeFocus %~ focusNext
 handleCanvasSizePromptEvent s (VtyEvent (V.EvKey V.KBackTab [])) =

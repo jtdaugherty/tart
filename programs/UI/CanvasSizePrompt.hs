@@ -26,7 +26,9 @@ drawPromptWindow s =
     where
         body = padBottom (Pad 1) width <=> height
         renderString = txt . T.unlines
-        width = str "Width: "  <+> withFocusRing (s^.canvasSizeFocus)
-            (renderEditor renderString) (s^.canvasSizeWidthEdit)
-        height = str "Height: " <+> withFocusRing (s^.canvasSizeFocus)
-            (renderEditor renderString) (s^.canvasSizeHeightEdit)
+        width = str "Width: "  <+>
+                (clickable CanvasSizeWidthEdit $
+                 withFocusRing (s^.canvasSizeFocus) (renderEditor renderString) (s^.canvasSizeWidthEdit))
+        height = str "Height: " <+>
+                (clickable CanvasSizeHeightEdit $
+                 withFocusRing (s^.canvasSizeFocus) (renderEditor renderString) (s^.canvasSizeHeightEdit))
