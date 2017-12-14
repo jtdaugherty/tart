@@ -91,6 +91,7 @@ mkInitialState chan mc = do
                       , _canvasPath              = fp
                       , _canvasDirty             = False
                       , _askToSaveFilenameEdit   = editor AskToSaveFilenameEdit (Just 1) ""
+                      , _saveError               = Nothing
                       , _appEventChannel         = chan
                       , _textEntered             = mempty
                       , _textEntryStart          = (0, 0)

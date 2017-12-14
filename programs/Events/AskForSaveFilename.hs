@@ -22,7 +22,7 @@ handleAskForSaveFilenameEvent isQuitting s (VtyEvent (V.EvKey V.KEnter [])) = do
         then if isQuitting then halt s else continue $ popMode s
         else let s' = s & canvasPath .~ Just (T.unpack fn)
              in if isQuitting
-                then quit False s'
+                then quit False (popMode s')
                 else continue =<< (popMode <$> saveAndContinue s')
 handleAskForSaveFilenameEvent _ s (VtyEvent e) =
     continue =<< handleEventLensed s askToSaveFilenameEdit handleEditorEvent e

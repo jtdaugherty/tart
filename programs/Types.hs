@@ -63,6 +63,7 @@ module Types
   , undoStack
   , redoStack
   , drawStyle
+  , saveError
   )
 where
 
@@ -233,6 +234,7 @@ data AppState =
              , _canvasPath              :: Maybe FilePath
              , _canvasDirty             :: Bool
              , _askToSaveFilenameEdit   :: Editor T.Text Name
+             , _saveError               :: Maybe T.Text
              , _appEventChannel         :: BChan AppEvent
              , _textEntered             :: [(Char, V.Attr)]
              , _textEntryStart          :: (Int, Int)

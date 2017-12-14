@@ -1,6 +1,7 @@
 {-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TupleSections #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 module State
   ( checkForMouseSupport
   , setTool
@@ -78,6 +79,7 @@ where
 
 import Control.Monad (when, forM, forM_)
 import Control.Monad.Trans (liftIO)
+import qualified Control.Exception as E
 import Data.Monoid ((<>))
 import qualified Graphics.Vty as V
 import qualified Data.Vector as Vec
@@ -369,8 +371,12 @@ quit ask s = do
                     if ask
                     then continue $ askToSave s
                     else do
-                        liftIO $ saveToDisk s p
-                        halt s
+                        result <- liftIO $ E.try $ saveToDisk s p
+                        case result of
+                            Left (e::E.SomeException) ->
+                                continue $ askForSaveFilename True $
+                                    s & saveError .~ (Just $ T.pack $ show e)
+                            Right () -> halt s
         False -> halt s
 
 saveToDisk :: AppState -> FilePath -> IO ()

@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module UI.AskForSaveFilename
   ( drawAskForSaveFilenameUI
   )
@@ -37,8 +38,13 @@ drawPromptWindow isQuitting s =
                             , withDefAttr keybindingAttr $ str "Esc"
                             , str " to cancel)"
                             ]
-        body = (hCenter $ str "Save changes to:") <=>
+        body = maybeError <=>
+               (hCenter $ str "Save changes to:") <=>
                (hCenter help) <=>
                padTopBottom 1 fn
+        maybeError = maybe emptyWidget mkSaveError (s^.saveError)
+        mkSaveError msg = withDefAttr errorAttr $
+                          (hCenter $ txt "Error saving:") <=>
+                          (padBottom (Pad 1) $ txtWrap msg)
         renderString = txt . T.unlines
         fn = str "Path: " <+> renderEditor renderString True (s^.askToSaveFilenameEdit)
