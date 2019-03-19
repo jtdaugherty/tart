@@ -109,4 +109,5 @@ main = do
     chan <- newBChan 10
     let mkVty = V.mkVty =<< V.standardIOConfig
 
-    (void . customMain mkVty (Just chan) application) =<< mkInitialState chan c
+    initialVty <- mkVty
+    (void . customMain initialVty mkVty (Just chan) application) =<< mkInitialState chan c
