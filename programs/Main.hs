@@ -55,7 +55,9 @@ configFromOpts (Output f:os) c = do
 configFromOpts (Import f:os) c = do
     ex <- doesFileExist f
     case ex of
-        False -> error $ "file not found: " <> f
+        False -> do
+            putStrLn $ "Error: file not found: " <> f
+            exitFailure
         True -> configFromOpts os $ c { configImport = Just f }
 
 showHelp :: IO ()
