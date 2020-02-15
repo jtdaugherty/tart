@@ -37,7 +37,8 @@ library
                        microlens-platform,
                        bytestring,
                        mtl,
-                       binary
+                       binary,
+                       text
 
 executable tart
   ghc-options:         -threaded -Wall

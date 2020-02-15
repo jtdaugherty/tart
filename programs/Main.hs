@@ -10,6 +10,7 @@ import System.Exit (exitFailure, exitSuccess)
 import System.Console.GetOpt
 import Data.Monoid ((<>))
 import System.Directory (doesFileExist)
+import qualified Data.Text.IO as T
 
 import App
 import State
@@ -83,8 +84,8 @@ main = do
     -- format
     c <- case configImport cfg of
         Just f -> do
-            s <- readFile f
-            c <- canvasFromText s
+            t <- T.readFile f
+            c <- canvasFromText t
             case configOutput cfg of
                 Nothing -> return $ Just (Nothing, [c], [0], ["default"])
                 Just output -> do

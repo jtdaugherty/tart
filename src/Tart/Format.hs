@@ -15,6 +15,7 @@ import qualified Data.Binary.Put as B
 import qualified Data.Binary.Get as B
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as BSL
+import qualified Data.Text.IO as T
 
 import Tart.Canvas
 import Tart.Format.Types
@@ -87,7 +88,7 @@ writeTartFilePretty color tf (TartFilePath path) =
     let ext = if color then ".color.txt"
                        else ".plain.txt"
         fn = path <> ext
-    in writeFile fn $
+    in T.writeFile fn $
        prettyPrintCanvas color $ tartFileCanvasesSorted tf
 
 writeTartFileBinary :: TartFile -> TartFilePath -> IO ()

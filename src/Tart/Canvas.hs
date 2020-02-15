@@ -1,6 +1,7 @@
 {-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE BinaryLiterals #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Tart.Canvas
   ( Canvas
   , CanvasData
@@ -15,6 +16,7 @@ module Tart.Canvas
   , prettyPrintCanvas
   , merge
   , clearCanvas
+  , canvasFromString
   , canvasFromText
   , canvasLayersToImage
   , normalizeAttr
@@ -27,7 +29,6 @@ import Data.Bits
 import Data.Word (Word64)
 import Data.Monoid ((<>))
 import Data.Maybe (catMaybes)
-import Data.List (intercalate)
 import qualified Graphics.Vty as V
 import qualified Data.Array.IArray as I
 import qualified Data.Array.MArray as A
@@ -35,6 +36,7 @@ import qualified Data.Binary as B
 import Data.Array.IO (IOUArray)
 import Data.Array.Unboxed (UArray)
 import Lens.Micro.Platform
+import qualified Data.Text as T
 
 data Canvas =
     Canvas { mut   :: IOUArray (Int, Int) Word64
@@ -87,17 +89,20 @@ newCanvas sz = do
     drawFreeze <- A.freeze draw
     return $ Canvas draw drawFreeze sz
 
-canvasFromText :: String -> IO Canvas
-canvasFromText s = do
-    let ls = convertTab <$> lines s
-        convertTab l = concat $ convertTabChar <$> l
-        convertTabChar '\t' = replicate 8 ' '
-        convertTabChar c = [c]
+canvasFromString :: String -> IO Canvas
+canvasFromString = canvasFromText . T.pack
+
+canvasFromText :: T.Text -> IO Canvas
+canvasFromText t = do
+    let ls = convertTab <$> T.lines t
+        convertTab = T.concatMap convertTabChar
+        convertTabChar '\t' = T.replicate 8 " "
+        convertTabChar c = T.singleton c
         height = length ls
-        width = maximum $ length <$> ls
+        width = maximum $ T.length <$> ls
         pixs = concat $ mkRowPixels <$> zip [0..] ls
         mkRowPixels (rowNum, row) =
-            mkPixel rowNum <$> zip [0..] row
+            mkPixel rowNum <$> zip [0..] (T.unpack row)
         mkPixel rowNum (colNum, ch) =
             ((colNum, rowNum), ch, V.defAttr)
 
@@ -116,12 +121,12 @@ clearCanvas c = do
 type RLE a = State RLEState a
 
 data RLEState =
-    RLEState { content       :: [(String, V.Attr)]
-             , currentString :: String
+    RLEState { content       :: [(T.Text, V.Attr)]
+             , currentString :: T.Text
              , currentAttr   :: V.Attr
              }
 
-runRLE :: RLE () -> [(String, V.Attr)]
+runRLE :: RLE () -> [(T.Text, V.Attr)]
 runRLE act =
     let s = execState (act >> sealFinalToken) (RLEState [] "" V.defAttr)
     in content s
@@ -137,26 +142,26 @@ rleNext (ch, attr) = do
 
 appendCharacter :: Char -> RLE ()
 appendCharacter c =
-    modify $ \s -> s { currentString = currentString s <> [c]
+    modify $ \s -> s { currentString = currentString s <> T.singleton c
                      }
 
 sealFinalToken :: RLE ()
 sealFinalToken =
-    modify $ \s -> s { content = if null $ currentString s
+    modify $ \s -> s { content = if T.null $ currentString s
                                  then content s
                                  else content s <> [(currentString s, currentAttr s)]
                      }
 
 newToken :: Char -> V.Attr -> RLE ()
 newToken c a =
-    modify $ \s -> s { currentString = [c]
+    modify $ \s -> s { currentString = T.singleton c
                      , currentAttr = a
-                     , content = if null $ currentString s
+                     , content = if T.null $ currentString s
                                  then content s
                                  else content s <> [(currentString s, currentAttr s)]
                      }
 
-prettyPrintCanvas :: Bool -> [Canvas] -> String
+prettyPrintCanvas :: Bool -> [Canvas] -> T.Text
 prettyPrintCanvas emitSequences cs =
     let pairs = runRLE (mkRLE cs)
         mkOutput (s, attr) =
@@ -165,7 +170,7 @@ prettyPrintCanvas emitSequences cs =
             else s
         ctrlSequence a =
             "\ESC[0m" <> attrSequence a
-    in concat $ mkOutput <$> pairs
+    in T.concat $ mkOutput <$> pairs
 
 mkRLE :: [Canvas] -> RLE ()
 mkRLE [] = return ()
@@ -176,14 +181,14 @@ mkRLE cs@(c:_) = do
             rleNext $ findPixel cs (col, row)
         rleNext ('\n', V.defAttr)
 
-attrSequence :: V.Attr -> String
+attrSequence :: V.Attr -> T.Text
 attrSequence a =
     let fg = colorCode True (V.attrForeColor a)
         bg = colorCode False (V.attrBackColor a)
         sty = styleCode (V.attrStyle a)
     in fg <> bg <> sty
 
-styleCode :: V.MaybeDefault V.Style -> String
+styleCode :: V.MaybeDefault V.Style -> T.Text
 styleCode V.KeepCurrent = ""
 styleCode V.Default = ""
 styleCode (V.SetTo s) = styleCode' s
@@ -196,14 +201,14 @@ styles =
     , V.reverseVideo
     ]
 
-styleCode' :: V.Style -> String
+styleCode' :: V.Style -> T.Text
 styleCode' s =
     let present = filter (V.hasStyle s) styles
     in if null present
        then ""
-       else "\ESC[" <> intercalate ";" (styleToCode <$> present) <> "m"
+       else "\ESC[" <> T.intercalate ";" (styleToCode <$> present) <> "m"
 
-styleToCode :: V.Style -> String
+styleToCode :: V.Style -> T.Text
 styleToCode s =
     let mapping = [ (V.bold,         "1")
                   , (V.underline,    "4")
@@ -212,19 +217,19 @@ styleToCode s =
                   ]
     in maybe "" id $ lookup s mapping
 
-colorCode :: Bool -> V.MaybeDefault V.Color -> String
+colorCode :: Bool -> V.MaybeDefault V.Color -> T.Text
 colorCode _ V.KeepCurrent = ""
 colorCode _ V.Default = ""
 colorCode f (V.SetTo c) = colorCode' f c
 
-colorCode' :: Bool -> V.Color -> String
+colorCode' :: Bool -> V.Color -> T.Text
 colorCode' f (V.Color240 w) =
-    "\ESC[" <> if f then "38" else "48" <> ";5;" <> show w <> "m"
+    "\ESC[" <> if f then "38" else "48" <> ";5;" <> T.pack (show w) <> "m"
 colorCode' f (V.ISOColor w) =
     let c = if f then "38" else "48"
         valid v = v >= 0 && v <= 15
     in if valid w
-       then "\ESC[" <> c <> ";5;" <> show w <> "m"
+       then "\ESC[" <> c <> ";5;" <> T.pack (show w) <> "m"
        else ""
 
 canvasSize :: Canvas -> (Int, Int)
