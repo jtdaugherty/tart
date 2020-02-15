@@ -7,6 +7,7 @@ module App
   )
 where
 
+import Control.Monad.Trans (liftIO)
 import qualified Graphics.Vty as V
 import qualified Data.Vector as Vec
 import qualified Data.Map as M
@@ -124,8 +125,8 @@ application =
         , appHandleEvent = handleEvent
         , appStartEvent = \s -> do
             vty <- getVtyHandle
-            V.setMode (V.outputIface vty) V.Mouse True
-            V.setMode (V.outputIface vty) V.BracketedPaste True
+            liftIO $ V.setMode (V.outputIface vty) V.Mouse True
+            liftIO $ V.setMode (V.outputIface vty) V.BracketedPaste True
             return s
         , appAttrMap = const theme
         }
