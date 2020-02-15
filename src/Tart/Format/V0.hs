@@ -4,6 +4,7 @@ module Tart.Format.V0
 where
 
 import qualified Data.Binary as B
+import qualified Data.Text as T
 
 import Tart.Canvas
 import Tart.Format.Types
@@ -27,4 +28,4 @@ tartFileFromDataV0 d = do
     result <- canvasFromData (tartFileDataV0CanvasData d)
     case result of
         Left s -> return $ Left s
-        Right c -> return $ Right $ TartFile [c] ["default"] [0]
+        Right c -> return $ Right $ TartFile [c] [T.pack "default"] [0]

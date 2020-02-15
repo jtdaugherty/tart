@@ -5,13 +5,14 @@ module Tart.Format.V1
 where
 
 import qualified Data.Binary as B
+import qualified Data.Text as T
 
 import Tart.Canvas
 import Tart.Format.Types
 
 data TartFileDataV1 =
     TartFileDataV1 { tartFileDataV1CanvasData  :: [CanvasData]
-                   , tartFileDataV1CanvasNames :: [String]
+                   , tartFileDataV1CanvasNames :: [T.Text]
                    , tartFileDataV1CanvasOrder :: [Int]
                    }
 
@@ -25,11 +26,11 @@ version1Format =
 instance B.Binary TartFileDataV1 where
     put d = do
         B.put $ tartFileDataV1CanvasData d
-        B.put $ tartFileDataV1CanvasNames d
+        B.put $ T.unpack <$> tartFileDataV1CanvasNames d
         B.put $ tartFileDataV1CanvasOrder d
     get = do
         TartFileDataV1 <$> B.get
-                       <*> B.get
+                       <*> (fmap T.pack <$> B.get)
                        <*> B.get
 
 tartFileToDataV1 :: TartFile -> TartFileDataV1

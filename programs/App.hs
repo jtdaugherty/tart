@@ -12,6 +12,7 @@ import qualified Graphics.Vty as V
 import qualified Data.Vector as Vec
 import qualified Data.Map as M
 import Lens.Micro.Platform
+import qualified Data.Text as T
 
 import Brick
 import Brick.BChan (BChan)
@@ -49,13 +50,13 @@ initialCanvasSize :: (Int, Int)
 initialCanvasSize = (40, 17)
 
 mkInitialState :: BChan AppEvent
-               -> Maybe (Maybe FilePath, [Canvas], [Int], [String])
+               -> Maybe (Maybe FilePath, [Canvas], [Int], [T.Text])
                -> IO AppState
 mkInitialState chan mc = do
     (cs, order, names, fp) <- case mc of
         Nothing -> do
             c <- newCanvas initialCanvasSize
-            return ([c], [0], ["default"], Nothing)
+            return ([c], [0], [T.pack "default"], Nothing)
         Just (fp, cs, order, names) ->
             return (cs, order, names, fp)
 

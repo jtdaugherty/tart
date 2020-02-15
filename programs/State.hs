@@ -121,7 +121,7 @@ charTools =
     , FloodFill
     ]
 
-styleBindings :: [(Char, (V.Style, String))]
+styleBindings :: [(Char, (V.Style, T.Text))]
 styleBindings =
     [ ('!', (V.bold, "Bold"))
     , ('@', (V.underline, "Underline"))
@@ -142,14 +142,14 @@ toggleStyleFromKey e s =
          in s & drawStyle %~ toggleStyle sty
     else s
 
-boxStyles :: [(String, BorderStyle)]
+boxStyles :: [(T.Text, BorderStyle)]
 boxStyles =
     [ ("ASCII", ascii)
     , ("Unicode", unicode)
     , ("Unicode rounded", unicodeRounded)
     ]
 
-getBoxBorderStyle :: AppState -> (String, BorderStyle)
+getBoxBorderStyle :: AppState -> (T.Text, BorderStyle)
 getBoxBorderStyle s = boxStyles !! (s^.boxStyleIndex)
 
 increaseToolSize :: AppState -> AppState
@@ -207,7 +207,7 @@ pushUndo l s = s & undoStack %~ (l:)
 beginLayerRename :: AppState -> AppState
 beginLayerRename s =
     let z = textZipper [line] (Just 1)
-        line = T.pack $ s^.layerInfoFor(s^.selectedLayerIndex).layerName
+        line = s^.layerInfoFor(s^.selectedLayerIndex).layerName
     in pushMode RenameLayer $
         s & layerNameEditor.editContentsL .~ gotoEOL z
 
@@ -226,16 +226,15 @@ renameCurrentLayer name s =
     withUndo $ renameLayer (s^.selectedLayerIndex) name s
 
 renameLayer :: Int -> T.Text -> AppState -> (AppState, [Action])
-renameLayer idx name s =
-    let newName = T.unpack name
-        oldName = s^.layerInfoFor(idx).layerName
-        act = ChangeLayerName idx (T.pack oldName)
-    in if null newName
+renameLayer idx newName s =
+    let oldName = s^.layerInfoFor(idx).layerName
+        act = ChangeLayerName idx oldName
+    in if T.null newName
        then (s, [])
        else if newName == oldName
             then (popMode s, [])
             else (popMode $
-                   s & layerInfoFor(idx).layerName .~ T.unpack name
+                   s & layerInfoFor(idx).layerName .~ newName
                      & canvasDirty .~ True
                  , [act])
 
@@ -333,7 +332,7 @@ deleteLayer idx s
              & layerInfo %~ fixNameKeys
            , [act])
 
-insertLayer :: Canvas -> Int -> Int -> String -> AppState -> (AppState, [Action])
+insertLayer :: Canvas -> Int -> Int -> T.Text -> AppState -> (AppState, [Action])
 insertLayer c newIdx orderIndex name s =
     let selIdx = s^.selectedLayerIndex
         newSelIndex = if selIdx >= newIdx
@@ -393,7 +392,7 @@ saveAndContinue s = do
             liftIO $ saveToDisk s p
             return $ s & canvasDirty .~ False
 
-writeCanvasFiles :: FilePath -> [Canvas] -> [Int] -> [String] -> IO ()
+writeCanvasFiles :: FilePath -> [Canvas] -> [Int] -> [T.Text] -> IO ()
 writeCanvasFiles path cs order names = do
     let tf = TartFile cs names order
         tfp = toTartFilepath path
@@ -569,7 +568,7 @@ toggleLayerList s =
 
 addLayer :: AppState -> EventM Name AppState
 addLayer s = do
-    let newLayerName = "layer " <> (show $ idx + 1)
+    let newLayerName = T.pack $ "layer " <> (show $ idx + 1)
         idx = M.size $ s^.layers
         orderIndex = length (s^.layerOrder)
 

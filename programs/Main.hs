@@ -10,6 +10,7 @@ import System.Exit (exitFailure, exitSuccess)
 import System.Console.GetOpt
 import Data.Monoid ((<>))
 import System.Directory (doesFileExist)
+import qualified Data.Text as T
 import qualified Data.Text.IO as T
 
 import App
@@ -89,9 +90,9 @@ main = do
             t <- T.readFile f
             c <- canvasFromText t
             case configOutput cfg of
-                Nothing -> return $ Just (Nothing, [c], [0], ["default"])
+                Nothing -> return $ Just (Nothing, [c], [0], [T.pack "default"])
                 Just output -> do
-                    writeCanvasFiles output [c] [0] ["default"]
+                    writeCanvasFiles output [c] [0] [T.pack "default"]
                     exitSuccess
         Nothing ->
             case rest of

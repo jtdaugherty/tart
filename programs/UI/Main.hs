@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module UI.Main
   ( drawMainUI
   , toolSelectorEntryWidth
@@ -45,11 +46,11 @@ topHud s =
                          ]
         filename = case s^.canvasPath of
             Nothing -> "<unsaved>"
-            Just p -> p
+            Just p -> T.pack p
         modified = if not $ s^.canvasDirty then "" else "*"
     in clickable TopHud $
        vBox [ (padLeft (Pad 1) $ hBox $ padRight (Pad 1) <$> toolbarEntries)
-            , hBox [hBorder, str ("[" <> filename <> modified <> "]"), borderElem bsHorizontal]
+            , hBox [hBorder, txt ("[" <> filename <> modified <> "]"), borderElem bsHorizontal]
             ]
 
 layerHud :: AppState -> Widget Name
@@ -57,7 +58,7 @@ layerHud s = translateBy (Location (0, 4)) $
              padBottom (Pad 4) $
              (hLimit 20 $ layerList <=> fill ' ' <=> layerOptions) <+> vBorder
     where
-        layerList = vBox $ (hCenter $ str "Layers") :
+        layerList = vBox $ (hCenter $ withDefAttr headerAttr $ txt "Layers") :
                            (mkEntry <$> entries) <>
                            [addLayerEntry]
         entries = [ ( i
@@ -67,7 +68,7 @@ layerHud s = translateBy (Location (0, 4)) $
                   ]
         addLayerEntry =
             clickable AddLayer $ hCenter $
-              withDefAttr clickableAttr $ str "Add Layer (C-a)"
+              withDefAttr clickableAttr $ txt "Add Layer (C-a)"
         mkEntry (idx, LayerInfo name vis) =
             if RenameLayer `elem` s^.modes && s^.selectedLayerIndex == idx
                then
@@ -76,20 +77,20 @@ layerHud s = translateBy (Location (0, 4)) $
                    let applyAttr = if idx == s^.selectedLayerIndex
                                    then withDefAttr selectedLayerAttr
                                    else id
-                       showHiddenStatus = if vis then id else (<+> str "H")
+                       showHiddenStatus = if vis then id else (<+> txt "H")
                    in clickable (if idx == s^.selectedLayerIndex
                                  then LayerName
                                  else SelectLayer idx) $
                       applyAttr $ vLimit 1 $
                       showHiddenStatus $
-                      str name <+> fill ' '
+                      txt name <+> fill ' '
         layerOptions =
             let i = s^.selectedLayerIndex
                 entry n label =
                     clickable n $ vLimit 1 $ withDefAttr clickableAttr $
-                                             str label <+> fill ' '
+                                             txt label <+> fill ' '
             in vBox $ catMaybes
-                 [ Just $ hBorderWithLabel (str "Layer Options")
+                 [ Just $ hBorderWithLabel (txt "Layer Options")
                  , Just $ entry ToggleLayerVisible
                             (if s^.layerInfoFor(i).layerVisible
                              then "Hide (C-v)"
@@ -152,24 +153,24 @@ restyleHud = drawToolSize
 
 drawToolSize :: AppState -> Widget Name
 drawToolSize s =
-    let inc = clickable IncreaseToolSize $ withDefAttr keybindingAttr $ str ">>"
-        dec = clickable DecreaseToolSize $ withDefAttr keybindingAttr $ str "<<"
+    let inc = clickable IncreaseToolSize $ withDefAttr keybindingAttr $ txt ">>"
+        dec = clickable DecreaseToolSize $ withDefAttr keybindingAttr $ txt "<<"
         sz = fromMaybe (error "BUG: current tool has no size") $ toolSize s
-    in borderWithLabel (str "Size") $
-       dec <+> (hLimit 5 $ hCenter $ str $ show sz) <+> inc
+    in borderWithLabel (txt "Size") $
+       dec <+> (hLimit 5 $ hCenter $ txt $ T.pack $ show sz) <+> inc
 
 drawBoxStyleSelector :: AppState -> Widget Name
 drawBoxStyleSelector s =
     let styleName = fst $ getBoxBorderStyle s
     in clickable BoxStyleSelector $
-       borderWithLabel (str "Box Style") $
+       borderWithLabel (txt "Box Style") $
        hLimit boxStyleSelectorEntryWidth $
-       hCenter $ str styleName
+       hCenter $ txt styleName
 
 drawStyleSelector :: AppState -> Widget Name
 drawStyleSelector s =
     clickable StyleSelector $
-    borderWithLabel (str "St" <+> (withDefAttr keybindingAttr $ str "y") <+> str "le") $
+    borderWithLabel (txt "St" <+> (withDefAttr keybindingAttr $ txt "y") <+> txt "le") $
     hLimit styleSelectorEntryWidth $
     hCenter $ raw $ V.string (V.defAttr `V.withStyle` (s^.drawStyle)) "demo"
 
@@ -177,14 +178,14 @@ drawCanvasSize :: AppState -> Widget Name
 drawCanvasSize s =
     let (width, height) = s^.appCanvasSize
     in clickable ResizeCanvas $
-       borderWithLabel (str "Can" <+> (withDefAttr keybindingAttr (str "v")) <+> str "as") $
-       hLimit 8 $ hCenter (str $ show width <> "x" <> show height)
+       borderWithLabel (txt "Can" <+> (withDefAttr keybindingAttr (txt "v")) <+> txt "as") $
+       hLimit 8 $ hCenter (txt $ T.pack $ show width <> "x" <> show height)
 
 drawChar :: AppState -> Widget Name
 drawChar s =
     clickable CharSelector $
-    borderWithLabel ((withDefAttr keybindingAttr $ str "C") <+> str "har") $
-    padLeftRight 2 $ str [s^.drawCharacter]
+    borderWithLabel ((withDefAttr keybindingAttr $ txt "C") <+> txt "har") $
+    padLeftRight 2 $ txt $ T.singleton $ s^.drawCharacter
 
 toolSelectorEntryWidth :: Int
 toolSelectorEntryWidth = 20
@@ -193,19 +194,19 @@ drawToolSelector :: AppState -> Widget Name
 drawToolSelector s =
     let Just idx = lookup (s^.tool) tools
     in clickable ToolSelector $
-       borderWithLabel ((withDefAttr keybindingAttr $ str "T") <+> str "ool") $
+       borderWithLabel ((withDefAttr keybindingAttr $ txt "T") <+> txt "ool") $
        hLimit toolSelectorEntryWidth $
        hCenter $
-       (withDefAttr keybindingAttr (str $ show idx)) <+>
-       (str $ ":" <> toolName (s^.tool))
+       (withDefAttr keybindingAttr (txt $ T.pack $ show idx)) <+>
+       (txt $ ":" <> toolName (s^.tool))
 
 drawPaletteSelector :: AppState -> Bool -> Widget Name
 drawPaletteSelector s isFg =
     (clickable selName $ borderWithLabel label curColor)
     where
         label = if isFg
-                then (withDefAttr keybindingAttr $ str "F") <+> str "G"
-                else (withDefAttr keybindingAttr $ str "B") <+> str "G"
+                then (withDefAttr keybindingAttr $ txt "F") <+> txt "G"
+                else (withDefAttr keybindingAttr $ txt "B") <+> txt "G"
         curIdx = if isFg then s^.drawFgPaletteIndex
                          else s^.drawBgPaletteIndex
         selName = if isFg then FgSelector else BgSelector

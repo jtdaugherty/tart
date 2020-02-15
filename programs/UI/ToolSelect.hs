@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module UI.ToolSelect
   ( drawToolSelectUI
   )
@@ -8,6 +9,7 @@ import Brick
 import Brick.Widgets.Border
 import Brick.Widgets.Border.Style
 import Lens.Micro.Platform
+import qualified Data.Text as T
 
 import Types
 import UI.Main
@@ -37,5 +39,5 @@ drawToolSelector ext =
             clickable (ToolSelectorEntry t) $
             vLimit 1 $
             hLimit toolSelectorEntryWidth $
-            (withDefAttr keybindingAttr (str $ show i)) <+>
-            (str $ ":" <> toolName t) <+> fill ' '
+            (withDefAttr keybindingAttr (txt $ T.pack $ show i)) <+>
+            (txt $ ":" <> toolName t) <+> fill ' '

@@ -6,12 +6,13 @@ module Tart.Format.Types
 where
 
 import qualified Data.Binary as B
+import qualified Data.Text as T
 
 import Tart.Canvas
 
 data TartFile =
     TartFile { tartFileCanvasList  :: [Canvas]
-             , tartFileCanvasNames :: [String]
+             , tartFileCanvasNames :: [T.Text]
              , tartFileCanvasOrder :: [Int]
              }
 

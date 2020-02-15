@@ -1,6 +1,7 @@
 {-# LANGUAGE BinaryLiterals #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Types
   ( Mode(..)
   , Name(..)
@@ -89,7 +90,7 @@ data AppEvent =
 data Action =
     SetPixels Int [((Int, Int), (Char, V.Attr))]
     | ClearCanvasDirty
-    | InsertLayer Canvas Int Int String
+    | InsertLayer Canvas Int Int T.Text
     | RemoveLayer Int
     | ChangeLayerName Int T.Text
     | MoveLayerBy Int Bool
@@ -164,7 +165,7 @@ data Tool = Freehand
           | TextString
           deriving (Eq, Show, Ord)
 
-toolName :: Tool -> String
+toolName :: Tool -> T.Text
 toolName Freehand   = "Freehand"
 toolName Box        = "Box"
 toolName Line       = "Line"
@@ -198,7 +199,7 @@ noStyle :: V.Style
 noStyle = 0
 
 data LayerInfo =
-    LayerInfo { _layerName :: String
+    LayerInfo { _layerName :: T.Text
               , _layerVisible :: Bool
               }
 

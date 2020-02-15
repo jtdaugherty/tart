@@ -6,6 +6,7 @@ module Theme
   , selectedLayerAttr
   , clickableAttr
   , errorAttr
+  , headerAttr
   )
 where
 
@@ -22,6 +23,9 @@ selectedLayerAttr = "selectedLayer"
 clickableAttr :: AttrName
 clickableAttr = "clickable"
 
+headerAttr :: AttrName
+headerAttr = "header"
+
 errorAttr :: AttrName
 errorAttr = "error"
 
@@ -32,5 +36,6 @@ theme = attrMap defAttr
   , (editFocusedAttr,       black `on` yellow)
   , (selectedLayerAttr,     white `on` magenta)
   , (clickableAttr,         fg white `withStyle` bold)
+  , (headerAttr,            fg white `withStyle` underline)
   , (errorAttr,             fg red)
   ]

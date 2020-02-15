@@ -7,13 +7,14 @@ where
 import Control.Monad (when)
 import Data.Int (Int32)
 import qualified Data.Binary as B
+import qualified Data.Text as T
 
 import Tart.Canvas
 import Tart.Format.Types
 
 data TartFileDataV2 =
     TartFileDataV2 { tartFileDataV2CanvasData  :: [CanvasData]
-                   , tartFileDataV2CanvasNames :: [String]
+                   , tartFileDataV2CanvasNames :: [T.Text]
                    , tartFileDataV2CanvasOrder :: [Int]
                    }
 
@@ -31,7 +32,7 @@ instance B.Binary TartFileDataV2 where
     put d = do
         B.put tartFileDataV2Magic
         B.put $ tartFileDataV2CanvasData d
-        B.put $ tartFileDataV2CanvasNames d
+        B.put $ T.unpack <$> tartFileDataV2CanvasNames d
         B.put $ tartFileDataV2CanvasOrder d
     get = do
         magic <- B.get
@@ -39,7 +40,7 @@ instance B.Binary TartFileDataV2 where
             fail "not a valid tart file version 1"
 
         TartFileDataV2 <$> B.get
-                       <*> B.get
+                       <*> (fmap T.pack <$> B.get)
                        <*> B.get
 
 tartFileToDataV2 :: TartFile -> TartFileDataV2

@@ -37,4 +37,4 @@ drawBoxStyleSelector ext =
             clickable (BoxStyleSelectorEntry i) $
             vLimit 1 $
             hLimit boxStyleSelectorEntryWidth $
-            (str n) <+> fill ' '
+            (txt n) <+> fill ' '

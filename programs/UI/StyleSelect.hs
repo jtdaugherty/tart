@@ -1,3 +1,4 @@
+{-# LANGUAGE OverloadedStrings #-}
 module UI.StyleSelect
   ( drawStyleSelectUI
   )
@@ -8,6 +9,7 @@ import Brick.Widgets.Border
 import Brick.Widgets.Border.Style
 import Lens.Micro.Platform
 import qualified Graphics.Vty as V
+import qualified Data.Text as T
 
 import Types
 import UI.Main
@@ -37,12 +39,12 @@ drawStyleSelector curStyle ext =
         entries = mkEntry <$> styleBindings
         maybeActive sty =
             if hasStyle sty curStyle
-            then (<+> str "*")
+            then (<+> txt "*")
             else id
         mkEntry (ch, (sty, label)) =
             clickable (StyleSelectorEntry sty) $
             vLimit 1 $
             hLimit styleSelectorEntryWidth $
-            (withDefAttr keybindingAttr (str [ch])) <+> str ":" <+>
-            (maybeActive sty $ raw $ V.string (V.defAttr `V.withStyle` sty) label) <+>
+            (withDefAttr keybindingAttr (txt $ T.singleton ch)) <+> txt ":" <+>
+            (maybeActive sty $ raw $ V.text' (V.defAttr `V.withStyle` sty) label) <+>
             fill ' '
