@@ -73,6 +73,8 @@ applyAction s (MoveLayerBy idx up) =
     return $ moveLayer idx up s
 applyAction s (ToggleLayer idx) =
     return $ toggleLayer idx s
+applyAction s (SelectLayerIndex idx) =
+    return $ selectLayer idx s
 
 findFgPaletteEntry :: V.Attr -> AppState -> Int
 findFgPaletteEntry a s =

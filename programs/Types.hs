@@ -92,6 +92,7 @@ data Action =
     | ClearCanvasDirty
     | InsertLayer Canvas Int Int T.Text
     | RemoveLayer Int
+    | SelectLayerIndex Int
     | ChangeLayerName Int T.Text
     | MoveLayerBy Int Bool
     | ToggleLayer Int

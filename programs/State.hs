@@ -282,9 +282,9 @@ selectPrevLayer s =
                  else (s^.layerOrder) !! (selIndex - 1)
     in s & selectedLayerIndex .~ newSel
 
-selectLayer :: Int -> AppState -> AppState
+selectLayer :: Int -> AppState -> (AppState, [Action])
 selectLayer idx s =
-    s & selectedLayerIndex .~ idx
+    (s & selectedLayerIndex .~ idx, [SelectLayerIndex $ s^.selectedLayerIndex])
 
 cancelDragging :: AppState -> AppState
 cancelDragging s =
@@ -348,14 +348,15 @@ insertLayer c newIdx orderIndex name s =
                          then (i + 1, n)
                          else (i, n)
 
-        act = RemoveLayer newIdx
+        removeAct = RemoveLayer newIdx
+        selAct = SelectLayerIndex (s^.selectedLayerIndex)
 
     in (
-       s & selectedLayerIndex .~ newSelIndex
+       s & selectedLayerIndex .~ (length (s^.layerOrder))
          & layers %~ (M.insert newIdx c . fixNameKeys)
          & layerOrder .~ newOrder
          & layerInfo %~ (M.insert newIdx (LayerInfo name True) . fixNameKeys)
-       , [act])
+       , [removeAct, selAct])
 
 quit :: Bool -> AppState -> EventM Name (Next AppState)
 quit ask s = do

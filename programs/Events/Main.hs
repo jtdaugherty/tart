@@ -64,7 +64,7 @@ handleEvent s (MouseDown n _ _ _) =
         IncreaseToolSize    -> return $ increaseToolSize s
         DecreaseToolSize    -> return $ decreaseToolSize s
         BoxStyleSelector    -> return $ beginBoxStyleSelect s
-        SelectLayer idx     -> return $ selectLayer idx s
+        SelectLayer idx     -> return $ fst $ selectLayer idx s
         AddLayer            -> addLayer s
         CharSelector        -> return $ whenTool s charTools beginCharacterSelect
         _                   -> return s
