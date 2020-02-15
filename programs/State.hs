@@ -121,12 +121,12 @@ charTools =
     , FloodFill
     ]
 
-styleBindings :: [(Char, V.Style)]
+styleBindings :: [(Char, (V.Style, String))]
 styleBindings =
-    [ ('!', V.bold)
-    , ('@', V.underline)
-    , ('#', V.blink)
-    , ('$', V.reverseVideo)
+    [ ('!', (V.bold, "Bold"))
+    , ('@', (V.underline, "Underline"))
+    , ('#', (V.blink, "Blink"))
+    , ('$', (V.reverseVideo, "Reverse"))
     ]
 
 isStyleKey :: V.Event -> Bool
@@ -138,7 +138,7 @@ toggleStyleFromKey :: V.Event -> AppState -> AppState
 toggleStyleFromKey e s =
     if isStyleKey e
     then let V.EvKey (V.KChar c) _ = e
-             Just sty = lookup c styleBindings
+             Just (sty, _) = lookup c styleBindings
          in s & drawStyle %~ toggleStyle sty
     else s
 

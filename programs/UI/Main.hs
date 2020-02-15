@@ -136,7 +136,7 @@ boxStyleSelectorEntryWidth :: Int
 boxStyleSelectorEntryWidth = 18
 
 styleSelectorEntryWidth :: Int
-styleSelectorEntryWidth = 7
+styleSelectorEntryWidth = 12
 
 boxHud :: AppState -> Widget Name
 boxHud = drawBoxStyleSelector

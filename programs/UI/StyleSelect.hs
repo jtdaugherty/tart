@@ -39,10 +39,10 @@ drawStyleSelector curStyle ext =
             if hasStyle sty curStyle
             then (<+> str "*")
             else id
-        mkEntry (ch, sty) =
+        mkEntry (ch, (sty, label)) =
             clickable (StyleSelectorEntry sty) $
             vLimit 1 $
             hLimit styleSelectorEntryWidth $
             (withDefAttr keybindingAttr (str [ch])) <+> str ":" <+>
-            (maybeActive sty $ raw $ V.string (V.defAttr `V.withStyle` sty) "demo") <+>
+            (maybeActive sty $ raw $ V.string (V.defAttr `V.withStyle` sty) label) <+>
             fill ' '
