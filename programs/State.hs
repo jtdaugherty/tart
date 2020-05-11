@@ -334,11 +334,7 @@ deleteLayer idx s
 
 insertLayer :: Canvas -> Int -> Int -> T.Text -> AppState -> (AppState, [Action])
 insertLayer c newIdx orderIndex name s =
-    let selIdx = s^.selectedLayerIndex
-        newSelIndex = if selIdx >= newIdx
-                      then selIdx + 1
-                      else selIdx
-        newOrderNoInsert = (\i -> if i >= newIdx then i + 1 else i) <$> s^.layerOrder
+    let newOrderNoInsert = (\i -> if i >= newIdx then i + 1 else i) <$> s^.layerOrder
         newOrder = take orderIndex newOrderNoInsert <>
                    [newIdx] <>
                    drop orderIndex newOrderNoInsert
