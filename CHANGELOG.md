@@ -1,4 +1,23 @@
 
+0.2
+---
+
+`tart` tool changes:
+ * When inserting a new layer, also select it and make that selection
+   part of the undo action.
+ * Attribute style selector now uses more descriptive labels for style
+   options.
+
+Tart library changes:
+ * Added a dependency on the `text` package.
+ * The type of some fields was changed from `String` to
+   `Text` (`TartFile` / `tartFileCanvasNames`, `TartFileDataV1`
+   / `tartFileDataV1CanvasNames`, `TartFileDataV2` /
+   `tartFileDataV2CanvasNames`)
+ * Added `Tart.Canvas.canvasFromString` and changed `canvasFromText` to
+   take a `Text` input rather than a `String`.
+ * Relaxed bounds on `vty`.
+
 0.1.2
 -----
 
