@@ -89,8 +89,6 @@ handleEvent s (VtyEvent e) =
         (EvKey (KChar 'd') [MCtrl])            -> return $ moveCurrentLayerDown s
         (EvKey (KChar 'v') [MCtrl])            -> return $ toggleCurrentLayer s
         (EvKey (KChar 'C') [])                 -> return $ recenterCanvas s
-        (EvKey (KChar 'f') [])                 -> return $ beginFgPaletteSelect s
-        (EvKey (KChar 'b') [])                 -> return $ beginBgPaletteSelect s
         (EvKey (KChar '>') [])                 -> return $ increaseToolSize s
         (EvKey (KChar '<') [])                 -> return $ decreaseToolSize s
         (EvKey KEsc []) | isJust (s^.dragging) -> return $ cancelDragging s
