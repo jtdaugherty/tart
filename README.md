@@ -33,8 +33,9 @@ $ $(find . -name tart -type f)
 ```
 
 By default, `tart` is built as both a library and a command-line tool.
-But if you want to use tart only for its Haskell library, you can build
-with the `libonly` cabal build flag.
+But if you want to use tart only for its Haskell library and avoid the
+additional executable dependencies, you can build with the `libonly`
+cabal build flag.
 
 Features
 ========
