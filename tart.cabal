@@ -19,6 +19,10 @@ Source-Repository head
   type:     git
   location: git://github.com/jtdaugherty/tart.git
 
+Flag libonly
+    Description:     Build only the library, not the tool
+    Default:         False
+
 library
   ghc-options:         -Wall
   hs-source-dirs:      src
@@ -41,6 +45,8 @@ library
                        text
 
 executable tart
+  if flag(libonly)
+    Buildable: False
   ghc-options:         -threaded -Wall
   hs-source-dirs:      programs
   main-is:             Main.hs
