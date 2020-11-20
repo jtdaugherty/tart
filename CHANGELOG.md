@@ -1,4 +1,13 @@
 
+0.3
+---
+
+Package changes:
+ * Added `libonly` flag (defaults to `False`) to control whether to
+   build the `tart` executable.
+ * Raised the `brick` upper bound.
+ * Raised the `vty` upper bound.
+
 0.2
 ---
 
