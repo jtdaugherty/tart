@@ -25,7 +25,6 @@ Building
 (preferably at least 2.0). Then:
 
 ```
-$ cabal update
 $ git clone https://github.com/jtdaugherty/tart.git
 $ cd tart
 $ cabal new-build
