@@ -16,6 +16,20 @@ written using my purely-functional terminal user interface toolkit,
 
 ![](screenshots/2.png)
 
+Status
+======
+
+Expectation management: This is a fun hobby project that I spent time
+on when I first created it many years ago. Since then, I have only
+done a little bit to keep it working. Since it was (and still is)
+mostly intended as a proof of concept, and since I do not use the tool
+actively, I have not been putting much energy into maintaining it beyond
+keeping it building. While that isn't likely to change, I am happy to
+support people who want to contribute to the tool and I may have energy
+to fix small things as they are reported. Use at your own risk. If other
+tools are more mature or perform better, you are probably better off
+using them!
+
 Building
 ========
 
