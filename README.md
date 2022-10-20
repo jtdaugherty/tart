@@ -50,6 +50,11 @@ But if you want to use tart only for its Haskell library and avoid the
 additional executable dependencies, you can build with the `libonly`
 cabal build flag.
 
+Nix
+---
+
+In order to develop and/or install this project using [Nix](https://nix.dev/), you can add a `flake.nix` based on [haskell-flake](https://github.com/srid/haskell-flake).
+
 Features
 ========
 
