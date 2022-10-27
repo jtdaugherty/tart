@@ -53,7 +53,7 @@ cabal build flag.
 Nix
 ---
 
-In order to develop and/or install this project using [Nix](https://nix.dev/), you can add a `flake.nix` based on [haskell-flake](https://github.com/srid/haskell-flake).
+In order to develop and/or install this project using [Nix](https://nix.dev/), you can add a `flake.nix` based on [haskell-flake](https://github.com/srid/haskell-flake). This will you give you a Nix shell (`nix develop`) with full development environment, as well as a Nix binary build (`nix build` or `nix run`).
 
 Features
 ========
