@@ -12,26 +12,29 @@ import Types
 import State
 import Events.Common
 
-handleBoxStyleSelectEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
-handleBoxStyleSelectEvent s e = do
-    result <- handleCommonEvent s e
+handleBoxStyleSelectEvent :: BrickEvent Name e -> EventM Name AppState ()
+handleBoxStyleSelectEvent e = do
+    result <- handleCommonEvent e
     case result of
-        Just s' -> continue s'
-        Nothing -> handleEvent s e
+        True -> return ()
+        False -> handleEvent e
 
-handleEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
-handleEvent s (MouseDown (BoxStyleSelectorEntry i) _ _ _) = do
-    continue $ popMode $ s & boxStyleIndex .~ i
-handleEvent s (VtyEvent (V.EvKey (V.KChar c) [])) | isDigit c = do
+handleEvent :: BrickEvent Name e -> EventM Name AppState ()
+handleEvent (MouseDown (BoxStyleSelectorEntry i) _ _ _) = do
+    boxStyleIndex .= i
+    modify popMode
+handleEvent (VtyEvent (V.EvKey (V.KChar c) [])) | isDigit c = do
     let i = read [c]
     case i >= 0 && i < length boxStyles of
-        True -> continue $ popMode $ s & boxStyleIndex .~ i
-        False -> continue s
-handleEvent s (MouseUp _ _ _) =
+        True -> do
+            modify popMode
+            boxStyleIndex .= i
+        False -> return ()
+handleEvent (MouseUp _ _ _) =
     -- Ignore mouse-up events so we don't go back to Main mode. This
     -- includes mouse-up events generated in this mode, in addition to
     -- the mouse-up event generated just after we switch into this mode
     -- from Main.
-    continue s
-handleEvent s _ =
-    continue $ popMode s
+    return ()
+handleEvent _ =
+    modify popMode

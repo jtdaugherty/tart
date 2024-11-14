@@ -12,14 +12,14 @@ import Lens.Micro.Platform
 import Types
 import State
 
-handleRenameLayerEvent :: AppState
-                       -> BrickEvent Name AppEvent
-                       -> EventM Name (Next AppState)
-handleRenameLayerEvent s (VtyEvent (V.EvKey V.KEsc [])) =
-    continue $ popMode s
-handleRenameLayerEvent s (VtyEvent (V.EvKey V.KEnter [])) =
-    continue $ renameCurrentLayer (T.concat $ getEditContents $ s^.layerNameEditor) s
-handleRenameLayerEvent s (VtyEvent e) =
-    continue =<< handleEventLensed s layerNameEditor handleEditorEvent e
-handleRenameLayerEvent s _ =
-    continue s
+handleRenameLayerEvent :: BrickEvent Name AppEvent
+                       -> EventM Name AppState ()
+handleRenameLayerEvent (VtyEvent (V.EvKey V.KEsc [])) =
+    modify popMode
+handleRenameLayerEvent (VtyEvent (V.EvKey V.KEnter [])) = do
+    ed <- use layerNameEditor
+    renameCurrentLayer (T.concat $ getEditContents ed)
+handleRenameLayerEvent e =
+    zoom layerNameEditor $ handleEditorEvent e
+handleRenameLayerEvent _ =
+    return ()

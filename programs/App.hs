@@ -124,10 +124,9 @@ application =
                       showCursorNamed LayerNameEditor locs
                   | otherwise -> Nothing
         , appHandleEvent = handleEvent
-        , appStartEvent = \s -> do
+        , appStartEvent = do
             vty <- getVtyHandle
             liftIO $ V.setMode (V.outputIface vty) V.Mouse True
             liftIO $ V.setMode (V.outputIface vty) V.BracketedPaste True
-            return s
         , appAttrMap = const theme
         }

@@ -5,6 +5,7 @@ module Events.Main
 where
 
 import Brick
+import Control.Monad (when, void)
 import Data.Char (isDigit)
 import Data.Maybe (isJust)
 import qualified Graphics.Vty as V
@@ -17,88 +18,93 @@ import Draw
 import State
 import Events.Common
 
-handleMainEvent :: AppState -> BrickEvent Name AppEvent -> EventM Name (Next AppState)
-handleMainEvent s e = do
-    result <- handleCommonEvent s e
+handleMainEvent :: BrickEvent Name AppEvent -> EventM Name AppState ()
+handleMainEvent e = do
+    result <- handleCommonEvent e
     case result of
-        Just s' -> continue s'
-        Nothing -> do
-            result2 <- handleAttrEvent s e
+        True -> return ()
+        False -> do
+            result2 <- handleAttrEvent e
             case result2 of
-                Just s'' -> continue s''
-                Nothing -> handleEvent s e
+                True -> return ()
+                False -> handleEvent e
 
-handleAttrEvent :: AppState -> BrickEvent Name AppEvent -> EventM Name (Maybe AppState)
-handleAttrEvent s (MouseDown FgSelector _ _ _) =
-    return $ Just $ beginFgPaletteSelect s
-handleAttrEvent s (MouseDown BgSelector _ _ _) =
-    return $ Just $ beginBgPaletteSelect s
-handleAttrEvent s (MouseDown StyleSelector _ _ _) =
-    return $ Just $ beginStyleSelect s
-handleAttrEvent _ _ = return Nothing
+handleAttrEvent :: BrickEvent Name AppEvent -> EventM Name AppState Bool
+handleAttrEvent (MouseDown FgSelector _ _ _) = do
+    beginFgPaletteSelect
+    return True
+handleAttrEvent (MouseDown BgSelector _ _ _) = do
+    beginBgPaletteSelect
+    return True
+handleAttrEvent (MouseDown StyleSelector _ _ _) = do
+    beginStyleSelect
+    return True
+handleAttrEvent _ =
+    return False
 
-handleEvent :: AppState -> BrickEvent Name AppEvent -> EventM Name (Next AppState)
-handleEvent s (VtyEvent (V.EvPaste bytes)) =
-    continue =<< pasteTextAtPoint (0, 0) s (decodeUtf8 bytes)
-handleEvent s (AppEvent (DragFinished n _ _)) =
-    continue =<< handleDragFinished s n
-handleEvent s (VtyEvent (V.EvMouseDown _ _ V.BScrollUp _)) =
-    continue $ increaseToolSize s
-handleEvent s (VtyEvent (V.EvMouseDown _ _ V.BScrollDown _)) =
-    continue $ decreaseToolSize s
-handleEvent s (MouseDown _ V.BScrollUp _ _) =
-    continue $ increaseToolSize s
-handleEvent s (MouseDown _ V.BScrollDown _ _) =
-    continue $ decreaseToolSize s
-handleEvent s (MouseDown Canvas _ _ (Location l)) =
-    continue =<< drawWithCurrentTool l s
-handleEvent s (MouseDown n _ _ _) =
-    continue =<< case n of
-        LayerName           -> return $ beginLayerRename s
-        DeleteLayer         -> return $ deleteSelectedLayer s
-        MoveLayerUp         -> return $ moveCurrentLayerUp s
-        MoveLayerDown       -> return $ moveCurrentLayerDown s
-        ResizeCanvas        -> return $ beginCanvasSizePrompt s
-        ToggleLayerVisible  -> return $ toggleCurrentLayer s
-        ToolSelector        -> return $ beginToolSelect s
-        IncreaseToolSize    -> return $ increaseToolSize s
-        DecreaseToolSize    -> return $ decreaseToolSize s
-        BoxStyleSelector    -> return $ beginBoxStyleSelect s
-        SelectLayer idx     -> return $ fst $ selectLayer idx s
-        AddLayer            -> addLayer s
-        CharSelector        -> return $ whenTool s charTools beginCharacterSelect
-        _                   -> return s
-handleEvent s (VtyEvent (V.EvKey (V.KChar 'q') [])) =
-    quit True s
-handleEvent s (VtyEvent e) =
-    continue =<< case e of
-        _ | isStyleKey e                       -> return $ toggleStyleFromKey e s
-        (EvKey (KChar 'l') [MCtrl])            -> return $ toggleLayerList s
-        (EvKey (KChar 'w') [])                 -> return $ canvasMoveDown s
-        (EvKey (KChar 's') [])                 -> return $ canvasMoveUp s
-        (EvKey (KChar 'a') [])                 -> return $ canvasMoveLeft s
-        (EvKey (KChar 'd') [])                 -> return $ canvasMoveRight s
-        (EvKey (KChar 'y') [])                 -> return $ beginStyleSelect s
-        (EvKey (KChar 'v') [])                 -> return $ beginCanvasSizePrompt s
-        (EvKey (KChar 's') [MCtrl])            -> return $ askForSaveFilename False s
-        (EvKey (KChar 'r') [MCtrl])            -> return $ beginLayerRename s
-        (EvKey (KChar 'x') [MCtrl])            -> return $ deleteSelectedLayer s
-        (EvKey (KChar 'n') [MCtrl])            -> return $ selectNextLayer s
-        (EvKey (KChar 'p') [MCtrl])            -> return $ selectPrevLayer s
-        (EvKey (KChar 'u') [MCtrl])            -> return $ moveCurrentLayerUp s
-        (EvKey (KChar 'd') [MCtrl])            -> return $ moveCurrentLayerDown s
-        (EvKey (KChar 'v') [MCtrl])            -> return $ toggleCurrentLayer s
-        (EvKey (KChar 'C') [])                 -> return $ recenterCanvas s
-        (EvKey (KChar '>') [])                 -> return $ increaseToolSize s
-        (EvKey (KChar '<') [])                 -> return $ decreaseToolSize s
-        (EvKey KEsc []) | isJust (s^.dragging) -> return $ cancelDragging s
-        (EvKey (KChar c) []) | isDigit c       -> return $ setToolByChar c s
-        (EvKey (KChar 'c') [])                 -> return $ whenTool s charTools
-                                                           beginCharacterSelect
-        (EvKey (KChar '+') [])                 -> increaseCanvasSize s
-        (EvKey (KChar '-') [])                 -> decreaseCanvasSize s
-        (EvKey (KChar 'a') [MCtrl])            -> addLayer s
-        (EvKey (KChar 'u') [])                 -> undo s
-        (EvKey (KChar 'r') [])                 -> redo s
-        _                                      -> return s
-handleEvent s _ = continue s
+handleEvent :: BrickEvent Name AppEvent -> EventM Name AppState ()
+handleEvent (VtyEvent (V.EvPaste bytes)) =
+    pasteTextAtPoint (0, 0) (decodeUtf8 bytes)
+handleEvent (AppEvent (DragFinished n _ _)) =
+    handleDragFinished n
+handleEvent (VtyEvent (V.EvMouseDown _ _ V.BScrollUp _)) =
+    increaseToolSize
+handleEvent (VtyEvent (V.EvMouseDown _ _ V.BScrollDown _)) =
+    decreaseToolSize
+handleEvent (MouseDown _ V.BScrollUp _ _) =
+    increaseToolSize
+handleEvent (MouseDown _ V.BScrollDown _ _) =
+    decreaseToolSize
+handleEvent (MouseDown Canvas _ _ (Location l)) =
+    drawWithCurrentTool l
+handleEvent (MouseDown n _ _ _) =
+    case n of
+        LayerName           -> beginLayerRename
+        DeleteLayer         -> deleteSelectedLayer
+        MoveLayerUp         -> moveCurrentLayerUp
+        MoveLayerDown       -> moveCurrentLayerDown
+        ResizeCanvas        -> beginCanvasSizePrompt
+        ToggleLayerVisible  -> toggleCurrentLayer
+        ToolSelector        -> beginToolSelect
+        IncreaseToolSize    -> increaseToolSize
+        DecreaseToolSize    -> decreaseToolSize
+        BoxStyleSelector    -> beginBoxStyleSelect
+        SelectLayer idx     -> void $ selectLayer idx
+        AddLayer            -> addLayer
+        CharSelector        -> whenTool charTools beginCharacterSelect
+        _                   -> return ()
+handleEvent (VtyEvent (V.EvKey (V.KChar 'q') [])) =
+    quit True
+handleEvent (VtyEvent e) =
+    case e of
+        _ | isStyleKey e                       -> toggleStyleFromKey e
+        (EvKey (KChar 'l') [MCtrl])            -> toggleLayerList
+        (EvKey (KChar 'w') [])                 -> canvasMoveDown
+        (EvKey (KChar 's') [])                 -> canvasMoveUp
+        (EvKey (KChar 'a') [])                 -> canvasMoveLeft
+        (EvKey (KChar 'd') [])                 -> canvasMoveRight
+        (EvKey (KChar 'y') [])                 -> beginStyleSelect
+        (EvKey (KChar 'v') [])                 -> beginCanvasSizePrompt
+        (EvKey (KChar 's') [MCtrl])            -> askForSaveFilename False
+        (EvKey (KChar 'r') [MCtrl])            -> beginLayerRename
+        (EvKey (KChar 'x') [MCtrl])            -> deleteSelectedLayer
+        (EvKey (KChar 'n') [MCtrl])            -> selectNextLayer
+        (EvKey (KChar 'p') [MCtrl])            -> selectPrevLayer
+        (EvKey (KChar 'u') [MCtrl])            -> moveCurrentLayerUp
+        (EvKey (KChar 'd') [MCtrl])            -> moveCurrentLayerDown
+        (EvKey (KChar 'v') [MCtrl])            -> toggleCurrentLayer
+        (EvKey (KChar 'C') [])                 -> recenterCanvas
+        (EvKey (KChar '>') [])                 -> increaseToolSize
+        (EvKey (KChar '<') [])                 -> decreaseToolSize
+        (EvKey KEsc [])                        -> do
+                                                    drg <- use dragging
+                                                    when (isJust drg) cancelDragging
+        (EvKey (KChar c) []) | isDigit c       -> setToolByChar c
+        (EvKey (KChar 'c') [])                 -> whenTool charTools beginCharacterSelect
+        (EvKey (KChar '+') [])                 -> increaseCanvasSize
+        (EvKey (KChar '-') [])                 -> decreaseCanvasSize
+        (EvKey (KChar 'a') [MCtrl])            -> addLayer
+        (EvKey (KChar 'u') [])                 -> undo
+        (EvKey (KChar 'r') [])                 -> redo
+        _                                      -> return ()
+handleEvent _ = return ()

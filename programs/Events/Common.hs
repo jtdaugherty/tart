@@ -9,17 +9,23 @@ import qualified Graphics.Vty as V
 import Types
 import State
 
-handleCommonEvent :: AppState -> BrickEvent Name e -> EventM Name (Maybe AppState)
-handleCommonEvent s (VtyEvent (V.EvKey (V.KChar 't') [])) = do
+handleCommonEvent :: BrickEvent Name e -> EventM Name AppState Bool
+handleCommonEvent (VtyEvent (V.EvKey (V.KChar 't') [])) = do
+    s <- get
     if currentMode s == ToolSelect
-       then return $ Just $ popMode s
-       else return $ Just $ beginToolSelect s
-handleCommonEvent s (VtyEvent (V.EvKey (V.KChar 'f') [])) = do
+       then modify popMode
+       else beginToolSelect
+    return True
+handleCommonEvent (VtyEvent (V.EvKey (V.KChar 'f') [])) = do
+    s <- get
     if currentMode s == FgPaletteEntrySelect
-       then return $ Just $ popMode s
-       else return $ Just $ beginFgPaletteSelect s
-handleCommonEvent s (VtyEvent (V.EvKey (V.KChar 'b') [])) = do
+       then modify popMode
+       else beginFgPaletteSelect
+    return True
+handleCommonEvent (VtyEvent (V.EvKey (V.KChar 'b') [])) = do
+    s <- get
     if currentMode s == BgPaletteEntrySelect
-       then return $ Just $ popMode s
-       else return $ Just $ beginBgPaletteSelect s
-handleCommonEvent _ _ = return Nothing
+       then modify popMode
+       else beginBgPaletteSelect
+    return True
+handleCommonEvent _ = return False

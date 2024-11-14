@@ -13,27 +13,26 @@ import Brick.Widgets.Edit
 import Types
 import State
 
-handleCanvasSizePromptEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
-handleCanvasSizePromptEvent s (MouseDown CanvasSizeWidthEdit _ _ _) =
-    continue $ s & canvasSizeFocus %~ focusSetCurrent CanvasSizeWidthEdit
-handleCanvasSizePromptEvent s (MouseDown CanvasSizeHeightEdit _ _ _) =
-    continue $ s & canvasSizeFocus %~ focusSetCurrent CanvasSizeHeightEdit
-handleCanvasSizePromptEvent s (MouseDown _ _ _ _) =
-    continue $ popMode s
-handleCanvasSizePromptEvent s (VtyEvent (V.EvKey (V.KChar '\t') [])) =
-    continue $ s & canvasSizeFocus %~ focusNext
-handleCanvasSizePromptEvent s (VtyEvent (V.EvKey V.KBackTab [])) =
-    continue $ s & canvasSizeFocus %~ focusPrev
-handleCanvasSizePromptEvent s (VtyEvent (V.EvKey V.KEsc [])) =
-    continue $ popMode s
-handleCanvasSizePromptEvent s (VtyEvent (V.EvKey V.KEnter [])) =
-    continue =<< tryResizeCanvas s
-handleCanvasSizePromptEvent s (VtyEvent e) =
-    case focusGetCurrent (s^.canvasSizeFocus) of
+handleCanvasSizePromptEvent :: BrickEvent Name e -> EventM Name AppState ()
+handleCanvasSizePromptEvent (MouseDown CanvasSizeWidthEdit _ _ _) =
+    canvasSizeFocus %= focusSetCurrent CanvasSizeWidthEdit
+handleCanvasSizePromptEvent (MouseDown CanvasSizeHeightEdit _ _ _) =
+    canvasSizeFocus %= focusSetCurrent CanvasSizeHeightEdit
+handleCanvasSizePromptEvent (MouseDown _ _ _ _) =
+    modify popMode
+handleCanvasSizePromptEvent (VtyEvent (V.EvKey (V.KChar '\t') [])) =
+    canvasSizeFocus %= focusNext
+handleCanvasSizePromptEvent (VtyEvent (V.EvKey V.KBackTab [])) =
+    canvasSizeFocus %= focusPrev
+handleCanvasSizePromptEvent (VtyEvent (V.EvKey V.KEsc [])) =
+    modify popMode
+handleCanvasSizePromptEvent (VtyEvent (V.EvKey V.KEnter [])) =
+    tryResizeCanvas
+handleCanvasSizePromptEvent e = do
+    foc <- use canvasSizeFocus
+    case focusGetCurrent foc of
         Just CanvasSizeWidthEdit ->
-            continue =<< handleEventLensed s canvasSizeWidthEdit handleEditorEvent e
+            zoom canvasSizeWidthEdit $ handleEditorEvent e
         Just CanvasSizeHeightEdit ->
-            continue =<< handleEventLensed s canvasSizeHeightEdit handleEditorEvent e
-        _ -> continue s
-handleCanvasSizePromptEvent s _ =
-    continue s
+            zoom canvasSizeHeightEdit $ handleEditorEvent e
+        _ -> return ()

@@ -22,50 +22,54 @@ import Events.BoxStyleSelect
 import Events.StyleSelect
 import Events.RenameLayer
 
-handleEvent :: AppState -> BrickEvent Name AppEvent -> EventM Name (Next AppState)
-handleEvent s (VtyEvent (V.EvResize _ _)) = do
-    continue =<< updateExtents s
-handleEvent s e = do
-    s' <- updateExtents s
+handleEvent :: BrickEvent Name AppEvent -> EventM Name AppState ()
+handleEvent (VtyEvent (V.EvResize _ _)) = do
+    updateExtents
+handleEvent e = do
+    updateExtents
+    drg <- use dragging
+    chan <- use appEventChannel
 
     next <- case e of
           MouseDown n _ _ l ->
-              case s'^.dragging of
+              case drg of
                   Nothing ->
-                      return $ Just (e, s' & dragging .~ Just (n, l, l))
+                      return $ Just (e, dragging .= Just (n, l, l))
                   Just (n', start, _) | n == n' ->
-                      return $ Just (e, s' & dragging .~ Just (n, start, l))
+                      return $ Just (e, dragging .= Just (n, start, l))
                   _ ->
-                      return $ Nothing
+                      return Nothing
           MouseUp _ _ _ -> do
-              case s'^.dragging of
+              case drg of
                   Nothing -> return ()
                   Just (n, l0, l1) -> do
                       let ev = DragFinished n l0 l1
-                      liftIO $ writeBChan (s^.appEventChannel) ev
-              return $ Just (e, s' & dragging .~ Nothing)
+                      liftIO $ writeBChan chan ev
+              return $ Just (e, dragging .= Nothing)
           _ ->
-              return $ Just (e, s')
+              return $ Just (e, return ())
 
     case next of
-        Nothing -> continue s'
-        Just (ev, st) ->
-            case currentMode st of
-                Main                 -> handleMainEvent st ev
-                FgPaletteEntrySelect -> handlePaletteEntrySelectEvent st ev
-                BgPaletteEntrySelect -> handlePaletteEntrySelectEvent st ev
-                ToolSelect           -> handleToolSelectEvent st ev
-                CharacterSelect      -> handleCharacterSelectEvent st ev
-                CanvasSizePrompt     -> handleCanvasSizePromptEvent st ev
-                AskToSave            -> handleAskToSaveEvent st ev
-                AskForSaveFilename q -> handleAskForSaveFilenameEvent q st ev
-                TextEntry            -> handleTextEntryEvent st ev
-                BoxStyleSelect       -> handleBoxStyleSelectEvent st ev
-                StyleSelect          -> handleStyleSelectEvent st ev
-                RenameLayer          -> handleRenameLayerEvent st ev
+        Nothing -> return ()
+        Just (ev, act) -> do
+            act
+            m <- gets currentMode
+            case m of
+                Main                 -> handleMainEvent ev
+                FgPaletteEntrySelect -> handlePaletteEntrySelectEvent ev
+                BgPaletteEntrySelect -> handlePaletteEntrySelectEvent ev
+                ToolSelect           -> handleToolSelectEvent ev
+                CharacterSelect      -> handleCharacterSelectEvent ev
+                CanvasSizePrompt     -> handleCanvasSizePromptEvent ev
+                AskToSave            -> handleAskToSaveEvent ev
+                AskForSaveFilename q -> handleAskForSaveFilenameEvent q ev
+                TextEntry            -> handleTextEntryEvent ev
+                BoxStyleSelect       -> handleBoxStyleSelectEvent ev
+                StyleSelect          -> handleStyleSelectEvent ev
+                RenameLayer          -> handleRenameLayerEvent ev
 
-updateExtents :: AppState -> EventM Name AppState
-updateExtents s = do
+updateExtents :: EventM Name AppState ()
+updateExtents = do
     fgExtent <- lookupExtent FgSelector
     bgExtent <- lookupExtent BgSelector
     tsExtent <- lookupExtent ToolSelector
@@ -73,9 +77,9 @@ updateExtents s = do
     bsExtent <- lookupExtent BoxStyleSelector
     ssExtent <- lookupExtent StyleSelector
 
-    return $ s & fgPaletteSelectorExtent .~ fgExtent
-               & bgPaletteSelectorExtent .~ bgExtent
-               & toolSelectorExtent      .~ tsExtent
-               & canvasExtent            .~ cExtent
-               & boxStyleSelectorExtent  .~ bsExtent
-               & styleSelectorExtent     .~ ssExtent
+    fgPaletteSelectorExtent .= fgExtent
+    bgPaletteSelectorExtent .= bgExtent
+    toolSelectorExtent      .= tsExtent
+    canvasExtent            .= cExtent
+    boxStyleSelectorExtent  .= bsExtent
+    styleSelectorExtent     .= ssExtent

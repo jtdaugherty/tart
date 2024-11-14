@@ -6,6 +6,7 @@ module Draw.Line
 where
 
 import Data.Bits (shiftR)
+import Control.Monad (when, forM_)
 import Control.Monad.State.Lazy
 import Lens.Micro.Platform
 

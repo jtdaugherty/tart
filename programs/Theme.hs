@@ -15,19 +15,19 @@ import Brick.Widgets.Edit
 import Graphics.Vty
 
 keybindingAttr :: AttrName
-keybindingAttr = "keybinding"
+keybindingAttr = attrName "keybinding"
 
 selectedLayerAttr :: AttrName
-selectedLayerAttr = "selectedLayer"
+selectedLayerAttr = attrName "selectedLayer"
 
 clickableAttr :: AttrName
-clickableAttr = "clickable"
+clickableAttr = attrName "clickable"
 
 headerAttr :: AttrName
-headerAttr = "header"
+headerAttr = attrName "header"
 
 errorAttr :: AttrName
-errorAttr = "error"
+errorAttr = attrName "error"
 
 theme :: AttrMap
 theme = attrMap defAttr

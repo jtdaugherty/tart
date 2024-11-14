@@ -10,23 +10,25 @@ import Types
 import State
 import Events.Common
 
-handleStyleSelectEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
-handleStyleSelectEvent s e = do
-    result <- handleCommonEvent s e
+handleStyleSelectEvent :: BrickEvent Name e -> EventM Name AppState ()
+handleStyleSelectEvent e = do
+    result <- handleCommonEvent e
     case result of
-        Just s' -> continue s'
-        Nothing -> handleEvent s e
+        True -> return ()
+        False -> handleEvent e
 
-handleEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
-handleEvent s (VtyEvent e) | isStyleKey e =
-    continue $ popMode $ toggleStyleFromKey e s
-handleEvent s (MouseDown (StyleSelectorEntry sty) _ _ _) = do
-    continue $ popMode $ s & drawStyle %~ toggleStyle sty
-handleEvent s (MouseUp _ _ _) =
+handleEvent :: BrickEvent Name e -> EventM Name AppState ()
+handleEvent (VtyEvent e) | isStyleKey e = do
+    toggleStyleFromKey e
+    modify popMode
+handleEvent (MouseDown (StyleSelectorEntry sty) _ _ _) = do
+    drawStyle %= toggleStyle sty
+    modify popMode
+handleEvent (MouseUp _ _ _) =
     -- Ignore mouse-up events so we don't go back to Main mode. This
     -- includes mouse-up events generated in this mode, in addition to
     -- the mouse-up event generated just after we switch into this mode
     -- from Main.
-    continue s
-handleEvent s _ =
-    continue $ popMode s
+    return ()
+handleEvent _ =
+    modify popMode

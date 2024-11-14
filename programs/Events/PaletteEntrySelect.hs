@@ -10,27 +10,27 @@ import State
 
 import Events.Common
 
-handlePaletteEntrySelectEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
-handlePaletteEntrySelectEvent s e = do
-    result <- handleCommonEvent s e
+handlePaletteEntrySelectEvent :: BrickEvent Name e -> EventM Name AppState ()
+handlePaletteEntrySelectEvent e = do
+    result <- handleCommonEvent e
     case result of
-        Just s' -> continue s'
-        Nothing -> handleEvent s e
+        True -> return ()
+        False -> handleEvent e
 
-handleEvent :: AppState -> BrickEvent Name e -> EventM Name (Next AppState)
-handleEvent s (MouseDown FgSelector _ _ _) = do
-    continue $ beginFgPaletteSelect s
-handleEvent s (MouseDown BgSelector _ _ _) = do
-    continue $ beginBgPaletteSelect s
-handleEvent s (MouseDown (FgPaletteEntry idx) _ _ _) = do
-    continue $ setFgPaletteIndex s idx
-handleEvent s (MouseDown (BgPaletteEntry idx) _ _ _) = do
-    continue $ setBgPaletteIndex s idx
-handleEvent s (MouseUp _ _ _) =
+handleEvent :: BrickEvent Name e -> EventM Name AppState ()
+handleEvent (MouseDown FgSelector _ _ _) = do
+    beginFgPaletteSelect
+handleEvent (MouseDown BgSelector _ _ _) = do
+    beginBgPaletteSelect
+handleEvent (MouseDown (FgPaletteEntry idx) _ _ _) = do
+    setFgPaletteIndex idx
+handleEvent (MouseDown (BgPaletteEntry idx) _ _ _) = do
+    setBgPaletteIndex idx
+handleEvent (MouseUp _ _ _) =
     -- Ignore mouse-up events so we don't go back to Main mode. This
     -- includes mouse-up events generated in this mode, in addition to
     -- the mouse-up event generated just after we switch into this mode
     -- from Main.
-    continue s
-handleEvent s _ =
-    continue $ popMode s
+    return ()
+handleEvent _ =
+    modify popMode

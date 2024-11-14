@@ -13,19 +13,21 @@ import Brick.Widgets.Edit
 import Types
 import State
 
-handleAskForSaveFilenameEvent :: Bool -> AppState -> BrickEvent Name e -> EventM Name (Next AppState)
-handleAskForSaveFilenameEvent isQuitting s (VtyEvent (V.EvKey V.KEsc [])) =
-    if isQuitting then halt s else continue $ popMode s
-handleAskForSaveFilenameEvent isQuitting s (VtyEvent (V.EvKey V.KEnter [])) = do
-    let [fn] = getEditContents (s^.askToSaveFilenameEdit)
+handleAskForSaveFilenameEvent :: Bool -> BrickEvent Name e -> EventM Name AppState ()
+handleAskForSaveFilenameEvent isQuitting (VtyEvent (V.EvKey V.KEsc [])) =
+    if isQuitting then halt else modify popMode
+handleAskForSaveFilenameEvent isQuitting (VtyEvent (V.EvKey V.KEnter [])) = do
+    editor <- use askToSaveFilenameEdit
+    let [fn] = getEditContents editor
     if T.null fn
-        then if isQuitting then halt s else continue $ popMode s
-        else let s' = s & canvasPath .~ Just (T.unpack fn)
-             in if isQuitting
-                then quit False (popMode s')
-                else continue =<< (popMode <$> saveAndContinue s')
-handleAskForSaveFilenameEvent _ s (VtyEvent e) =
-    continue =<< handleEventLensed s askToSaveFilenameEdit handleEditorEvent e
-handleAskForSaveFilenameEvent _ s _ =
-    continue s
+        then if isQuitting then halt else modify popMode
+        else do
+            canvasPath .= Just (T.unpack fn)
+            if isQuitting
+                then modify popMode >> quit False
+                else modify popMode >> saveAndContinue
+handleAskForSaveFilenameEvent _ e = do
+    zoom askToSaveFilenameEdit $ handleEditorEvent e
+handleAskForSaveFilenameEvent _ _ =
+    return ()
 

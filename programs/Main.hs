@@ -5,6 +5,7 @@ import Control.Applicative ((<|>))
 import Brick
 import Brick.BChan (newBChan)
 import qualified Graphics.Vty as V
+import qualified Graphics.Vty.CrossPlatform as V
 import System.Environment (getArgs, getProgName)
 import System.Exit (exitFailure, exitSuccess)
 import System.Console.GetOpt
@@ -111,7 +112,7 @@ main = do
                 _ -> return Nothing
 
     chan <- newBChan 10
-    let mkVty = V.mkVty =<< V.standardIOConfig
+    let mkVty = V.mkVty V.defaultConfig
 
     initialVty <- mkVty
     (void . customMain initialVty mkVty (Just chan) application) =<< mkInitialState chan c
