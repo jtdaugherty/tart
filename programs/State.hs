@@ -612,10 +612,9 @@ addLayer = do
     s <- get
     let newLayerName = T.pack $ "layer " <> (show $ idx + 1)
         idx = M.size $ s^.layers
-        orderIndex = length (s^.layerOrder)
 
     c <- liftIO $ newCanvas (s^.appCanvasSize)
-    withUndoM $ insertLayer c idx orderIndex newLayerName
+    withUndoM $ insertLayer c idx 0 newLayerName
 
 currentPaletteAttribute :: AppState -> V.Attr
 currentPaletteAttribute s =
