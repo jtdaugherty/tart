@@ -6,7 +6,7 @@ license:             BSD3
 license-file:        LICENSE
 author:              Jonathan Daugherty
 maintainer:          cygnus@foobox.com
-copyright:           2017 Jonathan Daugherty
+copyright:           2025 Jonathan Daugherty
 category:            Graphics
 build-type:          Simple
 extra-source-files:  CHANGELOG.md
