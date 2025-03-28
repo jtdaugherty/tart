@@ -1,4 +1,10 @@
 
+0.4
+---
+
+* Update for brick 2.7.
+* Get rid of `libonly` build flag
+
 0.3
 ---
 
